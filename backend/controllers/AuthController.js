@@ -38,7 +38,13 @@ class AuthController {
   }
 
   static login(req, res) {
-    res.status(200).json({ messasge: "Logged in succesfully" });
+    return res.status(200).json({ messasge: "Logged in succesfully" });
+  }
+
+  static logout(req, res) {
+    req.logOut(() =>
+      res.status(200).json({ message: "Logged out succesfully" })
+    );
   }
 }
 
