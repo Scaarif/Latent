@@ -34,14 +34,14 @@ const HouseSchema = new mongoose.Schema({
   longitude: {
     type: Number,
   },
-  price: {
-    type: Number,
+  // price: {
+  //   type: Number,
+  //   required: true,
+  // },
+  coverImage: {
+    type: String,
     required: true,
   },
-  //   coverImage: {
-  //     type: String,
-  //     required: true,
-  //   },
   //   images: [String],
   //   numRooms: {
   //     type: Number,
@@ -71,22 +71,22 @@ const HouseSchema = new mongoose.Schema({
   //     type: Boolean,
   //     required: true,
   //   },
-  electricity: {
-    type: Boolean,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  address: {
-    type: String,
-    required: true,
-  },
-  houseType: {
-    type: String,
-    required: true,
-  },
+  // electricity: {
+  //   type: Boolean,
+  //   required: true,
+  // },
+  // name: {
+  //   type: String,
+  //   required: true,
+  // },
+  // address: {
+  //   type: String,
+  //   required: true,
+  // },
+  // houseType: {
+  //   type: String,
+  //   required: true,
+  // },
 });
 
 HouseSchema.pre("save", async function (next) {
