@@ -16,10 +16,10 @@ const LocationSchema = new mongoose.Schema({
 });
 
 const HouseSchema = new mongoose.Schema({
-  // agentId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: [true, 'agentId missing']
-  // },
+  agentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null,
+  },
   description: {
     type: String,
     required: [true, "description missing"],

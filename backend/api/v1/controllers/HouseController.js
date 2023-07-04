@@ -50,6 +50,39 @@ class HouseController {
       res.status(400).json({ error: err.message });
     }
   }
+
+  static async getHouse(req, res) {
+    const params = {};
+    const numericalParamters = [
+      "numRooms",
+      "numFloors",
+      "numBathrooms",
+      "numToilets",
+      "price",
+    ];
+
+    // These paramters are attributes of location object in the db
+    const locationParamters = ["country", "state", "city"];
+
+    for (const key of Object.keys(req.query)) {
+      if (locationParamters.includes(key)) {
+        params[`location.${key}`] = req.query[key];
+        continue;
+      }
+      if (numericalParamters.includes(key)) {
+        params[key] = parseInt(req.query[key]);
+      } else {
+        params[key] = req.query[key];
+      }
+    }
+    try {
+      const result = await House.find(params);
+      console.log(params);
+      return res.status(200).json(result);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 }
 
 module.exports = HouseController;

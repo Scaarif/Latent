@@ -9,4 +9,6 @@ router.post(
   upload.array("images", 5),
   HouseController.postHouse
 );
+
+router.get("/api/v1/houses", HouseController.getHouse);
 module.exports = router;
