@@ -13,31 +13,34 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+const LocationSchema = new mongoose.Schema({
+  country: {
+    type: String,
+    required: true,
+  },
+  state: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: String,
+    required: true,
+  },
+});
+
 const HouseSchema = new mongoose.Schema({
-  //   agentId: {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Agent",
-  //   },
-  //   description: {
-  //     type: String,
-  //     required: true,
-  //   },
-  location: [
-    {
-      country: {
-        type: String,
-        required: true,
-      },
-      state: {
-        type: String,
-        required: true,
-      },
-      city: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
+  // agentId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   required: true,
+  // },
+  // description: {
+  //   type: String,
+  //   required: true,
+  // },
+  location: {
+    type: LocationSchema,
+    required: true,
+  },
   latitude: {
     type: Number,
   },
@@ -88,9 +91,10 @@ const HouseSchema = new mongoose.Schema({
 });
 
 HouseSchema.pre("save", async function (next) {
-  const location = this.location[0];
   try {
-    const response = await fetch(`https://geocode.xyz/${location.city}?json=1`);
+    const response = await fetch(
+      `https://geocode.xyz/${this.location.city}?json=1`
+    );
     const { longt, latt } = await response.json();
     if (longt && latt) {
       this.latitude = latt;

@@ -3,8 +3,10 @@ const House = require("../models/House");
 class HouseController {
   static async postHouse(req, res) {
     const { country, state, city, price, electricity } = req.body;
+    // const agentId = req.user._id;
     const newHouse = {
-      location: [{ country: country, state: state, city: city }],
+      // agentId,
+      location: { country: country, state: state, city: city },
       price,
       electricity,
     };
