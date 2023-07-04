@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post(
   "/api/v1/houses",
-  upload.single("image"),
+  upload.array("images", 5),
   HouseController.postHouse
 );
 module.exports = router;

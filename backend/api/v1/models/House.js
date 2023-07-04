@@ -20,10 +20,10 @@ const HouseSchema = new mongoose.Schema({
   //   type: mongoose.Schema.Types.ObjectId,
   //   required: true,
   // },
-  // description: {
-  //   type: String,
-  //   required: true,
-  // },
+  description: {
+    type: String,
+    required: true,
+  },
   location: {
     type: LocationSchema,
     required: true,
@@ -34,59 +34,55 @@ const HouseSchema = new mongoose.Schema({
   longitude: {
     type: Number,
   },
-  // price: {
-  //   type: Number,
-  //   required: true,
-  // },
+  price: {
+    type: Number,
+    required: true,
+  },
   coverImage: {
     type: String,
     required: true,
   },
-  //   images: [String],
-  //   numRooms: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   numBathrooms: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   numToilets: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   numFloors: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   numRooms: {
-  //     type: Number,
-  //     required: true,
-  //   },
-  //   shared: {
-  //     type: Boolean,
-  //     required: true,
-  //   },
-  //   water: {
-  //     type: Boolean,
-  //     required: true,
-  //   },
-  // electricity: {
-  //   type: Boolean,
-  //   required: true,
-  // },
-  // name: {
-  //   type: String,
-  //   required: true,
-  // },
-  // address: {
-  //   type: String,
-  //   required: true,
-  // },
-  // houseType: {
-  //   type: String,
-  //   required: true,
-  // },
+  images: [String],
+  numRooms: {
+    type: Number,
+    required: true,
+  },
+  numBathrooms: {
+    type: Number,
+    required: true,
+  },
+  numToilets: {
+    type: Number,
+    required: true,
+  },
+  numFloors: {
+    type: Number,
+    required: true,
+  },
+  shared: {
+    type: Boolean,
+    required: true,
+  },
+  water: {
+    type: Boolean,
+    required: true,
+  },
+  electricity: {
+    type: Boolean,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  houseType: {
+    type: String,
+    required: true,
+  },
 });
 
 HouseSchema.pre("save", async function (next) {
@@ -98,17 +94,15 @@ HouseSchema.pre("save", async function (next) {
     if (longt && latt) {
       this.latitude = latt;
       this.longitude = longt;
-      next();
     } else {
       this.latitude = null;
       this.longitude = null;
-      next();
     }
   } catch (error) {
     this.latitude = null;
     this.longitude = null;
-    next();
   }
+  next();
 });
 
 const House = mongoose.model("house", HouseSchema);
