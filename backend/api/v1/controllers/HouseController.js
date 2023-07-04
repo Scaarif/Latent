@@ -8,6 +8,7 @@ class HouseController {
       city,
       description,
       price,
+      numFloors,
       numRooms,
       numBathrooms,
       numToilets,
@@ -29,8 +30,18 @@ class HouseController {
       location: { country: country, state: state, city: city },
       coverImage: uploadedImages[0],
       images: [...uploadedImages.splice(0, 1)],
-      // price,
-      // electricity,
+      description,
+      price,
+      numFloors,
+      numRooms,
+      numBathrooms,
+      numToilets,
+      shared,
+      water,
+      electricity,
+      name,
+      address,
+      houseType,
     };
     try {
       const result = await House.create(newHouse);

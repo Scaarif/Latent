@@ -3,26 +3,26 @@ const mongoose = require("mongoose");
 const LocationSchema = new mongoose.Schema({
   country: {
     type: String,
-    required: true,
+    required: [true, "country missing"],
   },
   state: {
     type: String,
-    required: true,
+    required: [true, "state missing"],
   },
   city: {
     type: String,
-    required: true,
+    required: [true, "city missing"],
   },
 });
 
 const HouseSchema = new mongoose.Schema({
   // agentId: {
   //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
+  //   required: [true, 'agentId missing']
   // },
   description: {
     type: String,
-    required: true,
+    required: [true, "description missing"],
   },
   location: {
     type: LocationSchema,
@@ -30,34 +30,36 @@ const HouseSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number,
+    default: null,
   },
   longitude: {
     type: Number,
+    default: null,
   },
   price: {
     type: Number,
-    required: true,
+    required: [true, "price missing"],
   },
   coverImage: {
     type: String,
-    required: true,
+    required: [true, "cover image missing"],
   },
   images: [String],
   numRooms: {
     type: Number,
-    required: true,
+    required: [true, "number of rooms missing"],
   },
   numBathrooms: {
     type: Number,
-    required: true,
+    required: [true, "number of bathrooms missing"],
   },
   numToilets: {
     type: Number,
-    required: true,
+    required: [true, "number of toilets missing"],
   },
   numFloors: {
     type: Number,
-    required: true,
+    required: [true, "number of floors country missing"],
   },
   shared: {
     type: Boolean,
@@ -73,15 +75,15 @@ const HouseSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: true,
+    required: [true, "name missing"],
   },
   address: {
     type: String,
-    required: true,
+    required: [true, "address missing"],
   },
   houseType: {
     type: String,
-    required: true,
+    required: [true, "house type missing"],
   },
 });
 
