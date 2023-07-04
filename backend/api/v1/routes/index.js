@@ -11,4 +11,5 @@ router.post(
 );
 
 router.get("/api/v1/houses", HouseController.getHouse);
+router.delete("/api/v1/houses", HouseController.deleteHouse);
 module.exports = router;
