@@ -1,11 +1,11 @@
-require("dotenv").config();
-const express = require("express");
-const allRoutes = require("./routes/index");
-const mongoose = require("mongoose");
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const allRoutes = require('./routes/index');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost/latent";
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/latent';
 
 mongoose
   .connect(MONGO_URI, {
