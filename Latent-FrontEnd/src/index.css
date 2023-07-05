@@ -18,3 +18,8 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* linear gradient */
+linearGradient {
+  background: linear-gradient(91deg, #F7F7FD 0%, rgba(255, 255, 255, 0.00) 100%);
+}

@@ -3,8 +3,22 @@ module.exports = {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Nunito', 'Inter', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
+        mono: ['Fira Code', 'monospace'],
+      },
       colors: {
-        black: '#191624',
+        black: '#0D110F',
+        green: '#00853F',
+        s_gray: '#7F838F',
+        bg_color: '#F7F7FD',
+        light_green: '#E5F3EC', // also the alternative bg-color in some sections...
+        form_bg: '#E4E5DF',
+        md_green: '#75BD97',
+      },
+      backgroundImage: {
+        'hero-bg': "url('./src/assets/mapBg.png')",
       },
       animation: {
         slideup: 'slideup 1s ease-in-out',
