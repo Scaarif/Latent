@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+// const axios = require('axios');
 
 const LocationSchema = new mongoose.Schema({
   country: {
@@ -87,7 +88,9 @@ const HouseSchema = new mongoose.Schema({
   },
 });
 
-HouseSchema.pre('save', async (next) => {
+// eslint-disable-next-line func-names
+HouseSchema.pre('save', async function (next) {
+  console.log(this);
   try {
     // eslint-disable-next-line no-undef
     const response = await fetch(
@@ -102,6 +105,7 @@ HouseSchema.pre('save', async (next) => {
       this.longitude = null;
     }
   } catch (error) {
+    console.log(error.message);
     this.latitude = null;
     this.longitude = null;
   }

@@ -60,8 +60,9 @@ class HouseController {
       };
 
       // Create the new house entry in the database.
-      const result = await House.create(newHouse);
-      return res.status(201).json(result);
+      const house = new House(newHouse);
+      await house.save();
+      return res.sendStatus(201);
     } catch (err) {
       // If an error occurs during house creation, return a JSON response with a 400 status code
       // and the error message.
