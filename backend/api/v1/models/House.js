@@ -107,5 +107,5 @@ HouseSchema.pre("save", async function (next) {
   next();
 });
 
-const House = mongoose.model("house", HouseSchema);
+const House = mongoose.model("House", HouseSchema);
 module.exports = House;

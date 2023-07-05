@@ -108,17 +108,18 @@ class HouseController {
 
         // If it's a numerical parameter, parse the value to an integer and add it to the 'params' object.
         if (numericalParamters.includes(key)) {
-          if (key === "price") {
-            // Handle the price range here
-            const priceRange = req.query[key].split("_");
-            if (priceRange.length === 2) {
-              const minPrice = parseInt(priceRange[0]);
-              const maxPrice = parseInt(priceRange[1]);
-              params[key] = { $gte: minPrice, $lte: maxPrice };
-            }
-          } else {
-            params[key] = parseInt(req.query[key]);
-          }
+          // if (req.query.includes('minPrice') && req.)
+          // if (key === "price") {
+          //   // Handle the price range here
+          //   const priceRange = req.query[key].split("_");
+          //   if (priceRange.length === 2) {
+          //     const minPrice = parseInt(priceRange[0]);
+          //     const maxPrice = parseInt(priceRange[1]);
+          //     params[key] = { $gte: minPrice, $lte: maxPrice };
+          //   }
+          // } else {
+          //   params[key] = parseInt(req.query[key]);
+          // }
         } else {
           params[key] = req.query[key];
         }
