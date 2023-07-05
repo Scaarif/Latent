@@ -85,17 +85,21 @@ class HouseController {
         "numFloors",
         "numBathrooms",
         "numToilets",
-        "price",
+        "minPrice",
+        "maxPrice",
       ];
 
       // Define an array of parameter names that represent attributes of the location object in the database.
       const locationParamters = ["country", "state", "city"];
 
       for (const key of Object.keys(req.query)) {
-        // If agentName is one of the search parameters
-        if (key === "agentName") {
-          const [firstName, lastName] = req.query[key].split("_");
-          const agent = await Agent.findOne({ firstName, lastName });
+        // Check if agent parameters are part of the filter parameters
+        const { agentFirstName, agentLastName } = req.query;
+        if (agentFirstName && agentLastName) {
+          const agent = await Agent.findOne({
+            firstName: agentFirstName,
+            lastName: agentLastName,
+          });
           const agentId = agent._id;
           params.agentId = agentId;
         }
@@ -108,22 +112,28 @@ class HouseController {
 
         // If it's a numerical parameter, parse the value to an integer and add it to the 'params' object.
         if (numericalParamters.includes(key)) {
-          // if (req.query.includes('minPrice') && req.)
-          // if (key === "price") {
-          //   // Handle the price range here
-          //   const priceRange = req.query[key].split("_");
-          //   if (priceRange.length === 2) {
-          //     const minPrice = parseInt(priceRange[0]);
-          //     const maxPrice = parseInt(priceRange[1]);
-          //     params[key] = { $gte: minPrice, $lte: maxPrice };
-          //   }
-          // } else {
-          //   params[key] = parseInt(req.query[key]);
-          // }
+          // If both minPrice and maxPrice are provided
+          if ("minPrice" in req.query && "maxPrice" in req.query) {
+            // If both are equal, houses with exact price match is return
+            if (req.query["minPrice"] === req.query["maxPrice"]) {
+              params["price"] = parseInt(req.query["minPrice"]);
+            } else {
+              // Houses with price range from minPrice - maxPrice are returned
+              params["price"] = {
+                $gte: req.query["minPrice"],
+                $lte: req.query["minPrice"],
+              };
+            }
+          } else if (key === "minPrice") {
+            params["price"] = { $gte: req.query[key] };
+          } else if (key === "maxPrice") {
+            params["price"] = { $lte: req.query[key] };
+          }
         } else {
           params[key] = req.query[key];
         }
       }
+      console.log(params);
       const result = await House.find(params);
       return res.status(200).json(result);
     } catch (err) {
