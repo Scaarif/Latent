@@ -1,4 +1,5 @@
 const House = require("../models/House");
+// const Agent = require("../models/Agent");
 
 class HouseController {
   /**
@@ -9,6 +10,7 @@ class HouseController {
    */
   static async postHouse(req, res) {
     try {
+      // if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       // Extract the required properties from the request body.
       const {
         country,
@@ -73,36 +75,44 @@ class HouseController {
    * @returns {Promise} - A Promise that resolves to the JSON result or rejects with an error.
    */
   static async getHouse(req, res) {
-    // Initialize an empty object to store query parameters for filtering houses.
-    const params = {};
-
-    // Define an array of parameter names that represent numerical values.
-    const numericalParamters = [
-      "numRooms",
-      "numFloors",
-      "numBathrooms",
-      "numToilets",
-      "price",
-    ];
-
-    // Define an array of parameter names that represent attributes of the location object in the database.
-    const locationParamters = ["country", "state", "city"];
-
-    for (const key of Object.keys(req.query)) {
-      // If it's a location parameter, add it to the 'location' property of the 'params' object.
-      if (locationParamters.includes(key)) {
-        params[`location.${key}`] = req.query[key];
-        continue;
-      }
-
-      // If it's a numerical parameter, parse the value to an integer and add it to the 'params' object.
-      if (numericalParamters.includes(key)) {
-        params[key] = parseInt(req.query[key]);
-      } else {
-        params[key] = req.query[key];
-      }
-    }
     try {
+      // Initialize an empty object to store query parameters for filtering houses.
+      const params = {};
+
+      // Define an array of parameter names that represent numerical values.
+      const numericalParamters = [
+        "numRooms",
+        "numFloors",
+        "numBathrooms",
+        "numToilets",
+        "price",
+      ];
+
+      // Define an array of parameter names that represent attributes of the location object in the database.
+      const locationParamters = ["country", "state", "city"];
+
+      for (const key of Object.keys(req.query)) {
+        // If agentName is one of the search parameters
+        if (key === "agentName") {
+          const [firstName, lastName] = req.query[key].split("_");
+          const agent = await Agent.findOne({ firstName, lastName });
+          const agentId = agent._id;
+          params.agentId = agentId;
+        }
+
+        // If it's a location parameter, add it to the 'location' property of the 'params' object.
+        if (locationParamters.includes(key)) {
+          params[`location.${key}`] = req.query[key];
+          continue;
+        }
+
+        // If it's a numerical parameter, parse the value to an integer and add it to the 'params' object.
+        if (numericalParamters.includes(key)) {
+          params[key] = parseInt(req.query[key]);
+        } else {
+          params[key] = req.query[key];
+        }
+      }
       const result = await House.find(params);
       return res.status(200).json(result);
     } catch (err) {
