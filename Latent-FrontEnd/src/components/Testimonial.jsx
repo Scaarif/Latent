@@ -2,7 +2,7 @@ import React from 'react';
 import { MdFormatQuote } from 'react-icons/md';
 
 const Testimonial = () => (
-  <div className="flex flex-col w-[400px] space-y-2 p-4 border rounded-md relative">
+  <div className="flex flex-col md:w-[400px] space-y-2 p-4 border-t md:border rounded-md relative">
     <span className="absolute -top-6 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
       <MdFormatQuote style={{ color: 'green', transform: 'rotate(180deg)', height: '24px', width: '24px' }} />
     </span>

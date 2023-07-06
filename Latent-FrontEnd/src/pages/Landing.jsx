@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { BsLinkedin, BsFacebook, BsTwitter, BsInstagram } from 'react-icons/bs';
 import SearchBar from '../components/SearchBar';
-import { card1, card2, logo } from '../assets';
+import { card1, card2 } from '../assets';
 import Button from '../components/Button';
 import HouseCard from '../components/HouseCard';
 import Testimonial from '../components/Testimonial';
@@ -15,20 +15,23 @@ const Landing = () => {
 
       {/* Hero section */}
 
-      <div className="flex bg-hero-bg bg-cover h-[700px]">
+      <div className="flex flex-col md:flex-row bg-hero-bg bg-cover md:h-[700px] border">
         {/* Left */}
-        <div className="flex-1 bg-gradient-to-r from-bg_color via-bg_color to-bg-transparent pl-16 py-16">
-          <h1 className="font-bold text-[40px]">Hunt for Your next House Smarter, Quicker, Cheaper & Anywhere</h1>
+        <div className="flex-1 bg-gradient-to-r from-bg_color via-bg_color to-bg-transparent pl-4 md:pl-16 py-16">
+          <h1 className="font-bold text-[32px] md:text-[40px]">Hunt for Your next House Smarter, Quicker, Cheaper & Anywhere</h1>
           <p className="text-s_gray flex items-center py-24">
             <span className="font-bold text-[24px] text-green px-2 border-l-2">20k+</span>
             listed houses
           </p>
-          <div className="flex absolute">
+          <div className="hidden md:flex absolute">
             <SearchBar />
+          </div>
+          <div className="flex md:hidden">
+            <Button name="Dive in to searching" />
           </div>
         </div>
         {/* Right */}
-        <div className="flex-1 flex flex-col">
+        <div className="hidden flex-1 md:flex flex-col">
           <div className="flex">
             <img src={card1} alt="house1" className="h-[400px]" />
           </div>
@@ -41,10 +44,10 @@ const Landing = () => {
       {/* Services section */}
 
       <div className="bg-white border border-white">
-        <div className="flex flex-col my-16 mx-16">
+        <div className="flex flex-col my-16 mx-2 md:mx-16">
           <h1 className="text-center font-semibold text-[24px] text-green p-1">Our Services</h1>
           <p className="text-center text-sm text-s_gray">We make it easy and convenient for both landlords (& agents) and tenants</p>
-          <div className="flex text-center mt-16 gap-8">
+          <div className="flex flex-col md:flex-row text-center mt-16 gap-8">
             {/* Tenants */}
             <div className="flex-1 flex flex-col space-y-4">
               {/* <h2><span className='pr-1 pb-1 border-b-2 border-green'>For</span>Tenants</h2> */}
@@ -94,7 +97,7 @@ const Landing = () => {
       </div>
 
       {/* Houses listing section */}
-      <div className="flex flex-col m-16">
+      <div className="flex flex-col my-16 md:mx-16">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-center font-semibold text-[24px] text-green p-1">Listed Houses</h1>
           <p className="text-center text-sm text-s_gray">See the currently listed vacancies just in your current location</p>
@@ -114,18 +117,18 @@ const Landing = () => {
 
       {/* Testimonials section */}
       <div className="flex flex-col bg-white">
-        <div className="flex flex-col m-16">
+        <div className="flex flex-col my-16 mx-2 md:mx-16">
           <div className="flex flex-col items-center justify-center">
             <h1 className="text-center font-semibold text-[24px] text-green p-1">What our customers say?</h1>
             <p className="text-center text-sm text-s_gray">Don't take our word for it, hear directly from our customer landlords, agents  and clients.</p>
           </div>
-          <div className="flex space-x-4 mt-16">
+          <div className="flex flex-col md:flex-row md:overflow-hidden space-y-4 md:space-x-4 mt-16">
             <Testimonial />
             <Testimonial />
             <Testimonial />
           </div>
 
-          <div className="flex justify-center items-center gap-8 mt-8">
+          <div className="hidden md:flex justify-center items-center gap-8 mt-8">
             <span className="rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
               <MdArrowForwardIos
                 style={{ color: hovered ? 'green' : 'black', height: '20px', width: '20px', transform: 'rotate(180deg)' }}
@@ -155,7 +158,7 @@ const Landing = () => {
 
       {/* Footer section */}
       <div className="flex flex-col bg-green">
-        <div className="flex justify-between text-white m-16">
+        <div className="flex flex-col md:flex-row gap-4 md:justify-between text-white m-16 mb-12">
           <div className="flex flex-col space-y-8">
             <span className="text-lg">Latent</span>
             <div className="flex space-x-4">
@@ -170,23 +173,23 @@ const Landing = () => {
           </div>
           <div className="flex flex-col space-y-2">
             <span className="text-lg">Navigation</span>
-            <span className="">Home</span>
-            <span className="">Services</span>
-            <span className="">Contact us</span>
+            <span className="text-sm">Home</span>
+            <span className="text-sm">Services</span>
+            <span className="text-sm">Contact us</span>
           </div>
           <div className="flex flex-col space-y-2">
             <span className="text-lg">Company</span>
-            <span className="">Home</span>
-            <span className="">Services</span>
-            <span className="">Contact us</span>
+            <span className="text-sm">About us</span>
+            <span className="text-sm">Our mission and vision</span>
+            <span className="text-sm">Our team</span>
           </div>
           <div className="flex flex-col space-y-2">
             <span className="text-lg">Support</span>
-            <span className="">Contact us</span>
-            <span className="">Login</span>
+            <span className="text-sm">Contact us</span>
+            <span className="text-sm">Login</span>
           </div>
         </div>
-        <div className="flex justify-center text-white">
+        <div className="flex justify-center text-white mb-4">
           <span className="text-sm">Copyright &copy; 2023. All rights reserved.</span>
         </div>
       </div>
