@@ -8,6 +8,8 @@ import Button from '../components/Button';
 import HouseCard from '../components/HouseCard';
 import Testimonial from '../components/Testimonial';
 
+import { houses } from '../constants';
+
 const Landing = () => {
   const [hovered, setHovered] = useState(false);
 
@@ -110,12 +112,8 @@ const Landing = () => {
           <p className="text-center text-sm text-s_gray">See the currently listed vacancies just in your current location</p>
         </div>
         <div className="flex flex-wrap justify-center gap-4 mt-8">
-          <HouseCard roommate="true" />
-          <HouseCard loggedIn="true" />
-          <HouseCard />
-          <HouseCard />
-          <HouseCard roommate="true" />
-          <HouseCard />
+          {houses?.map((house, i) => <HouseCard key={i} house={house} roommate="true" />)}
+          {/* <HouseCard loggedIn="true" /> */}
         </div>
         <div className="flex justify-end items-center p-8">
           <Link to="/explore" className="mr-12 transition-colors hover:text-green cursor-pointer">see more ...</Link>
