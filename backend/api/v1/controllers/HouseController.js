@@ -30,21 +30,19 @@ class HouseController {
         houseType,
       } = req.body;
 
-      // Check if any images were uploaded.
-      if (req.files.length === 0) {
-        return res.status(400).send('No images uploaded');
-      }
+      // Extract paths to coverImage and optional images array
+      const coverImage = req.files.coverImage[0].path;
+      if (!coverImage) return res.status(400).json({ success: false, message: 'coverImage required' });
+      const images = req.files.images.map((file) => file.path);
 
-      // Extract the file paths of the uploaded images.
-      const uploadedImages = req.files.map((file) => file.path);
       // const agentId = req.user._id;
 
       // Create a new house object with the extracted data.
       const newHouse = {
         // agentId,
         location: { country, state, city },
-        coverImage: uploadedImages[0],
-        images: uploadedImages.slice(1), // Remove the cover image from the images array.
+        coverImage,
+        images,
         description,
         price,
         numFloors,
@@ -61,8 +59,8 @@ class HouseController {
 
       // Create the new house entry in the database.
       const house = new House(newHouse);
-      await house.save();
-      return res.sendStatus(201);
+      const result = await house.save();
+      return res.status(201).json(result);
     } catch (err) {
       // If an error occurs during house creation, return a JSON response with a 400 status code
       // and the error message.
@@ -195,12 +193,10 @@ class HouseController {
         houseType,
       } = req.body;
 
-      // Check if any images were uploaded.
-      if (req.files.length === 0) {
-        return res.status(400).json({ error: 'No images uploaded' });
-      }
-
-      const uploadedImages = req.files.map((file) => file.path);
+      // Extract image paths.
+      const coverImage = req.files.coverImage[0].path;
+      if (!coverImage) return res.status(400).json({ success: false, message: 'coverImage required' });
+      const images = req.files.images.map((file) => file.path);
 
       // Create an object with the properties to be updated in the database.
       const updateObject = {
@@ -217,8 +213,8 @@ class HouseController {
         name,
         address,
         houseType,
-        coverImage: uploadedImages[0],
-        images: uploadedImages.slice(1),
+        coverImage,
+        images,
       };
 
       // Find the existing house by ID and update it with the new data.
@@ -230,12 +226,12 @@ class HouseController {
 
       // If the house doesn't exist, return a 404 response.
       if (!existingHouse) {
-        return res.status(404).json({ error: 'House not found' });
+        return res.status(404).json({ success: false, message: 'House not found' });
       }
 
-      return res.status(200).json(existingHouse);
+      return res.status(200).json({ success: true, message: 'House updated' });
     } catch (err) {
-      return res.status(400).json({ error: err.message });
+      return res.status(400).json({ success: false, message: err.message });
     }
   }
 }

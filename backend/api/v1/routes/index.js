@@ -6,7 +6,9 @@ const router = express.Router();
 
 router.post(
   '/api/v1/houses',
-  upload.array('images', 5),
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'images', maxCount: 3 }]),
   HouseController.postHouse,
 );
 
