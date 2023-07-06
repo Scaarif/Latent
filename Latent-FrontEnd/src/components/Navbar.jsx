@@ -9,7 +9,7 @@ const Navbar = () => {
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <div className="w-full flex flex-row justify-between items-center bg-white py-2 px-4 fixed z-10">
+    <div className="max-w-[1400px] w-full flex flex-row justify-between items-center bg-white py-2 px-4 fixed z-10">
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
