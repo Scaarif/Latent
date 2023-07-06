@@ -7,7 +7,7 @@ const Button = ({ name, type }) => (
       ? 'border-green text-green transition-colors hover:bg-light_green'
       : 'bg-green border-green text-white transition-colors hover:border-light_green'} border px-4 py-1.5 rounded-[4px] cursor-pointer`}
   >
-    <span>{name}</span>
+    <span className="capitalize">{name}</span>
   </div>
 );
 

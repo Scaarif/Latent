@@ -127,7 +127,7 @@ const Landing = () => {
             <h1 className="text-center font-semibold text-[24px] text-green p-1">What our customers say?</h1>
             <p className="text-center text-sm text-s_gray">Don't take our word for it, hear directly from our customer landlords, agents  and clients.</p>
           </div>
-          <div className="flex flex-col md:flex-row md:overflow-hidden space-y-4 md:space-x-4 mt-16">
+          <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-16">
             <Testimonial />
             <Testimonial />
             <Testimonial />
