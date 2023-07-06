@@ -118,7 +118,7 @@ const Landing = () => {
           <HouseCard />
         </div>
         <div className="flex justify-end items-center p-8">
-          <span className="mr-12 transition-colors hover:text-green cursor-pointer">see more ...</span>
+          <Link to="/explore" className="mr-12 transition-colors hover:text-green cursor-pointer">see more ...</Link>
         </div>
       </div>
 
