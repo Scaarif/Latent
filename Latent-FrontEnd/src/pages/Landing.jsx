@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { BsLinkedin, BsFacebook, BsTwitter, BsInstagram } from 'react-icons/bs';
 import SearchBar from '../components/SearchBar';
@@ -15,7 +16,7 @@ const Landing = () => {
 
       {/* Hero section */}
 
-      <div className="flex flex-col md:flex-row bg-hero-bg bg-cover md:h-[700px] border">
+      <div id="hero" className="flex flex-col md:flex-row bg-hero-bg bg-cover md:h-[700px]">
         {/* Left */}
         <div className="flex-1 bg-gradient-to-r from-bg_color via-bg_color to-bg-transparent pl-4 md:pl-16 py-16">
           <h1 className="font-bold text-[32px] md:text-[40px]">Hunt for Your next House Smarter, Quicker, Cheaper & Anywhere</h1>
@@ -27,7 +28,9 @@ const Landing = () => {
             <SearchBar />
           </div>
           <div className="flex md:hidden">
-            <Button name="Dive in to searching" />
+            <Link to="/explore">
+              <Button name="Dive in to searching" />
+            </Link>
           </div>
         </div>
         {/* Right */}
@@ -43,7 +46,7 @@ const Landing = () => {
 
       {/* Services section */}
 
-      <div className="bg-white border border-white">
+      <div id="services" className="bg-white border border-white">
         <div className="flex flex-col my-16 mx-2 md:mx-16">
           <h1 className="text-center font-semibold text-[24px] text-green p-1">Our Services</h1>
           <p className="text-center text-sm text-s_gray">We make it easy and convenient for both landlords (& agents) and tenants</p>
@@ -67,7 +70,9 @@ const Landing = () => {
                 </p>
               </div>
               <div className="flex justify-center">
-                <Button name="Explore" type="secondary" />
+                <Link to="/explore">
+                  <Button name="Explore" type="secondary" />
+                </Link>
               </div>
             </div>
 
@@ -89,7 +94,9 @@ const Landing = () => {
                 </p>
               </div>
               <div className="flex justify-center">
-                <Button name="Try it out" type="light" />
+                <Link to="/houses/new">
+                  <Button name="Try it out" type="light" />
+                </Link>
               </div>
             </div>
           </div>
@@ -97,7 +104,7 @@ const Landing = () => {
       </div>
 
       {/* Houses listing section */}
-      <div className="flex flex-col my-16 md:mx-16">
+      <div id="explore" className="flex flex-col my-16 md:mx-16">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-center font-semibold text-[24px] text-green p-1">Listed Houses</h1>
           <p className="text-center text-sm text-s_gray">See the currently listed vacancies just in your current location</p>
@@ -149,7 +156,7 @@ const Landing = () => {
       </div>
 
       {/* Contact us section */}
-      <div className="flex flex-col m-16">
+      <div id="contacts" className="flex flex-col m-16">
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-center font-semibold text-[24px] text-green p-1">Contact Us</h1>
           <p className="text-center text-sm text-s_gray">We like hearing from our customers, write to us</p>

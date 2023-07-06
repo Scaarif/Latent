@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Button from './Button';
 
 const SearchBar = () => (
@@ -9,7 +10,9 @@ const SearchBar = () => (
       <input type="text" placeholder="Location" className="border pl-2 text-sm text-green focus:outline-none" />
       <input type="text" placeholder="Price range" className="border pl-2 text-sm text-green focus:outline-none" />
     </div>
-    <Button name="Search" />
+    <Link to="/explore">
+      <Button name="Search" />
+    </Link>
   </div>
 );
 
