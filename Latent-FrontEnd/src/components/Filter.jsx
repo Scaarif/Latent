@@ -34,7 +34,7 @@ export const MobileFilter = ({ setShowMobileFilter }) => {
 export const Filter = () => {
   const [hovered, setHovered] = useState(false);
   return (
-    <div className="hidden w-full md:flex md:flex-row justify-between bg-white rounded-sm mr-2 md:mr-0">
+    <div className="hidden w-full md:flex md:flex-row justify-between bg-white rounded-sm py-2 mr-2 md:mr-0">
       <div className="flex flex-col space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0 md:flex-row md:mr-2 p-2 px-4">
         <span className="hidden border-r border-slate-400 px-2 py-1">Showing all</span>
         <input type="text" placeholder="Agent full name" className="border rounded-md py-1.5 pl-2 text-sm text-green focus:outline-none" />
