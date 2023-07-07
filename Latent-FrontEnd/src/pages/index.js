@@ -6,6 +6,7 @@ import AgentHome from './AgentHome';
 import CreateHouse from './CreateHouse';
 import SignUp from './SignUp';
 import Login from './Login';
+import Cart from './Cart';
 
 export {
   Landing,
@@ -16,4 +17,5 @@ export {
   CreateHouse,
   SignUp,
   Login,
+  Cart,
 };

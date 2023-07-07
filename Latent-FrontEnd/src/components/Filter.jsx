@@ -6,7 +6,7 @@ export const MobileFilter = ({ setShowMobileFilter }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="flex flex-col w-full md:hidden bg-white border px-4 py-4">
+    <div className="flex flex-col w-full md:hidden bg-white shadow-sm px-4 py-4">
       <div className="flex items-center justify-between">
         <span className="py-1 px-2">Filter by</span>
         <span className="py-1 px-2">

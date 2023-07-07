@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
-import { House, Landing, Explore, AgentHome, Profile, Login, SignUp, CreateHouse } from './pages';
+import { House, Landing, Explore, AgentHome, Profile, Login, SignUp, CreateHouse, Cart } from './pages';
 import Navbar from './components/Navbar';
 
 const App = () => {
@@ -14,6 +14,7 @@ const App = () => {
           <Route path="/explore" element={<Explore />} />
           <Route path="/houses/:houseId" element={<House />} />
           <Route path="/user" element={<AgentHome />} />
+          <Route path="/user/cart" element={<Cart />} />
           <Route path="/user/:id" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

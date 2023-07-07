@@ -1,11 +1,9 @@
-import React from 'react'
+import React from 'react';
 
-const Profile = () => {
-  return (
-    <div>
-      Agent profile page - for user's view... 
-    </div>
-  )
-}
+const Profile = () => (
+  <div>
+    Agent profile page - for user's view...
+  </div>
+);
 
 export default Profile;

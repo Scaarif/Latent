@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Filter, MobileFilter } from './Filter';
 import PaginatedListing from './PaginatedListing';
 
-const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap }) => {
+const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap, toMap }) => {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   return (
     <div className="w-full my-8 mx-2 md:mx-16">
@@ -10,13 +11,26 @@ const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap
         <h1 className="text-xl text-green font-bold text-center md:text-start">
           { header || 'Explore Houses, find one that fits your needs and budget' }
         </h1>
-        <span
-          className="hidden md:flex p-1 md:p-2 border-b border-md_green md:border-none hover:border-green md:px-4
-              md:bg-white text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
-          onClick={() => setUseMap(true)}
-        >
-          { leaveLink || 'Go to map' }
-        </span>
+        {
+            toMap ? (
+              <span
+                className="hidden md:flex p-1 md:p-2 border-b border-md_green md:border-none hover:border-green md:px-4
+                md:bg-white text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
+                onClick={() => setUseMap(true)}
+              >
+                { leaveLink || 'Go to map' }
+              </span>
+            ) : (
+              <Link
+                to="/explore"
+                className="hidden md:flex p-1 md:p-2 border-b border-md_green md:border-none hover:border-green md:px-4
+                 md:bg-white text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
+                onClick={() => {}}
+              >
+                { leaveLink || 'Back to Listings' }
+              </Link>
+            )
+        }
         <span
           className="md:hidden p-1 border-b border-md_green text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
           onClick={() => setShowMobileFilter(true)}
@@ -29,7 +43,7 @@ const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap
         { showMobileFilter && <MobileFilter setShowMobileFilter={setShowMobileFilter} /> }
       </div>
       <div className="flex flex-col md:mt-8">
-        <h2 className="text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'}</h2>
+        <h2 className="hidden md:block text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'}</h2>
         <PaginatedListing houses={houses} />
       </div>
     </div>
