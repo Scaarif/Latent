@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-<<<<<<< HEAD
 const passport = require('passport');
 const logger = require('morgan');
 const cors = require('cors');
