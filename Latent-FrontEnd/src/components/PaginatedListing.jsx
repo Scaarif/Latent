@@ -9,28 +9,28 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   }
   return (
     <div className="flex items-center justify-center gap-2 mt-8">
-      <div className="bg-gray-400 cursor-pointer items-center px-2 py-2 rounded-full">
+      <div className="bg-light_green cursor-pointer items-center px-2 py-2 rounded-full">
         <span className="transition-colors text-white hover:text-black">
           <MdArrowForwardIos
-            style={{ color: 'white', height: '16px', width: '16px', transform: 'rotate(180deg)' }}
+            style={{ color: 'green', height: '16px', width: '16px', transform: 'rotate(180deg)' }}
           />
         </span>
       </div>
       {
         pages?.map((page) => (
-          <div className="bg-gray-400 cursor-pointer items-center px-3 py-1 rounded-full" key={page}>
+          <div className="bg-light_green cursor-pointer items-center px-3 py-1 rounded-full" key={page}>
             <span
               onClick={() => setCurrentPage(page)}
-              className={`transition-colors text-white hover:text-black ${currentPage === page && 'text-black'} `}
+              className={`transition-colors text-green hover:text-black ${currentPage === page && 'text-green'} `}
             >{page}
             </span>
           </div>
         ))
       }
-      <div className="bg-gray-400 cursor-pointer items-center px-2 py-2 rounded-full">
+      <div className="bg-light_green cursor-pointer items-center px-2 py-2 rounded-full">
         <span className="transition-colors text-white hover:text-black">
           <MdArrowForwardIos
-            style={{ color: 'white', height: '16px', width: '16px' }}
+            style={{ color: 'green', height: '16px', width: '16px' }}
           />
         </span>
       </div>
