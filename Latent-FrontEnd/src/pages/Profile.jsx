@@ -8,7 +8,9 @@ import { houses } from '../constants';
 const Profile = () => (
   <div className="flex flex-col border-green w-full mb-8 m-4 md:mx-16">
     <div className="flex flex-col gap-2">
-      <Link to="/explore" className="flex items-center gap-1 font-semibold text-green transition-color
+      <Link
+        to="/explore"
+        className="flex items-center gap-1 font-semibold text-green transition-color
         hover:text-md_green cursor-pointer"
       >
         <MdArrowForwardIos
