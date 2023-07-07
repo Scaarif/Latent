@@ -1,4 +1,8 @@
 .env
 node_modules
 uploads/
+<<<<<<< HEAD
+views/
+=======
 thumbnail.jpg
+>>>>>>> origin/backend
