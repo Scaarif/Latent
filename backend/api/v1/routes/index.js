@@ -16,7 +16,9 @@ router.get('/houses', HouseController.getHouse);
 router.delete('/houses', HouseController.deleteHouse);
 router.put(
   '/houses',
-  upload.array('images', 5),
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'images', maxCount: 3 }]),
   HouseController.updateHouse,
 );
 router.post('/appointment/:houseId', HouseController.bookHouse);
