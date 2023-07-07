@@ -2,6 +2,7 @@ import { house1, house2, house3 } from '../assets';
 
 export const houses = [
   {
+    id: 1,
     shared: true,
     location: { city: 'Kasarani', state: 'Nairobi', country: 'Kenya' },
     price: 13000,
@@ -12,8 +13,10 @@ export const houses = [
     address: '112, Carwash, Zimmerman',
     name: 'Twiga House',
     houseType: 'Apartment',
+    floor: 4,
   },
   {
+    id: 2,
     shared: false,
     location: { city: 'Njiru', state: 'Nairobi', country: 'Kenya' },
     price: 10000,
@@ -26,6 +29,7 @@ export const houses = [
     houseType: 'Apartment',
   },
   {
+    id: 3,
     shared: false,
     location: { city: 'Umoja', state: 'Nairobi', country: 'Kenya' },
     price: 30000,
@@ -38,6 +42,7 @@ export const houses = [
     houseType: 'Bungalow',
   },
   {
+    id: 4,
     shared: true,
     location: { city: 'Kasarani', state: 'Nairobi', country: 'Kenya' },
     price: 13000,
@@ -50,6 +55,7 @@ export const houses = [
     houseType: 'Apartment',
   },
   {
+    id: 5,
     shared: false,
     location: { city: 'Njiru', state: 'Nairobi', country: 'Kenya' },
     price: 10000,
@@ -62,6 +68,7 @@ export const houses = [
     houseType: 'Apartment',
   },
   {
+    id: 6,
     shared: false,
     location: { city: 'Umoja', state: 'Nairobi', country: 'Kenya' },
     price: 30000,
