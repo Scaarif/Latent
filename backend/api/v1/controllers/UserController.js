@@ -12,7 +12,7 @@ class UserController {
    * ...creation and log-in of a new user, or failure.
    */
   static async postUser(req, res) {
-    console.log('login controller called'); // SCAFF
+    // console.log('login controller called'); // SCAFF
     const {
       firstName,
       lastName,
@@ -37,7 +37,7 @@ class UserController {
         email,
         phone,
       }), password, (err, agent) => {
-        console.log(agent); // SCAFF
+        // console.log(agent); // SCAFF
         if (err && !agent) {
           res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
         } else if (agent) {
@@ -61,7 +61,7 @@ class UserController {
         email,
         phone,
       }), password, (err, tenant) => {
-        console.log(tenant); // SCAFF
+        // console.log(tenant); // SCAFF
         if (err && !tenant) {
           res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
         } else if (tenant) {
@@ -159,8 +159,33 @@ class UserController {
    */
   static async putUser(req, res) {
     if (req.isAuthenticated()) {
+      // retrieve allowed update parameters
+      const {
+        firstName,
+        lastName,
+        phone,
+      } = req.body;
+      const updateList = [firstName, lastName, phone];
+      const attrNames = ['firstName', 'lastName', 'phone'];
+      const updateObj = {};
+      // popultae `updateObj` with non-undefined attributes
+      for (let i = 0; i < updateList.length; i += 1) {
+        if (updateList[i]) {
+          // value is supplied for the attribute
+          updateObj[attrNames[i]] = updateList[i];
+        }
+      }
       // get the user's doc
-      const doc = await Tenant.findById(req.user._id);
+      // const doc = await Tenant.findById(req.user._id);
+      const doc = req.user;
+      // update doc with non-undefined attributes
+      Object.assign(doc, updateObj);
+      try {
+        await doc.save();
+        res.status(201).json({ success: true, message: 'updated successfully' });
+      } catch (err) {
+        res.status(401).json({ success: false, message: err.toString() });
+      }
     }
   }
 
@@ -171,10 +196,8 @@ class UserController {
    * @returns {Promise} - A Promise that resolves to the data of the logged-in user.
    */
   static async getUser(req, res) {
-    console.log(Object.entries(req.session)); // SCAFF
-    if (req.user) {
-      console.log(Object.entries(req.user)); // SCAFF
-    }
+    // console.log('USER INSTANCE:', req.user.constructor, req.user instanceof Tenant); // SCAFF
+    // console.log(Object.entries(req.session)); // SCAFF
     if (req.isAuthenticated()) {
       const user = req.user.toObject();
       delete user._id;
