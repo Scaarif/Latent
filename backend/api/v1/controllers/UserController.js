@@ -12,7 +12,7 @@ class UserController {
    * ...creation and log-in of a new user, or failure.
    */
   static async postUser(req, res) {
-    console.log('login controller called'); // SCAFF
+    // console.log('login controller called'); // SCAFF
     const {
       firstName,
       lastName,
@@ -37,7 +37,7 @@ class UserController {
         email,
         phone,
       }), password, (err, agent) => {
-        console.log(agent); // SCAFF
+        // console.log(agent); // SCAFF
         if (err && !agent) {
           res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
         } else if (agent) {
@@ -61,7 +61,7 @@ class UserController {
         email,
         phone,
       }), password, (err, tenant) => {
-        console.log(tenant); // SCAFF
+        // console.log(tenant); // SCAFF
         if (err && !tenant) {
           res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
         } else if (tenant) {
@@ -171,10 +171,7 @@ class UserController {
    * @returns {Promise} - A Promise that resolves to the data of the logged-in user.
    */
   static async getUser(req, res) {
-    console.log(Object.entries(req.session)); // SCAFF
-    if (req.user) {
-      console.log(Object.entries(req.user)); // SCAFF
-    }
+    // console.log(Object.entries(req.session)); // SCAFF
     if (req.isAuthenticated()) {
       const user = req.user.toObject();
       delete user._id;
