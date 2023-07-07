@@ -6,7 +6,7 @@ import SearchBar from '../components/SearchBar';
 import { card1, card2 } from '../assets';
 import Button from '../components/Button';
 import HouseCard from '../components/HouseCard';
-import Testimonial from '../components/Testimonial';
+import { Testimonial } from '../components/Testimonial';
 
 import { houses } from '../constants';
 

@@ -17,6 +17,14 @@ const AgentHome = () => {
         >
           Explore all Listings
         </Link>
+        <Link
+          to="/houses/new"
+          className="md:flex p-2 hover:border-green md:px-4
+             bg-white text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
+          onClick={() => {}}
+        >
+          +Post a new House
+        </Link>
         <span
           className="md:hidden p-1 border-b border-md_green text-green rounded-sm cursor-pointer transition-colors hover:text-md_green"
           onClick={() => setShowMobileFilter(true)}
