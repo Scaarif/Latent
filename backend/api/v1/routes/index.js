@@ -11,18 +11,23 @@ const router = express.Router();
 
 router.post(
   '/api/v1/houses',
-  upload.array('images', 5),
+
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'images', maxCount: 3 }]),
   HouseController.postHouse,
 );
 
-router.get('/api/v1/houses', HouseController.getHouse);
-router.delete('/api/v1/houses', HouseController.deleteHouse);
+router.get('/houses', HouseController.getHouse);
+router.delete('/houses', HouseController.deleteHouse);
 router.put(
-  '/api/v1/houses',
-  upload.array('images', 5),
+  '/houses',
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'images', maxCount: 3 }]),
   HouseController.updateHouse,
 );
-
+router.post('/appointment/:houseId', HouseController.bookHouse);
 /**
  * User section
  */
