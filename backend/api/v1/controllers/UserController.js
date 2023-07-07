@@ -1,7 +1,9 @@
-// const House = require("../models/House");
 const passport = require('passport');
+const mongoose = require('mongoose');
 const Tenant = require('../models/Tenant');
 const Agent = require('../models/Agent');
+const House = require('../models/House');
+// const Rating = require('../models/Rating');
 
 class UserController {
   /**
@@ -211,12 +213,93 @@ class UserController {
   }
 
   /**
-   * ...
+   * Deletes a specific user's account.
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
-   * @returns {Promise} - A Promise that resolves to ...
+   * @returns {Promise} - A Promise that resolves to the removal
+   * ...of all documents and records relating to a user.
    */
   static async deleteUser(req, res) {
+    // retrieve userId query param, if present
+    const { userId } = req.query;
+    if (userId) {
+      // retrieve doc using the userId if provided; otherwise use req.user
+      let userDoc;
+      userDoc = await Agent.findById(new mongoose.Types.ObjectId(userId)).exec();
+      if (!userDoc) {
+        // try fetching a Tenant
+        userDoc = await Tenant.findById(new mongoose.Types.ObjectId(userId)).exec();
+      }
+
+      if (userDoc) {
+        // TODO: refactor to remove duplicate code; START1
+        // a user with that ID found
+        // if an agent, remove all Ratings doc linked to it
+        // if an agent, also remove all houses linked to it
+        if (userDoc.listings instanceof Array) {
+          // agent account
+          const { listings } = userDoc;
+          for await (const houseId of listings) {
+            // remove all linked houses
+            const houseDoc = await House.findById(houseId).exec();
+            // await houseDoc.remove();
+            await houseDoc.deleteOne();
+          }
+
+          /* TODO: uncomment when Rating model is available
+          const ratingDocs = await Rating.find({ agentId: userDoc._id }).exec();
+          for await (const ratingDoc of ratingDocs) {
+            // remove all linked ratings
+            // await ratingDoc.remove();
+            await ratingDoc.deleteOne();
+          }
+          */
+        }
+
+        // remove doc from mongodb
+        await userDoc.deleteOne();
+
+        return res.json({ success: true, message: 'account unlinking complete' });
+        // TODO: END1
+      }
+    }
+
+    if (req.isAuthenticated()) {
+      // delete the currently logged-in user
+      const userDoc = req.user;
+
+      // TODO: refactor to remove duplicate code; START1
+      // if an agent, remove all Ratings doc linked to it
+      // if an agent, remove all houses linked to it
+      if (userDoc.listings instanceof Array) {
+        // agent account
+        const { listings } = userDoc;
+        for await (const houseId of listings) {
+          // remove all linked houses
+          const houseDoc = await House.findById(houseId).exec();
+          // await houseDoc.remove();
+          await houseDoc.deleteOne();
+        }
+
+        /* TODO: uncomment when Rating model is available
+        const ratingDocs = await Rating.find({ agentId: userDoc._id }).exec();
+        for await (const ratingDoc of ratingDocs) {
+          // remove all linked ratings
+          // await ratingDoc.remove();
+          await ratingDoc.deleteOne();
+        }
+        */
+      }
+
+      // remove doc from mongodb
+      await userDoc.deleteOne();
+
+      return res.json({ success: true, message: 'account unlinking complete' });
+      // TODO: END1
+    }
+
+    // not logged in
+    return res.status(401).json({ success: false, message: 'not allowed' });
   }
 }
 
