@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const House = require('../models/House');
-// const Agent = require("../models/Agent");
+const bookHouseQueue = require('../jobs/queue');
 
 class HouseController {
   /**
@@ -13,6 +13,7 @@ class HouseController {
       // if (!req.user) return res.status(401).json({ error: "Unauthorized" });
       // Extract the required properties from the request body.
       const {
+        agentId,
         country,
         state,
         city,
@@ -32,14 +33,18 @@ class HouseController {
 
       // Extract paths to coverImage and optional images array
       const coverImage = req.files.coverImage[0].path;
-      if (!coverImage) return res.status(400).json({ success: false, message: 'coverImage required' });
+      if (!coverImage) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'coverImage required' });
+      }
       const images = req.files.images.map((file) => file.path);
 
       // const agentId = req.user._id;
 
       // Create a new house object with the extracted data.
       const newHouse = {
-        // agentId,
+        agentId,
         location: { country, state, city },
         coverImage,
         images,
@@ -195,7 +200,11 @@ class HouseController {
 
       // Extract image paths.
       const coverImage = req.files.coverImage[0].path;
-      if (!coverImage) return res.status(400).json({ success: false, message: 'coverImage required' });
+      if (!coverImage) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'coverImage required' });
+      }
       const images = req.files.images.map((file) => file.path);
 
       // Create an object with the properties to be updated in the database.
@@ -226,10 +235,41 @@ class HouseController {
 
       // If the house doesn't exist, return a 404 response.
       if (!existingHouse) {
-        return res.status(404).json({ success: false, message: 'House not found' });
+        return res
+          .status(404)
+          .json({ success: false, message: 'House not found' });
       }
 
       return res.status(200).json({ success: true, message: 'House updated' });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+  }
+
+  static async bookHouse(req, res) {
+    try {
+      // Extract house id from request params
+      const { houseId } = req.params;
+      if (!houseId) return res.status(400).json({ success: false, message: 'HouseId required' });
+
+      // Get house with the id
+      const house = await House.findById(houseId);
+      if (!house) return res.status(404).json({ success: false, message: 'No house found' });
+
+      // Get the agent who owns the house and find his email
+      const { agentId, description, address } = house;
+      // Create a job data to send mail
+      const bookingJobData = {
+        agentId,
+        tenantId: '64a83bf52a67fd3c1679d96c',
+        houseAddress: address,
+        houseDescription: description,
+      };
+
+      // create a Queue and queue in the job data
+      const job = await bookHouseQueue.add(bookingJobData);
+      await job.finished();
+      return res.status(200).json({ success: true, message: 'Appointment booked' });
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
