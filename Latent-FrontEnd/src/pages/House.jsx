@@ -103,13 +103,14 @@ const House = () => {
           <div className="flex flex-col gap-1 py-16">
             <span className="text-sm text-s_gray">interested?</span>
             <span className="text-center text-white bg-green px-4 py-2 transition-colors
-            hover:text-light_green cursor-pointer rounded-sm">
+            hover:text-light_green cursor-pointer rounded-sm"
+            >
               Request for agent contact Information
             </span>
           </div>
         </div>
       </div>
-      <div id="listings" className="flex flex-col py-8 md:mb-8 -mx-16 bg-light_green">
+      <div id="listings" className="flex flex-col py-8 md:mb-8 md:-mx-16 bg-light_green">
         <h2 className="text-lg font-semibold text-slate-600 md:px-16">Similar listings</h2>
         <PaginatedListing houses={houses} itemsPerPage="3" />
       </div>
