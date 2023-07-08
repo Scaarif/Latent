@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Agent = require('../models/Agent');
-const Tenant = require('../models/Agent');
+const Tenant = require('../models/Tenant');
 const bookHouseQueue = require('./queue');
 const sendEmail = require('../utils/sendEmail');
 

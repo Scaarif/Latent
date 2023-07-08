@@ -150,7 +150,6 @@ class HouseController {
           params[key] = req.query[key];
         }
       }
-      console.log(params);
       const result = await House.find(params);
       return res.status(200).json(result);
     } catch (err) {
@@ -170,7 +169,7 @@ class HouseController {
       // Check if authenicated user is an agent
       const { listings } = req.user;
       if (!listings) return res.status(401).json({ error: 'Must be an agent to delete a house' });
-      const { _id } = req.user;
+      const { _id } = req.query;
 
       // Find and delete the house entry in the database with the provided ID.
       const result = await House.findByIdAndDelete(_id);
@@ -190,10 +189,11 @@ class HouseController {
   static async updateHouse(req, res) {
     try {
       if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
-      const { _id } = req.user;
-      // const { _id } = req.params;
-      // Add a check to confirm whether the authenticated user is the owner of the house
-      // ...
+      // Check if user is an agent
+      const { listings } = req.user;
+      if (!listings) return res.status(401).json({ error: 'Must be an agent to post a house' });
+      const { _id } = req.params;
+
       const {
         country,
         state,
@@ -260,8 +260,15 @@ class HouseController {
     }
   }
 
+  /**
+   * Books a house for inspection by sending email to tenant and agent
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   */
   static async bookHouse(req, res) {
     try {
+      // Check if the user is logged in
+      if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
       // Extract house id from request params
       const { houseId } = req.params;
       if (!houseId) return res.status(400).json({ success: false, message: 'HouseId required' });
@@ -270,12 +277,12 @@ class HouseController {
       const house = await House.findById(houseId);
       if (!house) return res.status(404).json({ success: false, message: 'No house found' });
 
-      // Get the agent who owns the house and find his email
+      // Extract necessary information from the house
       const { agentId, description, address } = house;
       // Create a job data to send mail
       const bookingJobData = {
         agentId,
-        tenantId: '64a83bf52a67fd3c1679d96c',
+        tenantId: req.user._id,
         houseAddress: address,
         houseDescription: description,
       };
