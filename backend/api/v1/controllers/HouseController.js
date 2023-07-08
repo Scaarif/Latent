@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const House = require('../models/House');
+const Agent = require('../models/Agent');
 const bookHouseQueue = require('../jobs/queue');
 
 class HouseController {
@@ -10,10 +11,16 @@ class HouseController {
    */
   static async postHouse(req, res) {
     try {
-      // if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+      // Check if user is authenticated
+      if (!req.user) return res.status(401).json({ error: 'You need to log in' });
+
+      // Check if user is an agent
+      const { listings } = req.user;
+      if (!listings) return res.status(401).json({ error: 'Must be an agent to post a house' });
+
+      const agentId = req.user._id;
       // Extract the required properties from the request body.
       const {
-        agentId,
         country,
         state,
         city,
@@ -93,6 +100,7 @@ class HouseController {
         'minPrice',
         'maxPrice',
       ];
+      const agentParameters = ['agentFirstname', 'agentLastname'];
 
       // Define an array of parameter names that represent attributes of
       // the location object in the database.
@@ -100,15 +108,15 @@ class HouseController {
 
       for (const key of Object.keys(req.query)) {
         // Check if agent parameters are part of the filter parameters
-        // const { agentFirstName, agentLastName } = req.query;
-        // if (agentFirstName && agentLastName) {
-        //   const agent = await Agent.findOne({
-        //     firstName: agentFirstName,
-        //     lastName: agentLastName,
-        //   });
-        //   const agentId = agent._id;
-        //   params.agentId = agentId;
-        // }
+        const { agentFirstname, agentLastname } = req.query;
+        if (agentFirstname && agentLastname) {
+          const agent = await Agent.findOne({
+            firstName: agentFirstname,
+            lastName: agentLastname,
+          });
+          const agentId = agent._id;
+          params.agentId = agentId;
+        }
 
         // If it's a location parameter, add it to the 'location' property of the 'params' object.
         if (locationParamters.includes(key)) {
@@ -134,8 +142,11 @@ class HouseController {
             params.price = { $gte: req.query[key] };
           } else if (key === 'maxPrice') {
             params.price = { $lte: req.query[key] };
+          } else {
+            params[key] = parseInt(req.query[key], 10);
           }
-        } else {
+        }
+        if (![...agentParameters, ...locationParamters, ...numericalParamters].includes(key)) {
           params[key] = req.query[key];
         }
       }
@@ -154,9 +165,12 @@ class HouseController {
    */
   static async deleteHouse(req, res) {
     try {
-      // if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-      // const { _id } = req.user;
-      const { _id } = req.query;
+      if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+      // Check if authenicated user is an agent
+      const { listings } = req.user;
+      if (!listings) return res.status(401).json({ error: 'Must be an agent to delete a house' });
+      const { _id } = req.user;
 
       // Find and delete the house entry in the database with the provided ID.
       const result = await House.findByIdAndDelete(_id);

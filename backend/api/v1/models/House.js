@@ -19,7 +19,7 @@ const LocationSchema = new mongoose.Schema({
 const HouseSchema = new mongoose.Schema({
   agentId: {
     type: mongoose.Schema.Types.ObjectId,
-    default: null,
+    ref: 'Agent',
   },
   description: {
     type: String,
