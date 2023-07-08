@@ -29,7 +29,7 @@ bookHouseQueue.process(async (job) => {
     const agent = await Agent.findById(agentId);
     if (!agent) throw new Error('No agent found');
 
-    const tenantMessage = `Hello ${tenant.firstName}\nYou have indicated interest in inspecting a house listed by ${agent.firstName}\n\nHouse details:\n\tAddress: ${houseAddress}\n\tDescription: ${houseDescription}\n\tAgent/Owner's contact: ${agent.phoneNumber}\n\nPlease kindly contact the agent\nThank you for choosing Latent for your housing services`;
+    const tenantMessage = `Hello ${tenant.firstName}\nYou have indicated interest in inspecting a house listed by ${agent.firstName}\n\nHouse details:\n\tAddress: ${houseAddress}\n\tDescription: ${houseDescription}\n\tAgent/Owner's contact: ${agent.phone}\n\nPlease kindly contact the agent\nThank you for choosing Latent for your housing services`;
     const agentMessage = `Hello ${agent.firstName}\nThere is a potential tenant by name ${tenant.firstName} who is interested in your house.\nHouse details:\n\tAddress: ${houseAddress}\n\tDescription: ${houseDescription}\n\nYour contact has been shared with the tenant\nThank you for choosing Latent for your housing services`;
 
     const mailOptions = [{
