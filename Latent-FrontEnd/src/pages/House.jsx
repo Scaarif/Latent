@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore } from 'react-icons/md';
+
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+
+// import required modules
+import { Navigation } from 'swiper/modules';
+
 import PaginatedListing from '../components/PaginatedListing';
 import { houses } from '../constants';
-import { house1 } from '../assets';
+// import { house1 } from '../assets';
 
 const House = () => {
   const { houseId } = useParams();
@@ -40,7 +51,17 @@ const House = () => {
         {/* <div className="w-full flex flex-initial flex-col gap-2 border border-green"> */}
         <div className="md:col-span-2 gap-2 rounded-sm overflow-hidden">
           <div className="flex">
-            <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
+            { house.images.length ? (
+              <Swiper navigation modules={[Navigation]} className="mySwiper">
+                {
+                  house.images?.map((image, i) => (
+                    <SwiperSlide key={i}><img src={image} alt="house" className="max-h-[400px] object-cover h-full w-full" /></SwiperSlide>
+                  ))
+                }
+              </Swiper>
+            ) : (
+              <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
+            )}
           </div>
           {/* agent details */}
           <div className="flex flex-col gap-4 bg-white mt-4 p-4">
