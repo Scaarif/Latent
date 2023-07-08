@@ -6,7 +6,7 @@ export const houses = [
     shared: true,
     location: { city: 'Kasarani', state: 'Nairobi', country: 'Kenya' },
     price: 13000,
-    images: [],
+    images: [house1, house2, house3],
     coverImage: house1,
     numRooms: 3,
     numBathrooms: 2,

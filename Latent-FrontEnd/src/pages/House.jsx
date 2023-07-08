@@ -11,7 +11,7 @@ const House = () => {
   const [showReviews, setShowReviews] = useState(false);
   // console.log(houseId)
   return (
-    <div className="flex flex-col border-green w-full mt-4 md:mx-16">
+    <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
       <div className="flex flex-col gap-2">
         <Link
           to="/explore"
@@ -25,7 +25,7 @@ const House = () => {
         </Link>
         <span className="flex items-center gap-2 font-semibold text-[24px] md:text-[32px] text-slate-600">
           { house.houseType }
-          { house.shared && <span className="text-sm p-1 px-2 bg-light_green">Roommate needed</span> }
+          { house.shared && <span className="text-sm text-green p-1 px-2 bg-light_green">Roommate needed</span> }
         </span>
         <span className="flex items-center gap-1 text-sm text-s_gray transition-colors hover:text-md_green">
           <MdLocationOn style={{ color: 'gray', height: '16px', width: '16px' }} />
@@ -40,7 +40,7 @@ const House = () => {
         {/* <div className="w-full flex flex-initial flex-col gap-2 border border-green"> */}
         <div className="md:col-span-2 gap-2 rounded-sm overflow-hidden">
           <div className="flex">
-            <img src={house1} alt="house" />
+            <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
           </div>
           {/* agent details */}
           <div className="flex flex-col gap-4 bg-white mt-4 p-4">
@@ -56,15 +56,15 @@ const House = () => {
               />
             </div>
             <div className={`flex flex-col gap-4 py-4 smooth-transition ${showReviews ? 'h-full opacity-1' : 'h-0 opacity-0'}`}>
-              <div className="flex flex-col gap-2 justify-start text-sm pr-16 pb-4 border-b">
+              <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4 border-b">
                 <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
                 <span className="self-end font-semibold text-s_gray">Felix Jimoh</span>
               </div>
-              <div className="flex flex-col gap-2 justify-start text-sm pr-16 pb-4 border-b">
+              <div className="flex flex-col gap-2 justify-start text-sm md:pr-16 pr-4 pb-4 border-b">
                 <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
                 <span className="self-end font-semibold text-s_gray">Scaarif Ngache`</span>
               </div>
-              <div className="flex flex-col gap-2 justify-start text-sm pr-16 pb-4">
+              <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4">
                 <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
                 <span className="self-end font-semibold text-s_gray">Alison James</span>
               </div>
@@ -85,6 +85,7 @@ const House = () => {
           <div className="flex items-center gap-2 bg-light_green mt-2 p-2 rounded-sm">
             <MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} />
             <span className="font-semibold text-green">{house.price} ksh/mth</span>
+            <span className="font-semibold text-white bg-green px-4 py-1">Per Individual</span>
           </div>
           <div className="flex items-center gap-2 mt-2 p-2">
             <MdPushPin style={{ height: '20px', width: '20px', color: '#75BD97' }} />
@@ -110,8 +111,11 @@ const House = () => {
           </div>
         </div>
       </div>
+
+      {/* Similar listings page */}
+
       <div id="listings" className="flex flex-col py-8 md:mb-8 md:-mx-16 bg-light_green">
-        <h2 className="text-lg font-semibold text-slate-600 md:px-16">Similar listings</h2>
+        <h2 className="text-lg font-semibold text-slate-600 text-center md:text-start md:px-16">Similar listings</h2>
         <PaginatedListing houses={houses} itemsPerPage="3" />
       </div>
     </div>

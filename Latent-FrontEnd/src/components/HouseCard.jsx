@@ -6,10 +6,10 @@ const HouseCard = ({ house, loggedIn }) => {
   const navigate = useNavigate();
   return (
     <div
-      className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md"
+      className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
       onClick={() => navigate(`/houses/${house.id}`)}
     >
-      <img src={house.coverImage} alt="house" className="h-2/4 rounded-t-md" />
+      <img src={house.coverImage} alt="house" className="h-2/4 object-cover rounded-t-md" />
       {loggedIn && (
       <div className="absolute top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span className="px-2 py-1 border-r transition-colors hover:text-black cursor-pointer">Edit</span>
