@@ -38,7 +38,7 @@ const AgentHome = () => {
       </div>
       <div className="flex flex-col md:mt-8">
         <h2 className="hidden md:block text-green text-center md:text-start">Currently listed vacancies</h2>
-        <PaginatedListing houses={houses} />
+        <PaginatedListing houses={houses} loggedIn="true" />
       </div>
     </div>
   );

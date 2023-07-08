@@ -42,7 +42,7 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   );
 };
 
-const PaginatedListing = ({ houses, itemsPerPage }) => {
+const PaginatedListing = ({ houses, itemsPerPage, loggedIn = null }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [housesPerPage, setHousesPerPage] = useState(6);
   const lastHouseIndex = currentPage * housesPerPage;
@@ -57,7 +57,7 @@ const PaginatedListing = ({ houses, itemsPerPage }) => {
     <div>
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
         {currentHouses?.map((house, i) => (
-          <HouseCard key={i} house={house} />
+          <HouseCard key={i} house={house} loggedIn={loggedIn} />
         ))}
       </div>
       <Pagination

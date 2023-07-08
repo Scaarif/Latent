@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore, MdStar } from 'react-icons/md';
+import { IoMdSend } from 'react-icons/io';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -25,7 +26,7 @@ const Rating = ({ setRating, rating }) => {
     } else {
       setRating(rating - 1);
     }
-    console.log(rating);
+    // console.log(rating);
   };
 
   return (
@@ -43,6 +44,7 @@ const House = () => {
   const [rateAgent, setRateAgent] = useState(false);
   const [rating, setRating] = useState(1);
   const [comment, setComment] = useState('');
+  const [hovered, setHovered] = useState(false);
 
   const handleCommenting = (e) => {
     setComment(e.target.value);
@@ -95,7 +97,7 @@ const House = () => {
           <div className="flex flex-col gap-4 bg-white mt-4 p-4">
             <div className="flex gap-2 text-sm">
               <span className="text-s_gray">Listed by</span>
-              <span className="font-semibold text-slate-700">Wahura Wamaingi</span>
+              <Link to="/user/1" className="font-semibold text-slate-700 transition-colors hover:text-green">Wahura Wamaingi</Link>
             </div>
 
             {/* Rate the agent's service */}
@@ -116,7 +118,7 @@ const House = () => {
   rateAgent
                 && (
                 <div className="flex flex-col md:mx-4 p-2 md:p-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star, i) => (
                       <Rating
                         key={i}
@@ -125,7 +127,7 @@ const House = () => {
                       />
                     ))}
                   </div>
-                  <div className="flex">
+                  <div className="flex items-end">
                     <textarea
                       name="comment"
                       id=""
@@ -137,6 +139,13 @@ const House = () => {
                       placeholder="leave a comment"
                       className="border mt-2 rounded p-2 text-slate-600 focus:outline-none focus:border-light_green"
                     />
+                    <span className="border-y border-x rounded px-4 py-2">
+                      <IoMdSend
+                        onMouseEnter={() => setHovered(true)}
+                        onMouseLeave={() => setHovered(false)}
+                        style={{ color: hovered ? 'green' : 'gray', width: '20px', height: '20px' }}
+                      />
+                    </span>
                   </div>
                 </div>
                 )
