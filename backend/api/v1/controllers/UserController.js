@@ -167,14 +167,14 @@ class UserController {
         lastName,
         phone,
       } = req.body;
-      const updateList = [firstName, lastName, phone];
+      const attrValues = [firstName, lastName, phone];
       const attrNames = ['firstName', 'lastName', 'phone'];
       const updateObj = {};
       // popultae `updateObj` with non-undefined attributes
-      for (let i = 0; i < updateList.length; i += 1) {
-        if (updateList[i]) {
+      for (let i = 0; i < attrValues.length; i += 1) {
+        if (attrValues[i]) {
           // value is supplied for the attribute
-          updateObj[attrNames[i]] = updateList[i];
+          updateObj[attrNames[i]] = attrValues[i];
         }
       }
       // get the user's doc
@@ -221,14 +221,19 @@ class UserController {
    */
   static async deleteUser(req, res) {
     // retrieve userId query param, if present
-    const { userId } = req.query;
+    let { userId } = req.query;
     if (userId) {
       // retrieve doc using the userId if provided; otherwise use req.user
+      try {
+        userId = new mongoose.Types.ObjectId(userId);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'invalid ObjectId string' });
+      }
       let userDoc;
-      userDoc = await Agent.findById(new mongoose.Types.ObjectId(userId)).exec();
+      userDoc = await Agent.findById(userId).exec();
       if (!userDoc) {
         // try fetching a Tenant
-        userDoc = await Tenant.findById(new mongoose.Types.ObjectId(userId)).exec();
+        userDoc = await Tenant.findById(userId).exec();
       }
 
       if (userDoc) {
