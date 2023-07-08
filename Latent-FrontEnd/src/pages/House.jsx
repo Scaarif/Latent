@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore } from 'react-icons/md';
+import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore, MdStar } from 'react-icons/md';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -16,10 +16,38 @@ import PaginatedListing from '../components/PaginatedListing';
 import { houses } from '../constants';
 // import { house1 } from '../assets';
 
+const Rating = ({ setRating, rating }) => {
+  const [starred, setStarred] = useState(false);
+  const handleClick = () => {
+    setStarred(!starred);
+    if (starred) {
+      setRating(rating + 1);
+    } else {
+      setRating(rating - 1);
+    }
+    console.log(rating);
+  };
+
+  return (
+    <MdStar
+      onClick={handleClick}
+      style={{ color: starred ? '#339D65' : 'gray', height: '20px', width: '20px' }}
+    />
+  );
+};
+
 const House = () => {
   const { houseId } = useParams();
   const house = houses.find((hse) => hse.id === Number(houseId));
   const [showReviews, setShowReviews] = useState(false);
+  const [rateAgent, setRateAgent] = useState(false);
+  const [rating, setRating] = useState(1);
+  const [comment, setComment] = useState('');
+
+  const handleCommenting = (e) => {
+    setComment(e.target.value);
+    console.log(comment);
+  };
   // console.log(houseId)
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
@@ -69,6 +97,51 @@ const House = () => {
               <span className="text-s_gray">Listed by</span>
               <span className="font-semibold text-slate-700">Wahura Wamaingi</span>
             </div>
+
+            {/* Rate the agent's service */}
+
+            <div className="flex flex-col py-4">
+              <div className="flex items-center gap-2">
+                <span className="text-center text-green py-2 transition-colors
+                hover:text-md_green cursor-pointer rounded-sm z-10"
+                >
+                  Rate the agent's services
+                </span>
+                <MdExpandMore
+                  style={{ color: 'green', height: '24px', width: '24px' }}
+                  onClick={() => setRateAgent(!rateAgent)}
+                />
+              </div>
+              {
+  rateAgent
+                && (
+                <div className="flex flex-col md:mx-4 p-2 md:p-4">
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star, i) => (
+                      <Rating
+                        key={i}
+                        rating={rating}
+                        setRating={setRating}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex">
+                    <textarea
+                      name="comment"
+                      id=""
+                      cols="60"
+                      rows="5"
+                      value={comment}
+                      // onChange={(e) => setComment(e.target.value)}
+                      onChange={handleCommenting}
+                      placeholder="leave a comment"
+                      className="border mt-2 rounded p-2 text-slate-600 focus:outline-none focus:border-light_green"
+                    />
+                  </div>
+                </div>
+                )
+}
+            </div>
             <div className="flex items-center gap-4">
               <span className="font-semibold text-slate-700">What other customers have to say about the Agent</span>
               <MdExpandMore
@@ -89,13 +162,6 @@ const House = () => {
                 <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
                 <span className="self-end font-semibold text-s_gray">Alison James</span>
               </div>
-            </div>
-            <div className="flex py-4">
-              <span className="text-center text-green border border-green px-4 py-2 transition-colors
-              hover:text-md_green cursor-pointer rounded-sm z-10"
-              >
-                Rate the agent's services
-              </span>
             </div>
           </div>
         </div>
