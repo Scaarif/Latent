@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { BsLinkedin, BsFacebook, BsTwitter, BsInstagram } from 'react-icons/bs';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/pagination';
+
+// import required modules
+import { FreeMode, Pagination } from 'swiper/modules';
+
 import SearchBar from '../components/SearchBar';
 import { card1, card2 } from '../assets';
 import Button from '../components/Button';
@@ -128,28 +139,25 @@ const Landing = () => {
             <p className="text-center text-sm text-s_gray">Don't take our word for it, hear directly from our customer landlords, agents  and clients.</p>
           </div>
           <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mt-16">
-            <Testimonial />
-            <Testimonial />
-            <Testimonial />
+            <Swiper
+              slidesPerView={2}
+              spaceBetween={10}
+              freeMode
+              pagination={{
+                clickable: true,
+              }}
+              modules={[FreeMode, Pagination]}
+              className="mySwiper"
+            >
+              {
+         [1, 2, 3, 4, 5, 6].map((review, i) => (
+           <SwiperSlide key={i}>
+             <Testimonial />
+           </SwiperSlide>
+         ))
+        }
+            </Swiper>
           </div>
-
-          <div className="hidden md:flex justify-center items-center gap-8 mt-8">
-            <span className="rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
-              <MdArrowForwardIos
-                style={{ color: hovered ? 'green' : 'black', height: '20px', width: '20px', transform: 'rotate(180deg)' }}
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-              />
-            </span>
-            <span className="rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
-              <MdArrowForwardIos
-                style={{ color: hovered ? 'green' : 'black', height: '20px', width: '20px' }}
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-              />
-            </span>
-          </div>
-
         </div>
       </div>
 

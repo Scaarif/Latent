@@ -58,3 +58,7 @@ linearGradient {
 .swiper-button-prev::after {
   color: green;
 }
+
+.swiper-pagination-bullet .swiper-pagination-bullet-active {
+  color: green;
+}

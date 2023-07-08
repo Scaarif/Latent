@@ -2,8 +2,8 @@ import React from 'react';
 import { MdFormatQuote, MdStar, MdStarBorder } from 'react-icons/md';
 
 export const Testimonial = () => (
-  <div className="flex flex-col md:w-[400px] space-y-2 p-4 border-t md:border rounded-md relative">
-    <span className="absolute -top-6 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
+  <div className="flex flex-col md:w-[400px] space-y-2 p-4 rounded-md relative pb-16">
+    <span className="absolute top-0 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
       <MdFormatQuote style={{ color: 'green', transform: 'rotate(180deg)', height: '24px', width: '24px' }} />
     </span>
     <span className="font-semibold text-slate-600 pt-4">Felix Jimoh</span>
