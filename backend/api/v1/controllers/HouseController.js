@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 const House = require('../models/House');
 const Agent = require('../models/Agent');
+const Tenant = require('../models/Tenant');
 const bookHouseQueue = require('../jobs/queue');
 
 class HouseController {
@@ -72,7 +73,11 @@ class HouseController {
       // Create the new house entry in the database.
       const house = new House(newHouse);
       const result = await house.save();
-      return res.status(201).json(result);
+
+      // Add the house to agent.listings
+      const updateOptions = { $push: { listings: result._id } };
+      await Agent.findByIdAndUpdate(agentId, updateOptions);
+      return res.status(201).json({ success: true, message: 'House successfuly added to listings' });
     } catch (err) {
       // If an error occurs during house creation, return a JSON response with a 400 status code
       // and the error message.
@@ -169,11 +174,11 @@ class HouseController {
       // Check if authenicated user is an agent
       const { listings } = req.user;
       if (!listings) return res.status(401).json({ error: 'Must be an agent to delete a house' });
-      const { _id } = req.query;
+      const { houseId } = req.params;
 
       // Find and delete the house entry in the database with the provided ID.
-      const result = await House.findByIdAndDelete(_id);
-      return res.status(200).json(result);
+      await House.findByIdAndDelete(houseId);
+      return res.status(200).json({ success: true, message: 'House successfully deleted' });
     } catch (err) {
       // If an error occurs during house deletion, return a JSON response with
       // a 400 status code and the error message.
@@ -192,7 +197,7 @@ class HouseController {
       // Check if user is an agent
       const { listings } = req.user;
       if (!listings) return res.status(401).json({ error: 'Must be an agent to post a house' });
-      const { _id } = req.params;
+      const { houseId } = req.params;
 
       const {
         country,
@@ -242,7 +247,7 @@ class HouseController {
 
       // Find the existing house by ID and update it with the new data.
       const existingHouse = await House.findByIdAndUpdate(
-        _id,
+        houseId,
         updateObject,
         { new: true }, // Return the updated house after the update is applied.
       );
@@ -290,6 +295,11 @@ class HouseController {
       // create a Queue and queue in the job data
       const job = await bookHouseQueue.add(bookingJobData);
       await job.finished();
+
+      // Add house to users cart
+      // Add the house to agent.listings
+      const updateOptions = { $push: { cart: houseId } };
+      await Tenant.findByIdAndUpdate(req.user._id, updateOptions);
       return res.status(200).json({ success: true, message: 'Appointment booked' });
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });

@@ -17,9 +17,9 @@ router.post(
 );
 
 router.get('/houses', HouseController.getHouse);
-router.delete('/houses', HouseController.deleteHouse);
+router.delete('/houses/:houseId', HouseController.deleteHouse);
 router.put(
-  '/houses',
+  '/houses/:houseId',
   upload.fields([
     { name: 'coverImage', maxCount: 1 },
     { name: 'images', maxCount: 3 }]),
