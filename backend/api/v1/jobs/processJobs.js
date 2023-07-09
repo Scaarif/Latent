@@ -1,7 +1,8 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Agent = require('../models/Agent');
 const Tenant = require('../models/Tenant');
-const bookHouseQueue = require('./queue');
+const { bookHouseQueue, resetPassword } = require('./queue');
 const sendEmail = require('../utils/sendEmail');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/latent';
@@ -33,13 +34,13 @@ bookHouseQueue.process(async (job) => {
     const agentMessage = `Hello ${agent.firstName}\nThere is a potential tenant by name ${tenant.firstName} who is interested in your house.\nHouse details:\n\tAddress: ${houseAddress}\n\tDescription: ${houseDescription}\n\nYour contact has been shared with the tenant\nThank you for choosing Latent for your housing services`;
 
     const mailOptions = [{
-      from: 'Latent gideonobiasor@gmail.com',
+      from: `Latent ${process.env.EMAIL}`,
       to: tenant.email,
       subject: 'House inspection',
       text: `${tenantMessage}`,
     },
     {
-      from: 'Latent gideonobiasor@gmail.com',
+      from: `Latent ${process.env.EMAIL}`,
       to: agent.email,
       subject: 'House inspection',
       text: `${agentMessage}`,
@@ -50,5 +51,24 @@ bookHouseQueue.process(async (job) => {
     });
   } catch (err) {
     console.error(err.message);
+  }
+});
+
+// Handle sending of OTP to user email for password reset
+resetPassword.process(async (job) => {
+  try {
+    const {
+      email, otp, firstName, lastName,
+    } = job.data;
+    const message = `Click the link below to reset your password\n\nhttp://localhost:5000/api/v1/reset-password?email=${email}&otp=${otp}&firstName=${firstName}&lastName=${lastName}`;
+    const mailOptionS = {
+      from: `Latent ${process.env.EMAIL}`,
+      to: email,
+      subject: 'Password reset',
+      text: message,
+    };
+    await sendEmail(mailOptionS);
+  } catch (err) {
+    console.log(err.message);
   }
 });

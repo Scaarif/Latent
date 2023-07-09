@@ -7,4 +7,11 @@ const bookHouseQueue = new Queue('sendNotificationForHouseBooking', {
   },
 });
 
-module.exports = bookHouseQueue;
+const resetPassword = new Queue('resetPassword', {
+  redis: {
+    host: 'localhost',
+    port: 6379,
+  },
+});
+
+module.exports = { bookHouseQueue, resetPassword };
