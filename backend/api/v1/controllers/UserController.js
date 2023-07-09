@@ -13,6 +13,26 @@ const pwdQueue = new Bull('resetPassword');
 // generate a secret key of length 20 for OTPs
 const secret = speakEasy.generateSecret({ length: 20 });
 
+/**
+ * Capitalizes a string to title case.
+ * @param {String} str - The string to capitalize.
+ * @returns {String} - The capitalized string, if not empty and/or is a string; otherwise str.
+ *
+ * Examples:
+ * - capitalize('naMe') --> 'Name'
+ * - capitalize(50) --> 50
+ */
+function capitalize(str) {
+  if ((str instanceof String || typeof str === 'string') && str.length > 0) {
+    const firstChar = str.charAt(0);
+    const otherChar = str.slice(1);
+    const capitalizedStr = `${firstChar.toUpperCase()}${otherChar.toLowerCase()}`;
+    return capitalizedStr;
+  }
+  // invalid argument; return as-is
+  return str;
+}
+
 class UserController {
   /**
    * Create a new user entry with the provided details.
@@ -42,8 +62,8 @@ class UserController {
       // create an Agent doc
       Agent.register(new Agent({
         // array attr, like reviews, will be init to []
-        firstName,
-        lastName,
+        firstName: capitalize(firstName),
+        lastName: capitalize(lastName),
         email,
         phone,
       }), password, (err, agent) => {
@@ -66,8 +86,8 @@ class UserController {
     } else if (isAgent && isAgent.toLowerCase() === 'false') {
       // create a Tenant doc
       Tenant.register(new Tenant({
-        firstName,
-        lastName,
+        firstName: capitalize(firstName),
+        lastName: capitalize(lastName),
         email,
         phone,
       }), password, (err, tenant) => {
@@ -210,27 +230,50 @@ class UserController {
    * Step2 --> OTP has been delivered, and is being
    * provided with the email (again) for reset. Email will be in query string.
    *
-   * If no otp and/or isAgent, and email is set, it is assumed this is the first step, and
-   * the OTP needs to be sent. If both are present (step2), then
-   * we proceed to verifying the OTP, and resetting the password.
+   * If no otp, but the email, firstName and lastName are set, it is assumed this is
+   * the first step, and the OTP needs to be sent. If the four are present (step2), then
+   * we proceed to verifying the OTP, resetting the password, and logging out the user.
    *
-   * Otherwise (if no oldPassword and newPassword, or email), error is sent.
+   * Otherwise (if no oldPassword and newPassword, or no email), error is sent.
+   *
+   * In the first step, the
+   * user's email, firstName, and lastName are expected, and in the req body (form).
+   *
+   * In the second step, the email, otp, firstName, and lastName are
+   * expected in the query string, and the newPassword is expected in the body.
    */
   static async putPassword(req, res) {
-    // TODO: confirm implementation variables; e.g. isAgent
-    // TODO: logout user on successful password change; case1
+    // TODO: improve security by linking token with email
     const {
       oldPassword,
       newPassword,
-      otp,
-      isAgent,
     } = req.body;
 
-    let { email } = req.body;
+    const { otp: token } = req.query;
+    let { email, firstName, lastName } = req.body;
+    // console.log(email, firstName, lastName); // SCAFF
+    // console.log('##########'); // SCAFF
+    // console.log(Object.entries(req.query)); // SCAFF
+    // console.log(Object.entries(req.body)); // SCAFF
+    // console.log('##########'); // SCAFF
     if (!email) {
       // not in body; check query string
       email = req.query.email;
     }
+    if (!firstName) {
+      // not in body; check query string
+      firstName = req.query.firstName;
+    }
+    if (!lastName) {
+      // not in body; check query string
+      lastName = req.query.lastName;
+    }
+
+    // capitalize names for [case-sensitive] query search
+    firstName = capitalize(firstName);
+    lastName = capitalize(lastName);
+
+    // console.log(email, firstName, lastName); // SCAFF
 
     // case1: user is logged in and wants to reset password
     if (oldPassword && newPassword && req.isAuthenticated()) {
@@ -240,7 +283,16 @@ class UserController {
           return res.status(401).json({ success: false, message: err.toString() });
         }
 
-        return res.json({ success: true, message: 'password successfully changed' });
+        // logout user and respond
+        req.logout((err) => {
+          if (err) {
+            // probably some server error
+            res.status(500).json({ success: false, message: err.toString() });
+          }
+          // logout successfull
+          return res.json({ success: true, message: 'password successfully changed and user logged out' });
+        });
+        return undefined;
       });
 
       return undefined;
@@ -249,7 +301,8 @@ class UserController {
     // case2: user has forgotten password; must be logged out
     if (email && !req.isAuthenticated()) {
       // email provided
-      if (!otp || !isAgent) {
+      // console.log('email available...'); // SCAFF
+      if (!token && firstName && lastName) {
         // generate and send OTP
         // TODO: confirm expected interface from team
         /* =====generate OTP manually=====
@@ -269,38 +322,58 @@ class UserController {
         // which uses a 10-minute window (1 window is 30 secs step by default),
         // meaning the token is valid for only about 10 minutes
         const token = speakEasy.totp({ secret: secret.base32, encoding: 'base32' }); // hex and ascii key/encoding can be used
+        console.log(token); // SCAFF
 
         // add a job to the queue for sending emails with OTP
-        // TODO: might need to add data on interface confirm
-        const jobData = { token, email };
+        const jobData = {
+          otp: token,
+          email,
+          firstName,
+          lastName,
+        };
         pwdQueue.add(jobData);
 
         // TODO: confirm the response status code from team
         return res.status(102).json({ success: true, message: 'sending OTP' });
       }
 
-      // email, otp, and isAgent provided; attempt pwd reset
-      // verify token
-      const verified = speakEasy.totp.verify({
-        secret: secret.base32,
-        encoding: 'base32',
-        token: otp,
-        window: 20,
-      });
-      if (!verified) {
-        // invalid OTP
-        return res.status(401).json({ success: false, message: 'invalid OTP' });
-      }
+      if (email && token && firstName && lastName) {
+        // email, otp, firstName and lastName provided; attempt pwd reset
+        // verify token
+        // TODO: verify against mail on linking implementation
+        // TODO: invalidate the token on first use. E.g. unlink
+        const verified = speakEasy.totp.verify({
+          secret: secret.base32,
+          encoding: 'base32',
+          token,
+          window: 20,
+        });
+        if (!verified) {
+          // invalid OTP
+          return res.status(401).json({ success: false, message: 'invalid OTP' });
+        }
 
-      // +++++OTP verified+++++
+        // +++++OTP verified+++++
 
-      // retrieve the user doc
-      if (isAgent === 'yes') {
-        // `possibly` an agent
-        const agentDoc = await Agent.findOne({ email }).exec();
-        if (agentDoc) {
+        // retrieve the user doc
+        let userDoc = await Agent.findOne({
+          email,
+          firstName,
+          lastName,
+        }).exec();
+        if (!userDoc) {
+          // check if user is a tenant
+          userDoc = await Tenant.findOne({
+            email,
+            firstName,
+            lastName,
+          }).exec();
+        }
+
+        // process the doc
+        if (userDoc) {
           // document found
-          agentDoc.setPassword(newPassword, async (err, user, passwordErr) => {
+          userDoc.setPassword(newPassword, async (err, user, passwordErr) => {
             if (err) {
               // likely hashing algorithm error
               return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
@@ -313,37 +386,17 @@ class UserController {
             return res.json({ success: true, message: 'password reset complete' });
           });
         } else {
-          // no agent found
-          res.status(401).json({ success: false, message: 'no such agent found' });
+          // no user doc found
+          return res.status(401).json({ success: false, message: 'no user found' });
         }
-      } else {
-        // `possibly` a tenant
-        const tenantDoc = await Tenant.findOne({ email }).exec();
-        if (tenantDoc) {
-          // document found
-          tenantDoc.setPassword(newPassword, async (err, user, passwordErr) => {
-            if (err) {
-              // likely hashing algorithm error
-              return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
-            }
-            if (passwordErr) {
-              return res.status(401).json({ success: false, message: passwordErr.toString() });
-            }
-            // no errors
-            await user.save();
-            return res.json({ success: true, message: 'password reset complete' });
-          });
-        } else {
-          // no tenant found
-          res.status(401).json({ success: false, message: 'no such tenant found' });
-        }
-
         return undefined;
       }
+      // email present, but no firstName and/or lastName
+      return res.status(401).json({ success: false, message: 'no firstName and/or lastName' });
     }
 
     if (req.isAuthenticated()) {
-      return res.status(401).json({ success: false, message: 'no oldPassword and newPassword fields' });
+      return res.status(401).json({ success: false, message: 'no/invalid oldPassword and newPassword fields' });
     }
 
     // not authenticated, and no email
@@ -359,11 +412,14 @@ class UserController {
   static async putUser(req, res) {
     if (req.isAuthenticated()) {
       // retrieve allowed update parameters
-      const {
+      let {
         firstName,
         lastName,
-        phone,
       } = req.body;
+      const { phone } = req.body;
+      firstName = capitalize(firstName);
+      lastName = capitalize(lastName);
+
       const attrValues = [firstName, lastName, phone];
       const attrNames = ['firstName', 'lastName', 'phone'];
       const updateObj = {};

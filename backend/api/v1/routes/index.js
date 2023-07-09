@@ -33,6 +33,7 @@ router.post('/appointment/:houseId', HouseController.bookHouse);
 router.post('/login', UserController.postLogin);
 router.post('/logout', UserController.postLogout);
 router.put('/reset-password', UserController.putPassword);
+// router.post('/reset-password', UserController.putPassword);
 router.post('/users', UserController.postUser);
 router.put('/users', UserController.putUser);
 router.get('/users', UserController.getUser);
@@ -56,12 +57,12 @@ router.get('/login', (req, res) => {
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>HELLO PAGE</title>
+        <title>LOGIN PAGE</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta charset="utf-8">
     </head>
         <body>
-          <h1>Hello World!</h1>
+          <h1>Login</h1>
           <form method="POST" action="/api/v1/login" enctype="application/json">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <label for="uname">Enter email:</label>
@@ -70,6 +71,54 @@ router.get('/login', (req, res) => {
             <input type="password" id="pwd" name="password" autocomplete="current-password" required /><br><br>
             <input type="checkbox" name="check" value="rem" />Remember me<br><br>
             <input type="submit" value="Submit Credentials" />
+          </form>
+        </body>
+</html>
+    `);
+});
+
+router.get('/reset-password', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>PASSWORD RESET</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+    </head>
+        <body>
+          <h1>Password Reset</h1>
+          <form method="POST" action="/api/v1/reset-password" enctype="application/json">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <label for="pwd">Enter new password:</label>
+            <input type="password" id="pwd" name="newPassword" autocomplete="current-password" required /><br><br>
+            <input type="submit" value="Submit New Password" />
+          </form>
+        </body>
+</html>
+    `);
+});
+
+router.get('/get-reset-password', (req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>PASSWORD RESET EMAIL</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8">
+    </head>
+        <body>
+          <h1>Password Reset Email</h1>
+          <form method="POST" action="/api/v1/reset-password?email=obisann@gmail.com&firstName=Greenbel" enctype="application/json">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <label for="email">Enter email:</label>
+            <input type="email" id="email" name="email" autocomplete="current-password" required /><br><br>
+            <label for="fname">Enter first name:</label>
+            <input type="text" id="fname" name="firstName" autocomplete="current-password" required /><br><br>
+            <label for="lname">Enter last name:</label>
+            <input type="text" id="lname" name="lastName" autocomplete="current-password" required /><br><br>
+            <input type="submit" value="Submit Reset Email" />
           </form>
         </body>
 </html>
