@@ -37,6 +37,7 @@ router.post('/users', UserController.postUser);
 router.put('/users', UserController.putUser);
 router.get('/users', UserController.getUser);
 router.delete('/users', UserController.deleteUser);
+router.get('/agents/:agentId', UserController.getAgent);
 
 /**
  * Sanity check

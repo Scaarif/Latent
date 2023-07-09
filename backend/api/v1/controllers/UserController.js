@@ -1,9 +1,17 @@
 const passport = require('passport');
 const mongoose = require('mongoose');
+const Bull = require('bull');
+const speakEasy = require('speakeasy');
 const Tenant = require('../models/Tenant');
 const Agent = require('../models/Agent');
 const House = require('../models/House');
-// const Rating = require('../models/Rating');
+const Rating = require('../models/Rating');
+
+// a Bull queue using default 127.0.0.1:6379 connection
+const pwdQueue = new Bull('resetPassword');
+
+// generate a secret key of length 20 for OTPs
+const secret = speakEasy.generateSecret({ length: 20 });
 
 class UserController {
   /**
@@ -145,12 +153,201 @@ class UserController {
   }
 
   /**
-   * ...
+   * Returns a specific Agent by ID.
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
-   * @returns {Promise} - A Promise that resolves to ...
+   * @returns {Promise} - A Promise that resolves to a response with a contactless Agent object.
+   */
+  static async getAgent(req, res) {
+    // retrieve agentId string from URI
+    let { agentId } = req.params;
+
+    // IF agentId is set, use it to fetch agent doc
+    if (agentId && req.isAuthenticated()) {
+      try {
+        agentId = new mongoose.Types.ObjectId(agentId);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'invalid agent ID' });
+      }
+      const agentDoc = await Agent.findById(agentId).exec();
+
+      // convert to plain JavaScript object
+      const agentObj = agentDoc.toObject();
+
+      // delete salt, hash, email, and phone properties
+      delete agentObj.salt;
+      delete agentObj.hash;
+      delete agentObj.email;
+      delete agentObj.phone;
+
+      // send it
+      return res.json(agentObj);
+    }
+
+    if (!agentId && req.isAuthenticated()) {
+      // no agentId set
+      return res.status(400).json({ success: false, message: 'no agent ID set' });
+    }
+
+    // user not logged in
+    return res.status(401).json({ success: false, message: 'user not logged in' });
+  }
+
+  /**
+   * Changes/resets a user's password.
+   * @param {Object} req - The HTTP request object.
+   * @param {Object} res - The HTTP response object.
+   * @returns {Promise} - A Promise that resolves to a password change, or failure
+   *
+   * Algorithm:
+   *
+   * oldPassword and newPassword are always expected in the request body (form).
+   * If both are set, they'll be processed. If any of them is missing, check for email is done.
+   *
+   * If email is set, then then it is done in one of two steps:
+   * Step1 --> password is forgotten, the user is logged out,
+   * and their email is provided in a form for OTP delivery. Email will be in body.
+   * Step2 --> OTP has been delivered, and is being
+   * provided with the email (again) for reset. Email will be in query string.
+   *
+   * If no otp and/or isAgent, and email is set, it is assumed this is the first step, and
+   * the OTP needs to be sent. If both are present (step2), then
+   * we proceed to verifying the OTP, and resetting the password.
+   *
+   * Otherwise (if no oldPassword and newPassword, or email), error is sent.
    */
   static async putPassword(req, res) {
+    // TODO: confirm implementation variables; e.g. isAgent
+    // TODO: logout user on successful password change; case1
+    const {
+      oldPassword,
+      newPassword,
+      otp,
+      isAgent,
+    } = req.body;
+
+    let { email } = req.body;
+    if (!email) {
+      // not in body; check query string
+      email = req.query.email;
+    }
+
+    // case1: user is logged in and wants to reset password
+    if (oldPassword && newPassword && req.isAuthenticated()) {
+      req.user.changePassword(oldPassword, newPassword, (err) => {
+        if (err) {
+          // likely wrong old password
+          return res.status(401).json({ success: false, message: err.toString() });
+        }
+
+        return res.json({ success: true, message: 'password successfully changed' });
+      });
+
+      return undefined;
+    }
+
+    // case2: user has forgotten password; must be logged out
+    if (email && !req.isAuthenticated()) {
+      // email provided
+      if (!otp || !isAgent) {
+        // generate and send OTP
+        // TODO: confirm expected interface from team
+        /* =====generate OTP manually=====
+        let otp = (Math.round(Math.random() * 999999)).toString();
+        const padding = '0'.repeat(6 - otp.length);
+        otp = `${otp}${padding}`;
+        const jobData = {
+          email,
+          otp,
+        };
+        pwdQueue.add(job);
+        ================================== */
+        // generate OTP with speakeasy module
+        // generate a time-based OTP token based on the secret;
+        // to be verified later with:
+        // `speakEasy.totp.verify({secret: secret.base32, encoding: 'base32', token, window: 20})`
+        // which uses a 10-minute window (1 window is 30 secs step by default),
+        // meaning the token is valid for only about 10 minutes
+        const token = speakEasy.totp({ secret: secret.base32, encoding: 'base32' }); // hex and ascii key/encoding can be used
+
+        // add a job to the queue for sending emails with OTP
+        // TODO: might need to add data on interface confirm
+        const jobData = { token, email };
+        pwdQueue.add(jobData);
+
+        // TODO: confirm the response status code from team
+        return res.status(102).json({ success: true, message: 'sending OTP' });
+      }
+
+      // email, otp, and isAgent provided; attempt pwd reset
+      // verify token
+      const verified = speakEasy.totp.verify({
+        secret: secret.base32,
+        encoding: 'base32',
+        token: otp,
+        window: 20,
+      });
+      if (!verified) {
+        // invalid OTP
+        return res.status(401).json({ success: false, message: 'invalid OTP' });
+      }
+
+      // +++++OTP verified+++++
+
+      // retrieve the user doc
+      if (isAgent === 'yes') {
+        // `possibly` an agent
+        const agentDoc = await Agent.findOne({ email }).exec();
+        if (agentDoc) {
+          // document found
+          agentDoc.setPassword(newPassword, async (err, user, passwordErr) => {
+            if (err) {
+              // likely hashing algorithm error
+              return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
+            }
+            if (passwordErr) {
+              return res.status(401).json({ success: false, message: passwordErr.toString() });
+            }
+            // no errors
+            await user.save();
+            return res.json({ success: true, message: 'password reset complete' });
+          });
+        } else {
+          // no agent found
+          res.status(401).json({ success: false, message: 'no such agent found' });
+        }
+      } else {
+        // `possibly` a tenant
+        const tenantDoc = await Tenant.findOne({ email }).exec();
+        if (tenantDoc) {
+          // document found
+          tenantDoc.setPassword(newPassword, async (err, user, passwordErr) => {
+            if (err) {
+              // likely hashing algorithm error
+              return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
+            }
+            if (passwordErr) {
+              return res.status(401).json({ success: false, message: passwordErr.toString() });
+            }
+            // no errors
+            await user.save();
+            return res.json({ success: true, message: 'password reset complete' });
+          });
+        } else {
+          // no tenant found
+          res.status(401).json({ success: false, message: 'no such tenant found' });
+        }
+
+        return undefined;
+      }
+    }
+
+    if (req.isAuthenticated()) {
+      return res.status(401).json({ success: false, message: 'no oldPassword and newPassword fields' });
+    }
+
+    // not authenticated, and no email
+    return res.status(401).json({ success: false, message: 'no email field' });
   }
 
   /**
@@ -167,18 +364,17 @@ class UserController {
         lastName,
         phone,
       } = req.body;
-      const updateList = [firstName, lastName, phone];
+      const attrValues = [firstName, lastName, phone];
       const attrNames = ['firstName', 'lastName', 'phone'];
       const updateObj = {};
       // popultae `updateObj` with non-undefined attributes
-      for (let i = 0; i < updateList.length; i += 1) {
-        if (updateList[i]) {
+      for (let i = 0; i < attrValues.length; i += 1) {
+        if (attrValues[i]) {
           // value is supplied for the attribute
-          updateObj[attrNames[i]] = updateList[i];
+          updateObj[attrNames[i]] = attrValues[i];
         }
       }
       // get the user's doc
-      // const doc = await Tenant.findById(req.user._id);
       const doc = req.user;
       // update doc with non-undefined attributes
       Object.assign(doc, updateObj);
@@ -221,14 +417,19 @@ class UserController {
    */
   static async deleteUser(req, res) {
     // retrieve userId query param, if present
-    const { userId } = req.query;
+    let { userId } = req.query;
     if (userId) {
       // retrieve doc using the userId if provided; otherwise use req.user
+      try {
+        userId = new mongoose.Types.ObjectId(userId);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'invalid ObjectId string' });
+      }
       let userDoc;
-      userDoc = await Agent.findById(new mongoose.Types.ObjectId(userId)).exec();
+      userDoc = await Agent.findById(userId).exec();
       if (!userDoc) {
         // try fetching a Tenant
-        userDoc = await Tenant.findById(new mongoose.Types.ObjectId(userId)).exec();
+        userDoc = await Tenant.findById(userId).exec();
       }
 
       if (userDoc) {
@@ -242,18 +443,14 @@ class UserController {
           for await (const houseId of listings) {
             // remove all linked houses
             const houseDoc = await House.findById(houseId).exec();
-            // await houseDoc.remove();
             await houseDoc.deleteOne();
           }
 
-          /* TODO: uncomment when Rating model is available
           const ratingDocs = await Rating.find({ agentId: userDoc._id }).exec();
           for await (const ratingDoc of ratingDocs) {
             // remove all linked ratings
-            // await ratingDoc.remove();
             await ratingDoc.deleteOne();
           }
-          */
         }
 
         // remove doc from mongodb
@@ -277,18 +474,14 @@ class UserController {
         for await (const houseId of listings) {
           // remove all linked houses
           const houseDoc = await House.findById(houseId).exec();
-          // await houseDoc.remove();
           await houseDoc.deleteOne();
         }
 
-        /* TODO: uncomment when Rating model is available
         const ratingDocs = await Rating.find({ agentId: userDoc._id }).exec();
         for await (const ratingDoc of ratingDocs) {
           // remove all linked ratings
-          // await ratingDoc.remove();
           await ratingDoc.deleteOne();
         }
-        */
       }
 
       // remove doc from mongodb
