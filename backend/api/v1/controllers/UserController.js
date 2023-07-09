@@ -13,6 +13,26 @@ const pwdQueue = new Bull('resetPassword');
 // generate a secret key of length 20 for OTPs
 const secret = speakEasy.generateSecret({ length: 20 });
 
+/**
+ * Capitalizes a string to title case.
+ * @param {String} str - The string to capitalize.
+ * @returns {String} - The capitalized string, if not empty and/or is a string; otherwise str.
+ *
+ * Examples:
+ * - capitalize('naMe') --> 'Name'
+ * - capitalize(50) --> 50
+ */
+function capitalize(str) {
+  if ((str instanceof String || typeof str === 'string') && str.length > 0) {
+    const firstChar = str.charAt(0);
+    const otherChar = str.slice(1);
+    const capitalizedStr = `${firstChar.toUpperCase()}${otherChar.toLowerCase()}`;
+    return capitalizedStr;
+  }
+
+  return str;
+}
+
 class UserController {
   /**
    * Create a new user entry with the provided details.
@@ -42,8 +62,8 @@ class UserController {
       // create an Agent doc
       Agent.register(new Agent({
         // array attr, like reviews, will be init to []
-        firstName,
-        lastName,
+        firstName: capitalize(firstName),
+        lastName: capitalize(lastName),
         email,
         phone,
       }), password, (err, agent) => {
@@ -66,8 +86,8 @@ class UserController {
     } else if (isAgent && isAgent.toLowerCase() === 'false') {
       // create a Tenant doc
       Tenant.register(new Tenant({
-        firstName,
-        lastName,
+        firstName: capitalize(firstName),
+        lastName: capitalize(lastName),
         email,
         phone,
       }), password, (err, tenant) => {
@@ -359,11 +379,14 @@ class UserController {
   static async putUser(req, res) {
     if (req.isAuthenticated()) {
       // retrieve allowed update parameters
-      const {
+      let {
         firstName,
         lastName,
-        phone,
       } = req.body;
+      const { phone } = req.body;
+      firstName = capitalize(firstName);
+      lastName = capitalize(lastName);
+
       const attrValues = [firstName, lastName, phone];
       const attrNames = ['firstName', 'lastName', 'phone'];
       const updateObj = {};
