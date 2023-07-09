@@ -7,5 +7,5 @@ const ratingsSchema = new mongoose.Schema({
   agentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Agent' },
 });
 
-const Ratings = mongoose.model('Ratings', ratingsSchema);
-module.exports = Ratings;
+const Rating = mongoose.model('Rating', ratingsSchema);
+module.exports = Rating;
