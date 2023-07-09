@@ -153,6 +153,47 @@ class UserController {
   }
 
   /**
+   * Returns a specific Agent by ID.
+   * @param {Object} req - The HTTP request object.
+   * @param {Object} res - The HTTP response object.
+   * @returns {Promise} - A Promise that resolves to a response with a contactless Agent object.
+   */
+  static async getAgent(req, res) {
+    // retrieve agentId string from URI
+    let { agentId } = req.params;
+
+    // IF agentId is set, use it to fetch agent doc
+    if (agentId && req.isAuthenticated()) {
+      try {
+        agentId = new mongoose.Types.ObjectId(agentId);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'invalid agent ID' });
+      }
+      const agentDoc = await Agent.findById(agentId).exec();
+
+      // convert to plain JavaScript object
+      const agentObj = agentDoc.toObject();
+
+      // delete salt, hash, email, and phone properties
+      delete agentObj.salt;
+      delete agentObj.hash;
+      delete agentObj.email;
+      delete agentObj.phone;
+
+      // send it
+      return res.json(agentObj);
+    }
+
+    if (!agentId && req.isAuthenticated()) {
+      // no agentId set
+      return res.status(400).json({ success: false, message: 'no agent ID set' });
+    }
+
+    // user not logged in
+    return res.status(401).json({ success: false, message: 'user not logged in' });
+  }
+
+  /**
    * Changes/resets a user's password.
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
