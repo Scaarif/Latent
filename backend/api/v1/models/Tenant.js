@@ -31,7 +31,6 @@ const tenantSchema = new Schema({
 }, { optimisticConcurrency: true, timestamps: true });
 
 // plugin authentication middleware
-// TODO: decide on username/email field to know if to pass options object
 tenantSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 
 // TODO: connect mongoose before saving document

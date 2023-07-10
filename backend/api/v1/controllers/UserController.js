@@ -556,6 +556,152 @@ class UserController {
     // not logged in
     return res.status(401).json({ success: false, message: 'not allowed' });
   }
+
+  /**
+   * Links a review to a specific agent.
+   * @param {Object} req - The HTTP request object.
+   * @param {Object} res - The HTTP response object.
+   * @returns {Promise} - A Promise that resolves to the
+   * ...addition of a review to Agent.reviews and creation of a Rating.
+   */
+  static async postReview(req, res) {
+    // IF user is authenticated continue
+    if (req.isAuthenticated()) {
+      // fetch `comment` and `rating` fields
+      const { comment, rating } = req.body;
+
+      // retrieve the agent doc by specified ID
+      // get and validate ID
+      let { agentId } = req.params;
+      try {
+        agentId = new mongoose.Types.ObjectId(agentId);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: err.toString() });
+      }
+
+      // retrieve doc
+      const agentDoc = await Agent.findById(agentId).exec();
+      // ----IF no such agent (doc===null), return error
+      if (!agentDoc) {
+        // no agent found
+        return res.status(400).json({ success: false, message: 'no agent found' });
+      }
+
+      // check if user had previously posted a rating
+      let userReviewSubdoc;
+      for (const obj of agentDoc.reviews) {
+        if (obj.userId.toString() === req.user._id.toString()) {
+          // retrieve their review as a subdoc
+          userReviewSubdoc = obj;
+          break;
+        }
+      }
+
+      // IF no rating, old or new, return error
+      if (!rating && !userReviewSubdoc) {
+        // no new or previous rating, which is required
+        return res.status(400).json({ success: false, message: 'no `rating` field' });
+      }
+
+      if (userReviewSubdoc) {
+        // previous review exists; update Agent and Rating
+        const oldRating = userReviewSubdoc.rating; // save old
+        if (rating) {
+          // replace with new
+          userReviewSubdoc.rating = rating;
+        }
+        if (comment) {
+          userReviewSubdoc.comment = comment;
+        }
+
+        try {
+          // save agent doc to persist change in subdoc;
+          // invalid types will throw from mongoose validation
+          await agentDoc.save();
+
+          // TODO: update Agent.reviews.rating and
+          // recalculate Agent.rating when review is later edited/updated;
+          // this implementation takes care of both cases (old and new reviews)
+          // update Agent rating if old and new rating different
+          if (rating && (rating.toString() !== oldRating.toString())) {
+            const totalReviews = agentDoc.reviews.length;
+            const prevTotal = agentDoc.rating * totalReviews;
+            const newRating = Number(rating);
+            agentDoc.rating = (prevTotal - oldRating + newRating) / totalReviews;
+            await agentDoc.save();
+          }
+
+          // fetch the corresponding Rating doc to update with the new rating
+          // TODO: issue with two Rating docs with same tenant and agent ID;
+          // ...could be solved by including Rating ID in req.
+          const filterDoc = { tenantId: req.user._id, agentId };
+          const ratingDoc = await Rating.findOne(filterDoc).exec();
+          if (!ratingDoc) {
+            return res.status(400).json({ success: false, message: 'no linked Rating document' });
+          }
+
+          // +++++Rating doc found+++++
+
+          // update linked rating doc
+          ratingDoc.tenantRating = rating;
+          // save rating doc
+          await ratingDoc.save();
+          return res.status(201).json({ success: true, message: 'review successfully updated' });
+        } catch (err) {
+          // error in saving docs
+          return res.status(400).json({ success: false, message: err.toString() });
+        }
+      }
+
+      if (!userReviewSubdoc) {
+        // no previous review; create and link new review
+        // ------prepare a POJO with comment and rating
+        const reviewDoc = {
+          userId: req.user._id,
+          rating,
+          comment,
+        };
+
+        // ------push POJO to doc.reviews and save doc
+        // ------IF save successful (no validation/server error)
+        // --------create a Rating doc with the rating and IDs
+        // --------save the doc
+        // --------IF save successfull, return success; ELSE error
+        // ------ELSE return error
+        agentDoc.reviews.push(reviewDoc);
+        try {
+          await agentDoc.save();
+
+          // new review; update Agent.rating
+          // TODO: update Agent.reviews.rating and
+          // recalculate Agent.rating when review is later edited/updated
+          const totalReviews = agentDoc.reviews.length;
+          const prevTotal = agentDoc.rating * (totalReviews - 1);
+          const newRating = Number(rating);
+          agentDoc.rating = (prevTotal + newRating) / totalReviews;
+          await agentDoc.save();
+
+          // create a Rating doc with the rating and IDs
+          const ratingDoc = new Rating({
+            tenantId: req.user._id,
+            tenantRating: rating,
+            agentId,
+          });
+          // save rating doc;
+          // casting and validation are done before save()
+          await ratingDoc.save();
+          return res.status(201).json({ success: true, message: 'review successfully linked to agent' });
+        } catch (err) {
+          // error in saving docs
+          return res.status(400).json({ success: false, message: err.toString() });
+        }
+      }
+      return undefined;
+    }
+
+    // ELSE return authorization error
+    return res.status(401).json({ success: false, message: 'user not logged in' });
+  }
 }
 
 module.exports = UserController;

@@ -39,6 +39,7 @@ router.put('/users', UserController.putUser);
 router.get('/users', UserController.getUser);
 router.delete('/users', UserController.deleteUser);
 router.get('/agents/:agentId', UserController.getAgent);
+router.post('/agents/:agentId/reviews', UserController.postReview);
 
 /**
  * Sanity check
