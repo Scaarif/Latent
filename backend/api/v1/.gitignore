@@ -3,3 +3,4 @@ node_modules
 uploads/
 views/
 package-lock.json
+changes.yml

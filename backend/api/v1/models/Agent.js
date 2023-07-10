@@ -29,15 +29,19 @@ const agentSchema = new Schema({
     ref: 'House',
   }],
   reviews: [{
-    // will be automatically converyed to an array of subdocs
+    // will be automatically converted to an array of subdocs
     userId: Schema.Types.ObjectId,
     rating: {
       type: Number,
+      enum: [1, 2, 3, 4, 5],
       required: true,
     },
     comment: String,
   }],
-  rating: Number,
+  rating: {
+    type: Number,
+    default: 0,
+  },
   listings: [{
     // to be populated with `house` objects in query
     // listings is an array of House instance IDs
@@ -47,7 +51,8 @@ const agentSchema = new Schema({
 }, { optimisticConcurrency: true, timestamps: true });
 
 // plugin authentication middleware
-// agentSchema.plugin(passportLocalMongoose, { usernameField: 'email', selectFields: ['email', 'listings'] });
+// agentSchema.plugin(
+// passportLocalMongoose, { usernameField: 'email', selectFields: ['email', 'listings'] });
 agentSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 
 // TODO: connect mongoose before saving document
