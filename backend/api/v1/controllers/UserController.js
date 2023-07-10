@@ -1,14 +1,15 @@
 const passport = require('passport');
 const mongoose = require('mongoose');
-const Bull = require('bull');
+// const Bull = require('bull');
 const speakEasy = require('speakeasy');
+const { resetPassword: pwdQueue } = require('../jobs/queue');
 const Tenant = require('../models/Tenant');
 const Agent = require('../models/Agent');
 const House = require('../models/House');
 const Rating = require('../models/Rating');
 
 // a Bull queue using default 127.0.0.1:6379 connection
-const pwdQueue = new Bull('resetPassword');
+// const pwdQueue = new Bull('resetPassword');
 
 // generate a secret key of length 20 for OTPs
 const secret = speakEasy.generateSecret({ length: 20 });
@@ -304,7 +305,6 @@ class UserController {
       // console.log('email available...'); // SCAFF
       if (!token && firstName && lastName) {
         // generate and send OTP
-        // TODO: confirm expected interface from team
         /* =====generate OTP manually=====
         let otp = (Math.round(Math.random() * 999999)).toString();
         const padding = '0'.repeat(6 - otp.length);
@@ -331,10 +331,16 @@ class UserController {
           firstName,
           lastName,
         };
-        pwdQueue.add(jobData);
+        const job = pwdQueue.add(jobData); // Promise
+        job.then(() => {
+          // job completed
+          res.json({ success: true, message: 'sent OTP to email' });
+        }).catch((err) => {
+          // job failed
+          res.status(500).json({ success: false, message: err ? err.toString() : 'OTP not sent' });
+        });
 
-        // TODO: confirm the response status code from team
-        return res.status(102).json({ success: true, message: 'sending OTP' });
+        return undefined;
       }
 
       if (email && token && firstName && lastName) {
