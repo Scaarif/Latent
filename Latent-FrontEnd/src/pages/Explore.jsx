@@ -23,12 +23,14 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
   const [hovered, setHovered] = useState(false);
 
   const [coords, setCoords] = useState({});
+  const [map, setMap] = useState(/** @type google.maps.Map */ (null));
 
   // set initial map center as the user's location (as per their browser geo-locator)
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
       setCoords({ lat: latitude, lng: longitude });
     });
+    console.log({ coords });
   }, []); // set only once -- hence no dependencies
 
   return (
@@ -42,36 +44,65 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
             <HouseCard key={i} house={house} />
           ))}
         </div>
-        <div className="flex w-full bg-hero-bg border-2 border-light_green rounded-md">
-          <div className="w-full mt-2 capitalize">
-            <div className="flex justify-end items-center gap-2 px-4 mb-4">
-              <span
-                onClick={() => setShowFilter(true)}
-                className="bg-white px-4 py-1 rounded-sm text-green transition-colors hover:text-md_green cursor-pointer shadow-sm"
-              >
-                + Add filters
-              </span>
-              <span
-                onClick={() => setUseMap(false)}
-                className="bg-white px-4 py-1 rounded-sm text-green transition-colors hover:text-md_green cursor-pointer shadow-sm"
-              >
-                Close map
-              </span>
-            </div>
-            <div className={`${showFilter ? 'opacity-100' : 'opacity-0'} smooth-transition flex justify-center md:min-w-[790px] w-full`}>
-              <div className="flex items-center bg-white p-2 shadow-sm ">
-                <MapFilter />
-                <span className="">
-                  <AiOutlineClose
-                    style={{ color: hovered ? 'black' : 'green', height: '20px', width: '20px' }}
-                    onMouseEnter={() => setHovered(true)}
-                    onMouseLeave={() => setHovered(false)}
-                    onClick={() => setShowFilter(false)}
-                  />
-                </span>
+        {/* the map */}
+
+        <div className="flex flex-col w-full bg-white border-2 border-light_green rounded-md">
+          {
+            isLoaded ? (
+              <>
+                <div className="flex flex-col mb-4">
+                  <div className="w-full mt-2 capitalize">
+                    <div className="flex justify-end items-center gap-2 px-4 mb-4">
+                      <span
+                        onClick={() => setShowFilter(true)}
+                        className="bg-white px-4 py-1 rounded-sm text-green transition-colors hover:text-md_green cursor-pointer shadow-sm"
+                      >
+                        + Add filters
+                      </span>
+                      <span
+                        onClick={() => setUseMap(false)}
+                        className="bg-white px-4 py-1 rounded-sm text-green transition-colors hover:text-md_green cursor-pointer shadow-sm"
+                      >
+                        Close map
+                      </span>
+                    </div>
+                    <div className={`smooth-transition ${showFilter ? 'opacity-100 h-100' : 'opacity-0 h-0'} flex justify-center md:min-w-[790px] w-full border-y`}>
+                      <div className="flex items-center bg-white p-2 ">
+                        <MapFilter />
+                        <span className="">
+                          <AiOutlineClose
+                            style={{ color: hovered ? 'black' : 'green', height: '20px', width: '20px' }}
+                            onMouseEnter={() => setHovered(true)}
+                            onMouseLeave={() => setHovered(false)}
+                            onClick={() => setShowFilter(false)}
+                          />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <GoogleMap
+                  center={coords}
+                  zoom={15}
+                  mapContainerStyle={{ width: '100%', height: '100%' }}
+                  options={{
+                    zoomControl: false,
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                  }}
+                  onLoad={(map) => setMap(map)}
+                >
+                  <Marker position={coords} />
+                </GoogleMap>
+              </>
+            ) : (
+              <div className="flex items-center justify-center">
+                <span>Loading map....</span>
               </div>
-            </div>
-          </div>
+            )
+          }
+
           <div className="flex" />
         </div>
       </div>
