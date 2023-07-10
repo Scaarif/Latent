@@ -77,12 +77,12 @@ const ProfileModal = ({ showProfile }) => {
   );
 };
 
-const LoggedInNavbarLinks = () => {
+const LoggedInNavbarLinks = ({ active }) => {
   const [showProfile, setShowProfile] = useState(false);
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className="p-1 cursor-pointer capitalize hover:border-b border-green">My Listings</Link>
+        <Link to="/user" className={`p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
         <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
         <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
       </div>
@@ -135,7 +135,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { isLanding ? (<NavbarLinks />) : (<LoggedInNavbarLinks />)}
+      { isLanding ? (<NavbarLinks />) : (<LoggedInNavbarLinks active={currentRoute.pathname} />)}
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">

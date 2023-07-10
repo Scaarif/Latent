@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MdArrowForwardIos } from 'react-icons/md';
 import { BsLinkedin, BsFacebook, BsTwitter, BsInstagram } from 'react-icons/bs';
 
 import { Swiper, SwiperSlide } from 'swiper/react';

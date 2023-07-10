@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-// import SearchBar from '../components/SearchBar';
+
+import { GoogleMap, Marker } from '@react-google-maps/api';
+
 import { houses } from '../constants';
-// import PaginatedListing from '../components/PaginatedListing';
 import HouseCard from '../components/HouseCard';
-// import { Filter, MobileFilter } from '../components/Filter';
 import HousesListingTemplate from '../components/HousesListingTemplate';
 
 const MapFilter = () => (
@@ -18,9 +18,19 @@ const MapFilter = () => (
   </div>
 );
 
-const MapVersion = ({ setUseMap }) => {
+const MapVersion = ({ setUseMap, isLoaded }) => {
   const [showFilter, setShowFilter] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  const [coords, setCoords] = useState({});
+
+  // set initial map center as the user's location (as per their browser geo-locator)
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
+      setCoords({ lat: latitude, lng: longitude });
+    });
+  }, []); // set only once -- hence no dependencies
+
   return (
     <div className="hidden w-full md:flex flex-col mt-8 mx-16">
       <h1 className="text-xl text-green font-bold mb-8">
@@ -69,12 +79,12 @@ const MapVersion = ({ setUseMap }) => {
   );
 };
 
-const Explore = () => {
+const Explore = ({ isLoaded }) => {
   // const [useMap, setUseMap] = useState(true);
   const [useMap, setUseMap] = useState(false);
   const toMap = true;
 
-  if (useMap) return <MapVersion setUseMap={setUseMap} />;
+  if (useMap) return <MapVersion setUseMap={setUseMap} isLoaded={isLoaded} />;
   return (
     <HousesListingTemplate
       houses={houses}
