@@ -93,6 +93,12 @@ class HouseController {
    */
   static async getHouse(req, res) {
     try {
+      const pageSize = parseInt(req.query.pageSize, 10) || 10; // Default page size is 10
+      const pageNumber = parseInt(req.query.pageNumber, 10) || 1; // Default page number is 1
+
+      // Calculate the number of documents to skip based on the page size and number
+      const skip = (pageNumber - 1) * pageSize;
+
       // Initialize an empty object to store query parameters for filtering houses.
       const params = {};
 
@@ -151,12 +157,24 @@ class HouseController {
             params[key] = parseInt(req.query[key], 10);
           }
         }
-        if (![...agentParameters, ...locationParamters, ...numericalParamters].includes(key)) {
+        if (![...agentParameters, ...locationParamters, ...numericalParamters, 'pageNumber', 'pageSize'].includes(key)) {
           params[key] = req.query[key];
         }
       }
-      const result = await House.find(params);
-      return res.status(200).json(result);
+
+      // Implement pagination
+      const count = await House.countDocuments(params);
+      const totalPages = Math.ceil(count / pageSize);
+
+      const result = await House.find(params)
+        .skip(skip)
+        .limit(pageSize);
+
+      return res.status(200).json({
+        data: result,
+        totalPages,
+        totalCount: count,
+      });
     } catch (err) {
       return res.status(400).json({ error: err.message });
     }
