@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/v1',
+    baseUrl: 'http://localhost:3000/api/v1',
     // prepareHeaders: (headers) => {
     //   headers.set('', '');
     //   return headers;
@@ -13,6 +13,9 @@ export const latentAPI = createApi({
   }),
   endpoints: (builder) => ({
     getUser: builder.query({ query: (userId) => `/user?id=${userId}` }),
+    getCurrentUser: builder.query({
+      query: () => '/users',
+    }),
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -38,6 +41,7 @@ export const latentAPI = createApi({
 
 export const {
   useGetUserQuery,
+  useGetCurrentUserQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,

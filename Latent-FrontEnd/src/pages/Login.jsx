@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
-import { useLoginMutation } from '../redux/services/latentAPI';
+import { useLoginMutation, useGetCurrentUserQuery } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [values, setValues] = useState({
@@ -76,16 +76,45 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
 };
 
 const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }) => {
-  const input = {
-    id: 1,
-    name: 'email',
-    type: 'email',
-    placeholder: 'Enter your email',
-    errorMessage: 'It should be a valid email address!',
-    label: 'Email',
-    required: true,
-  };
-  const [email, setEmail] = useState('');
+  const [values, setValues] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+  });
+
+  const inputs = [
+    {
+      id: 1,
+      name: 'email',
+      type: 'email',
+      placeholder: 'Enter your email',
+      errorMessage: 'It should be a valid email address!',
+      label: 'Email',
+      required: true,
+    },
+    {
+      id: 1,
+      name: 'firstName',
+      type: 'text',
+      placeholder: 'First name',
+      errorMessage:
+        "First Name should contain only characters and should be at least one character long!",
+      label: 'First Name',
+      pattern: '^[A-Za-z]+$',
+      required: true,
+    },
+    {
+      id: 1,
+      name: 'lastName',
+      type: 'text',
+      placeholder: 'Last name',
+      errorMessage:
+        "Last Name should contain only characters and should be at least three character long!",
+      label: 'Last Name',
+      pattern: '^[A-Za-z]+$',
+      required: true,
+    },
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -94,26 +123,34 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
     setShowResetModal(true);
   };
 
+  const onChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
   return (
     <form
       onSubmit={handleSubmit}
       className={`absolute top-0 smooth-transition ${showEmailModal ? 'left-0 md:left-8' : '-left-[100%]'} bg-white z-10 flex flex-col
         items-center w-full md:w-1/2 h-full py-10 md:px-16 gap-2 md:rounded-md md:shadow-lg`}
     >
-      <FormInput
-        {...input}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <div className="w-full pl-12 md:pl-0">
-        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
-      </div>
+        {inputs.map((input) => (
+          <FormInput
+            key={input.id}
+            {...input}
+            value={values[input.name]}
+            onChange={onChange}
+          />
+        ))}
+        <div className="w-full pl-12 md:pl-0">
+            <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
+        </div>
     </form>
   );
 };
 
 const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
+  const getCurrentUser = useGetCurrentUserQuery();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -152,10 +189,11 @@ const Login = () => {
     if (!isLoading) {
       try {
         const res = await login(values);
-        console.log({ res });
-        if (res.data.success) {
+        if (!res.error) {
           // set user state
-          dispatch(setUser(true));
+          console.log('Logged in');
+          const userData = getCurrentUser.currentData;
+          dispatch(setUser(userData));
           navigate('/explore');
         }
       } catch (error) {
