@@ -11,7 +11,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.user = action.payload.user;
+      state.user = action.payload;
       if (action.payload?.data) {
         state.isAgent = action.payload.data?.isAgent;
       }

@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
 import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
+import { useLogoutMutation } from '../redux/services/latentAPI';
+import { setUser } from '../redux/features/userSlice';
 
 const ProfileModal = ({ showProfile }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -77,21 +81,27 @@ const ProfileModal = ({ showProfile }) => {
   );
 };
 
-const LoggedInNavbarLinks = ({ active }) => {
+const LoggedInNavbarLinks = ({ active, isAgent, handleLogout }) => {
   const [showProfile, setShowProfile] = useState(false);
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className={`p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
+        <Link to="/user" className={`${isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
         <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
         <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
       </div>
       <div
-        className="hidden group md:flex items-center space-x-2 mr-2 cursor-pointer"
-        onClick={() => setShowProfile(!showProfile)}
+        className="hidden md:flex items-center space-x-2 mr-2 cursor-pointer"
       >
-        <span className="text-sm text-green bg-bg_color rounded-full p-2 group-hover:text-md_green">JD</span>
-        <span className="text-green group-hover:text-md_green">John Doe</span>
+        <div
+          onClick={() => setShowProfile(!showProfile)}
+          className="flex group items-center space-x-2"
+        >
+          <span className="text-sm text-green bg-bg_color rounded-full p-2 group-hover:text-md_green">JD</span>
+          <span className="text-green group-hover:text-md_green">John Doe</span>
+        </div>
+
+        <span className="text-green hover:text-md_green border-l px-2" onClick={handleLogout}>Logout</span>
       </div>
       <ProfileModal
         showProfile={showProfile}
@@ -122,20 +132,36 @@ const NavbarLinks = () => (
 );
 
 const Navbar = () => {
+  const { user, isAgent } = useSelector((state) => state.user);
+  const [logout, { isLoading }] = useLogoutMutation();
   const currentRoute = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   // console.log(currentRoute.pathname);
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   // const [isAgent, setIsAgent] = useState(false);
 
-  const isLanding = currentRoute.pathname === '/';
+  // const isLanding = currentRoute.pathname === '/';
+  // console.log({ user });
+  const handleLogout = async () => {
+    if (!isLoading) {
+      const res = await logout();
+      console.log({ res });
+      if (res.data?.sucess || res.success) {
+        // clear user
+        dispatch(setUser(null));
+        navigate('/'); // navigate back to landing
+      }
+    }
+  };
 
   return (
     <div className="max-w-[1400px] w-full flex flex-row justify-between items-center bg-white py-2 px-4 fixed z-10">
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { isLanding ? (<NavbarLinks />) : (<LoggedInNavbarLinks active={currentRoute.pathname} />)}
+      { user ? (<LoggedInNavbarLinks active={currentRoute.pathname} isAgent={isAgent} handleLogout={handleLogout} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">
@@ -161,7 +187,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
 
       <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu isLanding={isLanding} />
+        <MobileMenu user={user} handleLogout={handleLogout} />
       </div>
     </div>
   );

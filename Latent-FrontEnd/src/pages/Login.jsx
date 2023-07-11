@@ -152,7 +152,7 @@ const Login = () => {
     if (!isLoading) {
       try {
         const res = await login(values);
-        // console.log({ res });
+        console.log({ res });
         if (res.data.success) {
           // set user state
           dispatch(setUser(true));

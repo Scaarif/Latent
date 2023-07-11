@@ -27,6 +27,12 @@ export const latentAPI = createApi({
         body: user,
       }),
     }),
+    logout: builder.mutation({
+      query: () => ({
+        url: '/logout',
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
@@ -34,4 +40,5 @@ export const {
   useGetUserQuery,
   useRegisterUserMutation,
   useLoginMutation,
+  useLogoutMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application
