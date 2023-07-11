@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
+// import { useHistory } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import { useRegisterUserMutation } from '../redux/services/latentAPI';
 
 const SignUp = () => {
+  const navigate = useNavigate();
+  // const history = useHistory();
   const [userType, setUserType] = useState(null);
   const [values, setValues] = useState({
     fullName: '',
@@ -74,11 +78,16 @@ const SignUp = () => {
     const [firstName, lastName] = values.fullName.split(' ');
     data.firstName = firstName;
     data.lastName = lastName;
-    data.isAgent = userType === 'agent';
-    console.log({ data });
+    data.isAgent = userType === 'agent' ? 'true' : 'false';
+    // console.log({ data });
     if (!isLoading) {
       try {
-        await registerUser(data).unwrap();
+        const res = await registerUser(data).unwrap();
+        console.log(res);
+        if (res.success) {
+          navigate('/login');
+          // history.push('/login');
+        }
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
       } catch (error) {
         console.error('Failed to register user: ', error);
