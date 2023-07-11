@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import FormInput from '../components/FormInput';
+import { useRegisterUserMutation } from '../redux/services/latentAPI';
 
 const SignUp = () => {
+  const [userType, setUserType] = useState(null);
   const [values, setValues] = useState({
     fullName: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
@@ -33,7 +35,7 @@ const SignUp = () => {
     },
     {
       id: 3,
-      name: 'phoneNumber',
+      name: 'phone',
       type: 'number',
       placeholder: 'Phone number',
       label: 'Phone Number',
@@ -60,10 +62,28 @@ const SignUp = () => {
       required: true,
     },
   ];
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ values });
+    // console.log({ values });
+    // console.log({ userType });
+    const data = { ...values };
+    delete data.fullName;
+    delete data.confirmPassword;
+    const [firstName, lastName] = values.fullName.split(' ');
+    data.firstName = firstName;
+    data.lastName = lastName;
+    data.isAgent = userType === 'agent';
+    console.log({ data });
+    if (!isLoading) {
+      try {
+        await registerUser(data).unwrap();
+        Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
+      } catch (error) {
+        console.error('Failed to register user: ', error);
+      }
+    }
   };
 
   const onChange = (e) => {
@@ -80,7 +100,9 @@ const SignUp = () => {
           Sign up as
           <select
             className="p-2 text-sm rounded focus:outline-none"
+            onChange={(e) => setUserType(e.target.value)}
           >
+            <option value="">choose one</option>
             <option value="agent">agent/landlord</option>
             <option value="user">user</option>
           </select>
