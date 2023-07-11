@@ -62,3 +62,13 @@ linearGradient {
 .swiper-pagination-bullet .swiper-pagination-bullet-active {
   color: green;
 }
+
+/* forms error handling */
+
+input:invalid[focused="true"]{
+  border: 1px solid red;
+}
+
+input:invalid[focused="true"] ~ span{
+  display: block;
+}

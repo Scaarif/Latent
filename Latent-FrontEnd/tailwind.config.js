@@ -16,9 +16,11 @@ module.exports = {
         light_green: '#E5F3EC', // also the alternative bg-color in some sections...
         form_bg: '#E4E5DF',
         md_green: '#75BD97',
+        red: '#FF4D4F',
       },
       backgroundImage: {
         'hero-bg': "url('./src/assets/mapBg.png')",
+        'form-bg': "url('./src/assets/house3.jpg')",
       },
       animation: {
         slideup: 'slideup 1s ease-in-out',

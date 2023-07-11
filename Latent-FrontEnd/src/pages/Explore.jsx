@@ -82,7 +82,7 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
                   </div>
                 </div>
                 <GoogleMap
-                  center={coords}
+                  center={coords.lat && coords.lng && coords}
                   zoom={15}
                   mapContainerStyle={{ width: '100%', height: '100%' }}
                   options={{
@@ -93,7 +93,7 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
                   }}
                   onLoad={(map) => setMap(map)}
                 >
-                  <Marker position={coords} />
+                  { coords.lat && coords.lng && <Marker position={coords} /> }
                 </GoogleMap>
               </>
             ) : (

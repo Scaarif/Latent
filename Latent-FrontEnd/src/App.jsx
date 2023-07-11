@@ -19,7 +19,7 @@ const App = () => {
       <Navbar />
       <div className="flex mt-16">
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Landing isLoaded={isLoaded} />} />
           <Route path="/explore" element={<Explore isLoaded={isLoaded} />} />
           <Route path="/houses/:houseId" element={<House />} />
           <Route path="/user" element={<AgentHome />} />

@@ -20,7 +20,7 @@ import { Testimonial } from '../components/Testimonial';
 
 import { houses } from '../constants';
 
-const Landing = () => (
+const Landing = ({ isLoaded }) => (
   <div className="w-full relative">
 
     {/* Hero section */}
@@ -34,7 +34,7 @@ const Landing = () => (
           listed houses
         </p>
         <div className="hidden md:flex absolute">
-          <SearchBar />
+          <SearchBar isLoaded={isLoaded} />
         </div>
         <div className="flex md:hidden">
           <Link to="/explore">
