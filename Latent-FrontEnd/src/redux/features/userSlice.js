@@ -13,7 +13,7 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload.user;
       if (action.payload?.data) {
-        state.isAgent = action.payload.data.isAgent;
+        state.isAgent = action.payload.data?.isAgent;
       }
     },
 

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import FormInput from '../components/FormInput';
+import { setUser } from '../redux/features/userSlice';
+import { useLoginMutation } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [values, setValues] = useState({
@@ -110,6 +113,9 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
 };
 
 const Login = () => {
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     email: '',
     password: '',
@@ -140,9 +146,22 @@ const Login = () => {
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ values });
+    // console.log({ values });
+    if (!isLoading) {
+      try {
+        const res = await login(values);
+        // console.log({ res });
+        if (res.data.success) {
+          // set user state
+          dispatch(setUser(true));
+          navigate('/explore');
+        }
+      } catch (error) {
+        console.error('Login failed: ', error);
+      }
+    }
   };
 
   const onChange = (e) => {
