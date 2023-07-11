@@ -1,19 +1,35 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import FormInput from '../components/FormInput';
 
-const CreateHouse = () => {
+import { houses } from '../constants';
+
+const EditHouse = () => {
   const navigate = useNavigate();
+  const { houseId } = useParams();
+  const house = houses.find((hse) => hse.id === Number(houseId));
+  // console.log({ house });
   const [values, setValues] = useState({
-    houseName: '',
-    address: '',
-    houseType: '',
-    price: '',
-    location: '',
-    numBedrooms: '',
-    numBathrooms: '',
-    description: '',
-    isShared: '',
+    // houseName: house.houseName,
+    address: house.address,
+    houseType: house.houseType,
+    price: house.price,
+    location: house.location,
+    numBedrooms: house.numRooms,
+    numBathrooms: house.numBathrooms,
+    description: house.description,
+    isShared: house.isShared ? 'yes' : 'no',
+    // coverImage: house.coverImage,
+    // houseImages: house.houseImages,
+    houseName: house.name,
+    // address: '',
+    // houseType: '',
+    // price: '',
+    // location: '',
+    // numBedrooms: '',
+    // numBathrooms: '',
+    // description: '',
+    // isShared: '',
     coverImage: '',
     houseImages: '',
   });
@@ -144,7 +160,7 @@ const CreateHouse = () => {
         className="flex flex-col px-4 md:px-16 md:items-start md:py-4 md:bg-white rounded-md md:w-2/3"
       >
         <h1 className="flex md:pl-0 gap-1 items-center py-4 text-lg font-semibold text-green">
-          Post a house
+          Edit house details
         </h1>
         {inputs.map((input) => (
           <FormInput
@@ -154,15 +170,25 @@ const CreateHouse = () => {
             onChange={onChange}
           />
         ))}
-        <button
-          type="submit"
-          className="w-[280px] md:w-full mt-8 bg-green rounded-md text-white p-3
-          transition-colors hover:bg-md_green"
-        >Post House
-        </button>
+        <div className="flex flex-col md:flex-row items-center gap-4 md:justify-between w-full">
+          <button
+            type="button"
+            onClick={() => navigate('/user')}
+            className="w-[280px] md:w-full mt-8 bg-green rounded-md text-white p-3
+            transition-colors hover:bg-md_green"
+          >Cancel
+          </button>
+          <button
+            type="submit"
+            className="w-[280px] md:w-full mt-8 bg-green rounded-md text-white p-3
+            transition-colors hover:bg-md_green"
+          >Edit
+          </button>
+        </div>
+
       </form>
     </div>
   );
 };
 
-export default CreateHouse;
+export default EditHouse;

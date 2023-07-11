@@ -7,17 +7,24 @@ const HouseCard = ({ house, loggedIn }) => {
   return (
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
-      onClick={() => navigate(`/houses/${house.id}`)}
     >
       <img src={house.coverImage} alt="house" className="h-2/4 object-cover rounded-t-md" />
+      <div className="absolute z-10 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
+        <span
+          onClick={() => navigate(`/houses/${house.id}`)}
+          className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer"
+        >
+          See more
+        </span>
+      </div>
       {loggedIn && (
-      <div className="absolute top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
-        <span className="px-2 py-1 border-r transition-colors hover:text-black cursor-pointer">Edit</span>
-        <span className="px-2 py-1 border-l transition-colors hover:text-black cursor-pointer">Delete</span>
+      <div className="absolute z-10 top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
+        <span className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate(`/edit/${house.id}`)}>Edit</span>
+        <span className="px-2 py-1 border-l transition-colors hover:text-md_green cursor-pointer">Delete</span>
       </div>
       ) }
       <div className="flex flex-col p-4 gap-2 text-s_gray">
-        <h1 className="font-semibold text-slate-500 py-2">{ house.name ? `${`${house.name} ${house.houseType}`}` : `${house.numRooms} Bedroom ${house.housType}`}</h1>
+        <h1 className="font-semibold text-slate-500 py-2">{ house.name ? `${`${house.name} ${house.houseType}`}` : `${house.numRooms} Bedroom ${house.houseType}`}</h1>
         <p className="flex items-center space-x-2">
           <span><MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} className="inline-block" /></span>
           <span className="text-md ">ksh {house.price}/mth</span>
