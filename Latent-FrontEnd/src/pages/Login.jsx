@@ -50,13 +50,13 @@ const Login = () => {
   console.log(user);
 
   if (user) {
-    return (<Navigate to="/" replace={true} />);
+    return (<Navigate to="/explore" replace={true} />);
   }
 
   return (
     <div className="w-full relative m-5">
         <form className="max-w-md mx-auto m-auto bg-white border border-white flex flex-col justify-center">
-            <h1 className="text-center font-semibold text-[24px] text-green p-3">Login page</h1>
+            <h1 className="text-center font-semibold text-[24px] text-green p-3">Log In</h1>
             <input required className="w-5/6 m-2 p-2 mx-auto text-green text-center border border-green rounded"
                    name="email" type="email" placeholder="Email" ref={emailField} />
             <input required className="w-5/6 m-2 p-2 mx-auto text-green text-center border border-green rounded"

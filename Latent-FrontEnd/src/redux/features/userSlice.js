@@ -13,10 +13,14 @@ const userSlice = createSlice({
       state.user = action.payload.user;
       state.isAgent = action.payload.user.isAgent;
     },
-    logout: (state, action) => {},
-    upgrade: (state, action) => {},
+    logout: (state, action) => {
+      state.user = null;
+    },
+    upgrade: (state, action) => {
+      state.isAgent = true;
+    },
   },
 });
 
-export const { login } = userSlice.actions;
+export const { login, logout, upgrade } = userSlice.actions;
 export default userSlice.reducer;

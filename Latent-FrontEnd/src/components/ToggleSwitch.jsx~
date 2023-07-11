@@ -1,0 +1,19 @@
+import React from 'react';
+
+const ToggleSwitch = ({label}) => {
+  return (
+    <label for="toggleFive" class="flex cursor-pointer select-none items-center">
+        <div class="relative">
+            <input id="toggleFive" type="checkbox" class="sr-only" />
+            <div class="h-5 w-14 rounded-full bg-[#E5E7EB] shadow-inner"></div>
+            <div
+              class="dot shadow-switch-1 absolute left-0 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-white transition"
+            >
+                <span class="active h-4 w-4 rounded-full bg-[#E5E7EB]"></span>
+            </div>
+        </div>
+    </label>
+  );
+}
+
+export default ToggleSwitch;
