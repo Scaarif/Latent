@@ -6,6 +6,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
+<<<<<<< HEAD
     baseUrl: 'http://localhost:5000/api/v1',
     // prepareHeaders: (headers, { getState }) => {
     //   const { user } = getState();
@@ -15,6 +16,11 @@ export const latentAPI = createApi({
     //       headers.set('Cookie', cookie);
     //     }
     //   }
+=======
+    baseUrl: 'http://localhost:3000/api/v1',
+    // prepareHeaders: (headers) => {
+    //   headers.set('', '');
+>>>>>>> 01dd700d3769ee4588d0ae2d446b1e046f6a1cee
     //   return headers;
     // },
     credentials: 'include',
@@ -42,6 +48,13 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: '/reset-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -51,6 +64,7 @@ export const {
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,
+  useResetPasswordMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application
 
 // import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';

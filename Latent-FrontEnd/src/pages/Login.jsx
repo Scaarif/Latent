@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 // import axios from 'axios';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
 
-import { useLoginMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
+import { useLoginMutation, useGetLoggedInUserQuery, useResetPasswordMutation } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
+  const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramObj = {}
+  for (const [key, value] of searchParams) {
+    paramObj[key] = value;
+  }
   const [values, setValues] = useState({
-    OTP: '',
+    otp: '',
+    ...paramObj,
     password: '',
     confirmPassword: '',
   });
   const inputs = [
     {
       id: 1,
-      name: 'OTP',
+      name: 'otp',
       type: 'number',
-      placeholder: 'OTP number',
+      placeholder: values.otp || 'OTP number',
       label: 'OTP',
     },
     {
@@ -45,9 +52,17 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
 
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // submit the email & close the modal + open the resetPassword modal
+    try {
+      const resp = await resetPassword(values);
+      if (resp.error) {
+        console.log('Could not reset password');
+      }
+    } catch (err) {
+      console.log(err);
+    }
     setShowResetModal(false);
   };
 
@@ -82,22 +97,64 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
 };
 
 const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }) => {
-  const input = {
-    id: 1,
-    name: 'email',
-    type: 'email',
-    placeholder: 'Enter your email',
-    errorMessage: 'It should be a valid email address!',
-    label: 'Email',
-    required: true,
-  };
-  const [email, setEmail] = useState('');
+  const [values, setValues] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+  });
+  const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
 
-  const handleSubmit = (e) => {
+  const inputs = [
+    {
+      id: 1,
+      name: 'email',
+      type: 'email',
+      placeholder: 'Enter your email',
+      errorMessage: 'It should be a valid email address!',
+      label: 'Email',
+      required: true,
+    },
+    {
+      id: 2,
+      name: 'firstName',
+      type: 'text',
+      placeholder: 'First name',
+      errorMessage:
+        "First Name should contain only characters and should be at least one character long!",
+      label: 'First Name',
+      pattern: '^[A-Za-z]+$',
+      required: true,
+    },
+    {
+      id: 3,
+      name: 'lastName',
+      type: 'text',
+      placeholder: 'Last name',
+      errorMessage:
+        "Last Name should contain only characters and should be at least three character long!",
+      label: 'Last Name',
+      pattern: '^[A-Za-z]+$',
+      required: true,
+    },
+  ];
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // submit the email & close the modal + open the resetPassword modal
+    try {
+      const resp = await resetPassword(values);
+      if (resp.error) {
+        console.log('Could not reset password');
+      }
+    } catch (err) {
+      console.log(err);
+    }
     setShowEmailModal(false);
     setShowResetModal(true);
+  };
+
+  const onChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   return (
@@ -106,19 +163,22 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       className={`absolute top-0 smooth-transition ${showEmailModal ? 'left-0 md:left-8' : '-left-[100%]'} bg-white z-10 flex flex-col
         items-center w-full md:w-1/2 h-full py-10 md:px-16 gap-2 md:rounded-md md:shadow-lg`}
     >
-      <FormInput
-        {...input}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <div className="w-full pl-12 md:pl-0">
-        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
-      </div>
+        {inputs.map((input) => (
+          <FormInput
+            key={input.id}
+            {...input}
+            value={values[input.name]}
+            onChange={onChange}
+          />
+        ))}
+        <div className="w-full pl-12 md:pl-0">
+            <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
+        </div>
     </form>
   );
 };
 
-const Login = () => {
+const Login = ({reset}) => {
   const [login, { isLoading }] = useLoginMutation();
   const { data: userData, isFetching, error: usrErr } = useGetLoggedInUserQuery();
   const dispatch = useDispatch();
@@ -128,7 +188,7 @@ const Login = () => {
     password: '',
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(reset);
 
   const inputs = [
     {

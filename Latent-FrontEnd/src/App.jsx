@@ -16,21 +16,22 @@ const App = () => {
 
   return (
     <div className="relative flex flex-col">
-      <Navbar />
-      <div className="flex mt-16">
-        <Routes>
-          <Route path="/" element={<Landing isLoaded={isLoaded} />} />
-          <Route path="/explore" element={<Explore isLoaded={isLoaded} />} />
-          <Route path="/houses/:houseId" element={<House />} />
-          <Route path="edit/:houseId" element={<EditHouse />} />
-          <Route path="/user" element={<AgentHome />} />
-          <Route path="/user/cart" element={<Cart />} />
-          <Route path="/user/:id" element={<Profile />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/houses/new" element={<CreateHouse />} />
-        </Routes>
-      </div>
+        <Navbar />
+        <div className="flex mt-16">
+            <Routes>
+                <Route path="/" element={<Landing isLoaded={isLoaded} />} />
+                <Route path="/explore" element={<Explore isLoaded={isLoaded} />} />
+                <Route path="/houses/:houseId" element={<House />} />
+                <Route path="edit/:houseId" element={<EditHouse />} />
+                <Route path="/user" element={<AgentHome />} />
+                <Route path="/user/cart" element={<Cart />} />
+                <Route path="/user/:id" element={<Profile />} />
+                <Route path="/login" element={<Login reset={false} />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/houses/new" element={<CreateHouse />} />
+                <Route path="/password-reset-form" element={<Login reset={true} />} />
+            </Routes>
+        </div>
 
     </div>
   );
