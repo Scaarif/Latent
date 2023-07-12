@@ -56,6 +56,13 @@ export const latentAPI = createApi({
         body: houseData,
       }),
     }),
+    editHouse: builder.mutation({
+      query: (houseData) => ({
+        url: `/houses/${houseData.id}`,
+        method: 'POST',
+        body: houseData,
+      }),
+    }),
   }),
 });
 

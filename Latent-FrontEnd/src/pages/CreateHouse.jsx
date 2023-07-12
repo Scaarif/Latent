@@ -15,7 +15,7 @@ const CreateHouse = () => {
     numBathrooms: '',
     numFloors: '',
     description: '',
-    isShared: '',
+    shared: '',
     coverImage: '',
     images: '',
   });
@@ -97,7 +97,7 @@ const CreateHouse = () => {
     },
     {
       id: 9,
-      name: 'isShared',
+      name: 'shared',
       type: 'text',
       placeholder: 'Looking for a roomate? Yes or No',
       errorMessage:
@@ -148,6 +148,7 @@ const CreateHouse = () => {
     data.city = city;
     data.state = state;
     data.country = country;
+    data.shared = data.shared === 'Yes';
     data.electricity = true;
     data.water = true;
     // data.country = country;
