@@ -150,18 +150,6 @@ const Navbar = () => {
   // console.log({ user });
 
   const handleLogout = async () => {
-<<<<<<< HEAD
-    const response = await fetch(`${`${rootUrl}/logout`}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    const res = await response.json();
-    console.log({ res });
-    if (res.success) {
-      // clear user
-      dispatch(setUser({}));
-      navigate('/'); // navigate back to landing
-=======
     if (!isLoading) {
       const res = await logout();
       console.log({ res });
@@ -170,7 +158,6 @@ const Navbar = () => {
         dispatch(setUser(null));
         navigate('/'); // navigate back to landing
       }
->>>>>>> 01dd700d3769ee4588d0ae2d446b1e046f6a1cee
     }
     // if (!isLoading) {
     //   const res = await logout();
