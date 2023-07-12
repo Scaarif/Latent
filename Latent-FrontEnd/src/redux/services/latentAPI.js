@@ -36,6 +36,13 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: '/reset-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -45,4 +52,5 @@ export const {
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,
+  useResetPasswordMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application

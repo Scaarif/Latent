@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
-import { useLoginMutation, useGetCurrentUserQuery } from '../redux/services/latentAPI';
+import {
+  useLoginMutation,
+  useGetCurrentUserQuery,
+  useResetPasswordMutation,
+} from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
+  const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramObj = {}
+  for (const [key, value] of searchParams) {
+    paramObj[key] = value;
+  }
   const [values, setValues] = useState({
-    OTP: '',
+    otp: '',
+    ...paramObj,
     password: '',
     confirmPassword: '',
   });
   const inputs = [
     {
       id: 1,
-      name: 'OTP',
+      name: 'otp',
       type: 'number',
-      placeholder: 'OTP number',
+      placeholder: values.otp || 'OTP number',
       label: 'OTP',
     },
     {
@@ -43,9 +54,17 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
 
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // submit the email & close the modal + open the resetPassword modal
+    try {
+      const resp = await resetPassword(values);
+      if (resp.error) {
+        console.log('Could not reset password');
+      }
+    } catch (err) {
+      console.log(err);
+    }
     setShowResetModal(false);
   };
 
@@ -81,6 +100,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
     firstName: '',
     lastName: '',
   });
+  const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
 
   const inputs = [
     {
@@ -93,7 +113,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       required: true,
     },
     {
-      id: 1,
+      id: 2,
       name: 'firstName',
       type: 'text',
       placeholder: 'First name',
@@ -104,7 +124,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       required: true,
     },
     {
-      id: 1,
+      id: 3,
       name: 'lastName',
       type: 'text',
       placeholder: 'Last name',
@@ -116,9 +136,17 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // submit the email & close the modal + open the resetPassword modal
+    try {
+      const resp = await resetPassword(values);
+      if (resp.error) {
+        console.log('Could not reset password');
+      }
+    } catch (err) {
+      console.log(err);
+    }
     setShowEmailModal(false);
     setShowResetModal(true);
   };
@@ -148,7 +176,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
   );
 };
 
-const Login = () => {
+const Login = ({reset}) => {
   const [login, { isLoading }] = useLoginMutation();
   const getCurrentUser = useGetCurrentUserQuery();
   const dispatch = useDispatch();
@@ -158,7 +186,7 @@ const Login = () => {
     password: '',
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(reset);
 
   const inputs = [
     {
