@@ -5,6 +5,7 @@ import PaginatedListing from './PaginatedListing';
 
 const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap, toMap }) => {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const [searchParams, setSearchParams] = useState({});
   return (
     <div className="w-full my-8 mx-2 md:mx-16">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-16 mb-8">
@@ -39,12 +40,12 @@ const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap
         </span>
       </div>
       <div className="flex items-center justify-center">
-        <Filter />
+        <Filter setSearchParams={setSearchParams} />
         { showMobileFilter && <MobileFilter setShowMobileFilter={setShowMobileFilter} /> }
       </div>
       <div className="flex flex-col md:mt-8">
         <h2 className="hidden md:block text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'}</h2>
-        <PaginatedListing houses={houses} />
+        <PaginatedListing searchParams={searchParams} />
       </div>
     </div>
   );

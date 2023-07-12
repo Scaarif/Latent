@@ -4,9 +4,10 @@ import { AiOutlineClose } from 'react-icons/ai';
 import { GoogleMap, Marker } from '@react-google-maps/api';
 
 import { useSelector } from 'react-redux';
-import { houses } from '../constants';
+// import { houses } from '../constants';
 import HouseCard from '../components/HouseCard';
 import HousesListingTemplate from '../components/HousesListingTemplate';
+import { useGetHousesQuery } from '../redux/services/latentAPI';
 
 const MapFilter = () => (
   <div className="flex items-center justify-between">
@@ -116,13 +117,14 @@ const Explore = ({ isLoaded }) => {
   const [useMap, setUseMap] = useState(false);
   const toMap = true;
 
+
   const user = useSelector((state) => state.user);
   console.log('selector user: ', user);
 
   if (useMap) return <MapVersion setUseMap={setUseMap} isLoaded={isLoaded} />;
   return (
     <HousesListingTemplate
-      houses={houses}
+      houses={[]}
       header=""
       useMap={useMap}
       setUseMap={setUseMap}

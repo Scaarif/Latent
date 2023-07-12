@@ -63,6 +63,12 @@ export const latentAPI = createApi({
         body: houseData,
       }),
     }),
+    getHouses: builder.query({
+      query: (data) => ({
+        url: '/houses',
+        params: data,
+      }),
+    }),
   }),
 });
 
@@ -74,4 +80,5 @@ export const {
   useLogoutMutation,
   useResetPasswordMutation,
   usePostHouseMutation,
+  useGetHousesQuery,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application

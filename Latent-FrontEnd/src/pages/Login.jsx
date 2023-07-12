@@ -219,7 +219,8 @@ const Login = ({reset}) => {
         const res = await login(values);
         if (!res.error) {
           // set user state
-          if (!usrErr && !isFetching) {
+          const userData = getCurrentUser.currentData;
+          if (!isLoading) {
             // console.log({ userData });
             dispatch(setUser(userData));
             if (userData?.isAgent) {

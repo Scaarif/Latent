@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MdArrowForwardIos } from 'react-icons/md';
 import HouseCard from './HouseCard';
+import { useGetHousesQuery } from '../redux/services/latentAPI';
 
 const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage }) => {
   const pages = [];
@@ -42,12 +43,11 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   );
 };
 
-const PaginatedListing = ({ houses, itemsPerPage, loggedIn = null }) => {
+const PaginatedListing = ({ searchParams, itemsPerPage, loggedIn = null }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [housesPerPage, setHousesPerPage] = useState(6);
-  const lastHouseIndex = currentPage * housesPerPage;
-  const firstHouseIndex = lastHouseIndex - housesPerPage;
-  const currentHouses = houses.slice(firstHouseIndex, lastHouseIndex);
+  const houses = useGetHousesQuery({...searchParams, pageNum: currentPage, pageSize: housesPerPage});
+  const currentHouses = houses.currentData?.data || [];
 
   useEffect(() => {
     if (itemsPerPage) setHousesPerPage(Number(itemsPerPage));
