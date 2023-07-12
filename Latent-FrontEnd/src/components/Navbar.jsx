@@ -148,7 +148,7 @@ const Navbar = () => {
     if (!isLoading) {
       const res = await logout();
       console.log({ res });
-      if (res.data?.sucess || res.success) {
+      if (!res.error) {
         // clear user
         dispatch(setUser(null));
         navigate('/'); // navigate back to landing

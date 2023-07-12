@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/v1',
+    baseUrl: 'http://localhost:3000/api/v1',
     // prepareHeaders: (headers) => {
     //   headers.set('', '');
     //   return headers;
@@ -13,6 +13,9 @@ export const latentAPI = createApi({
   }),
   endpoints: (builder) => ({
     getUser: builder.query({ query: (userId) => `/user?id=${userId}` }),
+    getCurrentUser: builder.query({
+      query: () => '/users',
+    }),
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -33,12 +36,21 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: '/reset-password',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
 export const {
   useGetUserQuery,
+  useGetCurrentUserQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,
+  useResetPasswordMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application
