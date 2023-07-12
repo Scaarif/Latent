@@ -151,12 +151,17 @@ const CreateHouse = () => {
     data.shared = data.shared === 'Yes';
     data.electricity = true;
     data.water = true;
-    // data.country = country;
+    data.numToilets = 1;
+    data.numBathrooms = Number(data.numBathrooms);
+    data.numRooms = Number(data.numRooms);
+    data.numFloors = Number(data.numFloors);
+    data.price = Number(data.price.split('-')[0]);
     console.log(data);
     if (!isLoading) {
       try {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
+        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'));
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {

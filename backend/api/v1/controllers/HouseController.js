@@ -39,6 +39,8 @@ class HouseController {
         houseType,
       } = req.body;
 
+//      console.log('req body: ', req.body);
+
       // Extract paths to coverImage and optional images array
       const coverImage = req.files.coverImage[0].path;
       if (!coverImage) {
