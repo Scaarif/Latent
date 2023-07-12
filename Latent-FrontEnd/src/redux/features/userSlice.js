@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   user: null,
   isAgent: false,
-  logout: false,
+  cookie: null,
 };
 
 const userSlice = createSlice({
@@ -17,12 +17,12 @@ const userSlice = createSlice({
       }
     },
 
-    logout: (state, action) => {
-      state.logout = action.payload;
+    setCookie: (state, action) => {
+      state.cookie = action.payload;
     },
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, setCookie } = userSlice.actions;
 
 export default userSlice.reducer;
