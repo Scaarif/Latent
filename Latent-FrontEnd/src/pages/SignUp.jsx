@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 // import { useHistory } from 'react-router-dom';
 import FormInput from '../components/FormInput';
-import { useRegisterUserMutation } from '../redux/services/latentAPI';
+// import { useRegisterUserMutation } from '../redux/services/latentAPI';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ const SignUp = () => {
       required: true,
     },
   ];
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  // const [registerUser, { isLoading }] = useRegisterUserMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,18 +80,44 @@ const SignUp = () => {
     data.lastName = lastName;
     data.isAgent = userType === 'agent' ? 'true' : 'false';
     // console.log({ data });
-    if (!isLoading) {
-      try {
-        const res = await registerUser(data).unwrap();
-        console.log(res);
-        if (res.success) {
-          navigate('/login');
-          // history.push('/login');
+    // if (!isLoading) {
+    //   try {
+    //     const res = await registerUser(data).unwrap();
+    //     console.log(res);
+    //     if (res.success) {
+    //       navigate('/login');
+    //       // history.push('/login');
+    //     }
+    //     Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
+    //   } catch (error) {
+    //     console.error('Failed to register user: ', error);
+    //   }
+    // }
+    try {
+      const response = await axios.post('http://localhost:5000/api/v1/users', data);
+      if (response.data.success) {
+        // get all headers
+        const allHeaders = response.headers;
+        console.log({ allHeaders });
+        // get cookie value
+        const cookieHeader = response.headers['set-cookie'];
+        console.log(cookieHeader);
+        if (cookieHeader) {
+          const connectSid = cookieHeader.split(';')[0].split('=')[1];
+          dispatch(setCookie(connectSid));
+        } else {
+          console.log('cookie not set on signup');
         }
+        // redirect to explore
+        dispatch(setUser(true));
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
-      } catch (error) {
-        console.error('Failed to register user: ', error);
+        navigate('/explore');
+      } else {
+        // show error message
+        console.log({ error: response.data.message });
       }
+    } catch (error) {
+      console.error('request failed: ', error);
     }
   };
 

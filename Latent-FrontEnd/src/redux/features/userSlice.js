@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   user: null,
   isAgent: false,
+  // cookie: 's%3AMQwSpnvPjPrS-IGcPRLGxK1qio7TP5BT.OqU5frcqVZy4%2FGa4IAotzT8H1eqoGcVqVosKe70ehys',,
   cookie: null,
 };
 

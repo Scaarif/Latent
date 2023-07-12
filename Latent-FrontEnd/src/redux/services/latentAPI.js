@@ -1,8 +1,8 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 // import { store } from '../store';
-import { useDispatch } from 'react-redux';
-import axios from 'axios';
+// import { useDispatch } from 'react-redux';
+// import axios from 'axios';
 import { setCookie } from '../features/userSlice';
 
 // making API calls using RTK Query
@@ -37,28 +37,28 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
-      async onQueryStarted(request, { dispatch }) {
-        console.log({ request });
-        try {
-          const response = await axios.post(request.baseQuery.baseUrl + request.endpoint.url, request.body);
+      // async onQueryStarted(request, { dispatch }) {
+      //   console.log({ request });
+      //   try {
+      //     const response = await axios.post(request.baseQuery.baseUrl + request.endpoint.url, request.body);
 
-          // Extract the Set-Cookie header
-          const cookieHeader = response.headers['set-cookie'];
-          console.log({ cookieHeader });
-          if (cookieHeader) {
-            const connectSid = cookieHeader.split(';')[0].split('=')[1];
-            dispatch(setCookie(connectSid));
-          }
+      //     // Extract the Set-Cookie header
+      //     const cookieHeader = response.headers['set-cookie'];
+      //     console.log({ cookieHeader });
+      //     if (cookieHeader) {
+      //       const connectSid = cookieHeader.split(';')[0].split('=')[1];
+      //       dispatch(setCookie(connectSid));
+      //     }
 
-          // Process the response
-          const result = response.data;
+      //     // Process the response
+      //     const result = response.data;
 
-          return { data: result };
-        } catch (error) {
-          console.error('Error:', error.message);
-          return { error };
-        }
-      },
+      //     return { data: result };
+      //   } catch (error) {
+      //     console.error('Error:', error.message);
+      //     return { error };
+      //   }
+      // },
     }),
     logout: builder.mutation({
       query: () => ({
@@ -66,6 +66,23 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+  }),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat((store) => (next) => (action) => {
+    if (action.type.endsWith('/fulfilled')) {
+      const response = action.payload;
+      const setCookieHeader = response.headers.get('Set-Cookie');
+      console.log('setCookieHeader: ', setCookieHeader);
+      if (setCookieHeader) {
+        // Extract the session cookie value from the Set-Cookie header
+        const sessionCookie = setCookieHeader.split(';')[0];
+
+        // Dispatch an action to store the session cookie in your application's state
+        store.dispatch(setCookie(sessionCookie));
+      } else {
+        console.log('cookie not set');
+      }
+    }
+    return next(action);
   }),
 });
 

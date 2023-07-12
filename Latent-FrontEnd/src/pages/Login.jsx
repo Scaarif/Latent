@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+// import axios from 'axios';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
+
 import { useLoginMutation } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
@@ -67,9 +69,13 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
           onChange={onChange}
         />
       ))}
-     <div className="w-full pl-12 md:pl-0">
-        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
-        hover:bg-md_green rounded-md">Reset Password</button>
+      <div className="w-full pl-12 md:pl-0">
+        <button
+          type="submit"
+          className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
+        hover:bg-md_green rounded-md"
+        >Reset Password
+        </button>
       </div>
     </form>
   );
@@ -162,6 +168,57 @@ const Login = () => {
         console.error('Login failed: ', error);
       }
     }
+    // const response = await fetch('http://localhost:5000/api/v1/login', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(values),
+    // });
+    // const data = await response.json();
+    // if (data.success) {
+    //   const allHeaders = response.getAllResponseHeaders();
+    //   console.log(allHeaders);
+    //   // const cookieHeader = response.headers.get('Set-Cookie');
+    //   const cookieHeader = response.headers.get('Set-Cookie');
+    //   if (cookieHeader) {
+    //     const connectSid = cookieHeader.split(';')[0].split('=')[1];
+    //     dispatch(setCookie(connectSid));
+    //   } else {
+    //     console.log('cookie not set');
+    //   }
+    //   // redirect to dashboard
+    //   dispatch(setUser(true));
+    //   navigate('/explore');
+    // } else {
+    //   // show error message
+    //   console.log('Login failed: ', data);
+    // }
+    // try {
+    //   const response = await axios.post('http://localhost:5000/api/v1/login', values);
+    //   if (response.data.success) {
+    //     // get all headers
+    //     const allHeaders = response.headers;
+    //     console.log({ allHeaders });
+    //     // get cookie value
+    //     const cookieHeader = response.headers['set-cookie'];
+    //     console.log(cookieHeader);
+    //     if (cookieHeader) {
+    //       const connectSid = cookieHeader.split(';')[0].split('=')[1];
+    //       dispatch(setCookie(connectSid));
+    //     } else {
+    //       console.log('cookie not set');
+    //     }
+    //     // redirect to explore
+    //     dispatch(setUser(true));
+    //     navigate('/explore');
+    //   } else {
+    //     // show error message
+    //     console.log({ error: response.data.message });
+    //   }
+    // } catch (error) {
+    //   console.error('request failed: ', error);
+    // }
   };
 
   const onChange = (e) => {
