@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
 
-import { useLoginMutation } from '../redux/services/latentAPI';
+// import { useLoginMutation } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [values, setValues] = useState({
@@ -119,7 +119,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
 };
 
 const Login = () => {
-  const [login, { isLoading }] = useLoginMutation();
+  // const [login, { isLoading }] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -152,73 +152,54 @@ const Login = () => {
     },
   ];
 
+  const getUser = async () => {
+    const response = await fetch('http://localhost:5000/api/v1/users', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // credentials: 'include',
+    });
+    const data = await response.json();
+    console.log({ data });
+    if (data.success) {
+      dispatch(setUser(data));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     // console.log({ values });
-    if (!isLoading) {
-      try {
-        const res = await login(values);
-        console.log({ res });
-        if (res.data.success) {
-          // set user state
-          dispatch(setUser(true));
-          navigate('/explore');
-        }
-      } catch (error) {
-        console.error('Login failed: ', error);
-      }
-    }
-    // const response = await fetch('http://localhost:5000/api/v1/login', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(values),
-    // });
-    // const data = await response.json();
-    // if (data.success) {
-    //   const allHeaders = response.getAllResponseHeaders();
-    //   console.log(allHeaders);
-    //   // const cookieHeader = response.headers.get('Set-Cookie');
-    //   const cookieHeader = response.headers.get('Set-Cookie');
-    //   if (cookieHeader) {
-    //     const connectSid = cookieHeader.split(';')[0].split('=')[1];
-    //     dispatch(setCookie(connectSid));
-    //   } else {
-    //     console.log('cookie not set');
-    //   }
-    //   // redirect to dashboard
-    //   dispatch(setUser(true));
-    //   navigate('/explore');
-    // } else {
-    //   // show error message
-    //   console.log('Login failed: ', data);
-    // }
-    // try {
-    //   const response = await axios.post('http://localhost:5000/api/v1/login', values);
-    //   if (response.data.success) {
-    //     // get all headers
-    //     const allHeaders = response.headers;
-    //     console.log({ allHeaders });
-    //     // get cookie value
-    //     const cookieHeader = response.headers['set-cookie'];
-    //     console.log(cookieHeader);
-    //     if (cookieHeader) {
-    //       const connectSid = cookieHeader.split(';')[0].split('=')[1];
-    //       dispatch(setCookie(connectSid));
-    //     } else {
-    //       console.log('cookie not set');
+    // if (!isLoading) {
+    //   try {
+    //     const res = await login(values);
+    //     console.log({ res });
+    //     if (res.data.success) {
+    //       // set user state
+    //       dispatch(setUser(true));
+    //       navigate('/explore');
     //     }
-    //     // redirect to explore
-    //     dispatch(setUser(true));
-    //     navigate('/explore');
-    //   } else {
-    //     // show error message
-    //     console.log({ error: response.data.message });
+    //   } catch (error) {
+    //     console.error('Login failed: ', error);
     //   }
-    // } catch (error) {
-    //   console.error('request failed: ', error);
     // }
+    const response = await fetch('http://localhost:5000/api/v1/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    if (data.success) {
+      // redirect to explore
+      // dispatch(setUser(true));
+      await getUser();
+      navigate('/explore');
+    } else {
+      // show error message
+      console.log('Login failed: ', data);
+    }
   };
 
   const onChange = (e) => {

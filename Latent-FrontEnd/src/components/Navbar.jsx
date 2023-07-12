@@ -3,10 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
+import { root } from 'postcss';
 import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
-import { useLogoutMutation } from '../redux/services/latentAPI';
+import { rootUrl } from '../constants';
+// import { useLogoutMutation } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
 const ProfileModal = ({ showProfile }) => {
@@ -133,7 +135,7 @@ const NavbarLinks = () => (
 
 const Navbar = () => {
   const { user, isAgent } = useSelector((state) => state.user);
-  const [logout, { isLoading }] = useLogoutMutation();
+  // const [logout, { isLoading }] = useLogoutMutation();
   const currentRoute = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -145,15 +147,26 @@ const Navbar = () => {
   // const isLanding = currentRoute.pathname === '/';
   // console.log({ user });
   const handleLogout = async () => {
-    if (!isLoading) {
-      const res = await logout();
-      console.log({ res });
-      if (res.data?.sucess || res.success) {
-        // clear user
-        dispatch(setUser(null));
-        navigate('/'); // navigate back to landing
-      }
+    const response = await fetch(`${`${rootUrl}/logout`}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const res = await response.json();
+    console.log({ res });
+    if (res.success) {
+      // clear user
+      dispatch(setUser(null));
+      navigate('/'); // navigate back to landing
     }
+    // if (!isLoading) {
+    //   const res = await logout();
+    //   console.log({ res });
+    //   if (res.data?.sucess || res.success) {
+    //     // clear user
+    //     dispatch(setUser(null));
+    //     navigate('/'); // navigate back to landing
+    //   }
+    // }
   };
 
   return (

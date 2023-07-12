@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
 // import { useHistory } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 // import { useRegisterUserMutation } from '../redux/services/latentAPI';
+import { setUser } from '../redux/features/userSlice';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   // const history = useHistory();
   const [userType, setUserType] = useState(null);
   const [values, setValues] = useState({
@@ -93,31 +96,22 @@ const SignUp = () => {
     //     console.error('Failed to register user: ', error);
     //   }
     // }
-    try {
-      const response = await axios.post('http://localhost:5000/api/v1/users', data);
-      if (response.data.success) {
-        // get all headers
-        const allHeaders = response.headers;
-        console.log({ allHeaders });
-        // get cookie value
-        const cookieHeader = response.headers['set-cookie'];
-        console.log(cookieHeader);
-        if (cookieHeader) {
-          const connectSid = cookieHeader.split(';')[0].split('=')[1];
-          dispatch(setCookie(connectSid));
-        } else {
-          console.log('cookie not set on signup');
-        }
-        // redirect to explore
-        dispatch(setUser(true));
-        Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
-        navigate('/explore');
-      } else {
-        // show error message
-        console.log({ error: response.data.message });
-      }
-    } catch (error) {
-      console.error('request failed: ', error);
+    const response = await fetch('http://localhost:5000/api/v1/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const res = await response.json();
+    if (res.success) {
+      // redirect to dashboard
+      dispatch(setUser(true));
+      Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
+      navigate('/explore');
+    } else {
+      // show error message
+      console.log('signup failed: ', data);
     }
   };
 
