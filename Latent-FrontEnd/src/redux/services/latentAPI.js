@@ -45,7 +45,7 @@ export const latentAPI = createApi({
     resetPassword: builder.mutation({
       query: (data) => ({
         url: '/reset-password',
-        method: 'POST',
+        method: 'PUT',
         body: data,
       }),
     }),

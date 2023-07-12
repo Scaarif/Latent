@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-// import axios from 'axios';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
-
-import { useLoginMutation, useGetLoggedInUserQuery, useResetPasswordMutation } from '../redux/services/latentAPI';
+import {
+  useLoginMutation,
+  useGetLoggedInUserQuery,
+  useResetPasswordMutation,
+} from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
@@ -84,13 +86,9 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
           onChange={onChange}
         />
       ))}
-      <div className="w-full pl-12 md:pl-0">
-        <button
-          type="submit"
-          className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
-        hover:bg-md_green rounded-md"
-        >Reset Password
-        </button>
+     <div className="w-full pl-12 md:pl-0">
+        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
+        hover:bg-md_green rounded-md">Reset Password</button>
       </div>
     </form>
   );
@@ -180,7 +178,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
 
 const Login = ({reset}) => {
   const [login, { isLoading }] = useLoginMutation();
-  const { data: userData, isFetching, error: usrErr } = useGetLoggedInUserQuery();
+  const getCurrentUser = useGetLoggedInUserQuery();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -219,8 +217,7 @@ const Login = ({reset}) => {
     if (!isLoading) {
       try {
         const res = await login(values);
-        // console.log({ res });
-        if (res.data.success) {
+        if (!res.error) {
           // set user state
           if (!usrErr && !isFetching) {
             // console.log({ userData });

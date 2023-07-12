@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import { useRegisterUserMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
@@ -90,6 +90,7 @@ const SignUp = () => {
           // set user to loggedIn user's details
           if (!usrErr && !isFetching) {
             dispatch(setUser(userData));
+            console.log(userData);
             if (userData?.isAgent) {
               navigate('/user');
             } else {
