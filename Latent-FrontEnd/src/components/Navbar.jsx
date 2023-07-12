@@ -6,8 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
-import { rootUrl } from '../constants';
-// import { useLogoutMutation } from '../redux/services/latentAPI';
+// import { rootUrl } from '../constants';
+import { useLogoutMutation } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
 const ProfileModal = ({ showProfile }) => {
@@ -82,12 +82,12 @@ const ProfileModal = ({ showProfile }) => {
   );
 };
 
-const LoggedInNavbarLinks = ({ active, isAgent, handleLogout }) => {
+const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout }) => {
   const [showProfile, setShowProfile] = useState(false);
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className={`${isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
+        <Link to="/user" className={`${loggedInUser?.isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
         <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
         <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
       </div>
@@ -99,7 +99,7 @@ const LoggedInNavbarLinks = ({ active, isAgent, handleLogout }) => {
           className="flex group items-center space-x-2"
         >
           <span className="text-sm text-green bg-bg_color rounded-full p-2 group-hover:text-md_green">JD</span>
-          <span className="text-green group-hover:text-md_green">John Doe</span>
+          <span className="text-green group-hover:text-md_green">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</span>
         </div>
 
         <span className="text-green hover:text-md_green border-l px-2" onClick={handleLogout}>Logout</span>
@@ -137,7 +137,7 @@ const Navbar = () => {
   const loggedInUser = useSelector((state) => state.user.user);
   // const tState = useSelector((state) => state);
   console.log('loggedInuser: ', loggedInUser);
-  // const [logout, { isLoading }] = useLogoutMutation();
+  const [logout, { isLoading }] = useLogoutMutation();
   const currentRoute = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -155,7 +155,7 @@ const Navbar = () => {
       console.log({ res });
       if (!res.error) {
         // clear user
-        dispatch(setUser(null));
+        dispatch(setUser({}));
         navigate('/'); // navigate back to landing
       }
     }
@@ -175,7 +175,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} isAgent={loggedInUser?.isAgent} handleLogout={handleLogout} />) : (<NavbarLinks />) }
+      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">
