@@ -18,7 +18,7 @@ const HouseCard = ({ house, loggedIn }) => {
         </span>
       </div>
       {loggedIn && (
-      <div className="absolute z-10 top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
+      <div className="absolute z-1 top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate(`/edit/${house.id}`)}>Edit</span>
         <span className="px-2 py-1 border-l transition-colors hover:text-md_green cursor-pointer">Delete</span>
       </div>

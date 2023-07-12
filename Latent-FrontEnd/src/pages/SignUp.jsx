@@ -90,11 +90,11 @@ const SignUp = () => {
           // set user to loggedIn user's details
           if (!usrErr && !isFetching) {
             dispatch(setUser(userData));
-          }
-          if (userData?.isAgent) {
-            navigate('/user');
-          } else {
-            navigate('/explore');
+            if (userData?.isAgent) {
+              navigate('/user');
+            } else {
+              navigate('/explore');
+            }
           }
         }
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));

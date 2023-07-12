@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import FormInput from '../components/FormInput';
+import { usePostHouseMutation } from '../redux/services/latentAPI';
 
 const CreateHouse = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState({
-    houseName: '',
+    name: '',
     address: '',
     houseType: '',
     price: '',
     location: '',
-    numBedrooms: '',
+    numRooms: '',
     numBathrooms: '',
+    numFloors: '',
     description: '',
     isShared: '',
     coverImage: '',
-    houseImages: '',
+    images: '',
   });
 
   const inputs = [
     {
       id: 1,
-      name: 'houseName',
+      name: 'name',
       type: 'text',
       placeholder: 'House name',
       errorMessage:
@@ -66,7 +68,7 @@ const CreateHouse = () => {
     },
     {
       id: 6,
-      name: 'numBedrooms',
+      name: 'numRooms',
       type: 'number',
       placeholder: 'Bedrooms',
       errorMessage: 'Number of bedrooms must be a number, [0] for bedsitter',
@@ -105,6 +107,15 @@ const CreateHouse = () => {
     },
     {
       id: 10,
+      name: 'numFloors',
+      type: 'number',
+      placeholder: 'Floor number',
+      errorMessage: 'Floor number must be a number',
+      label: 'Floor number',
+      required: true,
+    },
+    {
+      id: 11,
       name: 'coverImage',
       type: 'file',
       placeholder: 'House image',
@@ -114,8 +125,8 @@ const CreateHouse = () => {
       required: true,
     },
     {
-      id: 11,
-      name: 'houseImages',
+      id: 12,
+      name: 'images',
       type: 'file',
       placeholder: 'more images',
       errorMessage:
@@ -126,11 +137,35 @@ const CreateHouse = () => {
     },
   ];
 
-  const handleSubmit = (e) => {
+  const [postHouse, { isLoading }] = usePostHouseMutation();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ values });
-    // navigate back to user listings
-    navigate('/user');
+    // console.log({ values });
+    const data = { ...values };
+    delete data.location;
+    const [city, state, country] = values.location.split(',');
+    data.city = city;
+    data.state = state;
+    data.country = country;
+    data.electricity = true;
+    data.water = true;
+    // data.country = country;
+    console.log(data);
+    if (!isLoading) {
+      try {
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => formData.append(key, data[key]));
+        const res = await postHouse(formData).unwrap();
+        console.log('post house res: ', res);
+        if (res.success) {
+          // navigate back to user listings
+          navigate('/user');
+        }
+      } catch (error) {
+        console.error('Failed to post house: ', error);
+      }
+    }
   };
 
   const onChange = (e) => {

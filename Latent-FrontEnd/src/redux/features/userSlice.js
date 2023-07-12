@@ -6,7 +6,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     user: {},
-    isAgent: false,
+    isAgent: true,
   },
   reducers: {
     setUser: (state, action) => {

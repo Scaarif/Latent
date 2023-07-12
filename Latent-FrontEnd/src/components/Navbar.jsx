@@ -82,12 +82,12 @@ const ProfileModal = ({ showProfile }) => {
   );
 };
 
-const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout }) => {
+const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) => {
   const [showProfile, setShowProfile] = useState(false);
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className={`${loggedInUser?.isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
+        <Link to="/user" className={`${isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
         <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
         <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
       </div>
@@ -135,6 +135,7 @@ const NavbarLinks = () => (
 const Navbar = () => {
   // const [loggedInUser, setLoggedInUser] = useState(null);
   const loggedInUser = useSelector((state) => state.user.user);
+  const isAgent = useSelector((state) => state.user.isAgent);
   // const tState = useSelector((state) => state);
   console.log('loggedInuser: ', loggedInUser);
   const [logout, { isLoading }] = useLogoutMutation();
@@ -175,7 +176,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} />) : (<NavbarLinks />) }
+      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">
@@ -201,7 +202,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
 
       <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu user={loggedInUser} handleLogout={handleLogout} />
+        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />
       </div>
     </div>
   );

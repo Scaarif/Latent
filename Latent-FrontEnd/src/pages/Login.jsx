@@ -225,11 +225,11 @@ const Login = ({reset}) => {
           if (!usrErr && !isFetching) {
             // console.log({ userData });
             dispatch(setUser(userData));
-          }
-          if (userData?.isAgent) {
-            navigate('/user');
-          } else {
-            navigate('/explore');
+            if (userData?.isAgent) {
+              navigate('/user');
+            } else {
+              navigate('/explore');
+            }
           }
         }
       } catch (error) {
