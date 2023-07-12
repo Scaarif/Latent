@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
 
-// import { useLoginMutation } from '../redux/services/latentAPI';
+import { useLoginMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [values, setValues] = useState({
@@ -119,7 +119,8 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
 };
 
 const Login = () => {
-  // const [login, { isLoading }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
+  const { data: userData, isFetching, error: usrErr } = useGetLoggedInUserQuery();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -152,53 +153,28 @@ const Login = () => {
     },
   ];
 
-  const getUser = async () => {
-    const response = await fetch('http://localhost:5000/api/v1/users', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // credentials: 'include',
-    });
-    const data = await response.json();
-    console.log({ data });
-    if (data.success) {
-      dispatch(setUser(data));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     // console.log({ values });
-    // if (!isLoading) {
-    //   try {
-    //     const res = await login(values);
-    //     console.log({ res });
-    //     if (res.data.success) {
-    //       // set user state
-    //       dispatch(setUser(true));
-    //       navigate('/explore');
-    //     }
-    //   } catch (error) {
-    //     console.error('Login failed: ', error);
-    //   }
-    // }
-    const response = await fetch('http://localhost:5000/api/v1/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
-    const data = await response.json();
-    if (data.success) {
-      // redirect to explore
-      // dispatch(setUser(true));
-      await getUser();
-      navigate('/explore');
-    } else {
-      // show error message
-      console.log('Login failed: ', data);
+    if (!isLoading) {
+      try {
+        const res = await login(values);
+        // console.log({ res });
+        if (res.data.success) {
+          // set user state
+          if (!usrErr && !isFetching) {
+            // console.log({ userData });
+            dispatch(setUser(userData));
+          }
+          if (userData?.isAgent) {
+            navigate('/user');
+          } else {
+            navigate('/explore');
+          }
+        }
+      } catch (error) {
+        console.error('Login failed: ', error);
+      }
     }
   };
 

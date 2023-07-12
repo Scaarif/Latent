@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
-import { root } from 'postcss';
 import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
@@ -134,7 +133,10 @@ const NavbarLinks = () => (
 );
 
 const Navbar = () => {
-  const { user, isAgent } = useSelector((state) => state.user);
+  // const [loggedInUser, setLoggedInUser] = useState(null);
+  const loggedInUser = useSelector((state) => state.user.user);
+  // const tState = useSelector((state) => state);
+  console.log('loggedInuser: ', loggedInUser);
   // const [logout, { isLoading }] = useLogoutMutation();
   const currentRoute = useLocation();
   const navigate = useNavigate();
@@ -146,6 +148,7 @@ const Navbar = () => {
 
   // const isLanding = currentRoute.pathname === '/';
   // console.log({ user });
+
   const handleLogout = async () => {
     const response = await fetch(`${`${rootUrl}/logout`}`, {
       method: 'POST',
@@ -155,7 +158,7 @@ const Navbar = () => {
     console.log({ res });
     if (res.success) {
       // clear user
-      dispatch(setUser(null));
+      dispatch(setUser({}));
       navigate('/'); // navigate back to landing
     }
     // if (!isLoading) {
@@ -174,7 +177,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { user ? (<LoggedInNavbarLinks active={currentRoute.pathname} isAgent={isAgent} handleLogout={handleLogout} />) : (<NavbarLinks />) }
+      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} isAgent={loggedInUser?.isAgent} handleLogout={handleLogout} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">
@@ -200,7 +203,7 @@ const Navbar = () => {
       {/* Mobile Menu */}
 
       <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu user={user} handleLogout={handleLogout} />
+        <MobileMenu user={loggedInUser} handleLogout={handleLogout} />
       </div>
     </div>
   );

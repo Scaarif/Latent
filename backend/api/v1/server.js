@@ -94,7 +94,11 @@ app.use(express.urlencoded({ extended: true }));
 // setup logger
 app.use(logger('dev'));
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  exposedHeaders: ['Set-Cookie'],
+}));
 // app.use(cookieParser());
 // app.set('views', path.join(__dirname, 'views'));
 

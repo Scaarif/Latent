@@ -1,29 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  user: null,
-  isAgent: false,
-  // cookie: 's%3AMQwSpnvPjPrS-IGcPRLGxK1qio7TP5BT.OqU5frcqVZy4%2FGa4IAotzT8H1eqoGcVqVosKe70ehys',,
-  cookie: null,
-};
+// const initialState = {};
 
 const userSlice = createSlice({
   name: 'user',
-  initialState,
+  initialState: {
+    user: {},
+    isAgent: false,
+  },
   reducers: {
     setUser: (state, action) => {
+      // console.log('payload: ', action.payload);
       state.user = action.payload;
-      if (action.payload?.data) {
+      // console.log('state.user: ', state.user);
+      if (action.payload.isAgent) {
         state.isAgent = action.payload.data?.isAgent;
       }
-    },
-
-    setCookie: (state, action) => {
-      state.cookie = action.payload;
     },
   },
 });
 
-export const { setUser, setCookie } = userSlice.actions;
+export const { setUser } = userSlice.actions;
 
 export default userSlice.reducer;

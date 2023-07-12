@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
-// import { useHistory } from 'react-router-dom';
 import FormInput from '../components/FormInput';
-// import { useRegisterUserMutation } from '../redux/services/latentAPI';
+import { useRegisterUserMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
 const SignUp = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const history = useHistory();
   const [userType, setUserType] = useState(null);
   const [values, setValues] = useState({
     fullName: '',
@@ -69,7 +67,8 @@ const SignUp = () => {
       required: true,
     },
   ];
-  // const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const { data: userData, isFetching, usrErr } = useGetLoggedInUserQuery();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,35 +82,25 @@ const SignUp = () => {
     data.lastName = lastName;
     data.isAgent = userType === 'agent' ? 'true' : 'false';
     // console.log({ data });
-    // if (!isLoading) {
-    //   try {
-    //     const res = await registerUser(data).unwrap();
-    //     console.log(res);
-    //     if (res.success) {
-    //       navigate('/login');
-    //       // history.push('/login');
-    //     }
-    //     Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
-    //   } catch (error) {
-    //     console.error('Failed to register user: ', error);
-    //   }
-    // }
-    const response = await fetch('http://localhost:5000/api/v1/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    const res = await response.json();
-    if (res.success) {
-      // redirect to dashboard
-      dispatch(setUser(true));
-      Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
-      navigate('/explore');
-    } else {
-      // show error message
-      console.log('signup failed: ', data);
+    if (!isLoading) {
+      try {
+        const res = await registerUser(data).unwrap();
+        // console.log(res);
+        if (res.success) {
+          // set user to loggedIn user's details
+          if (!usrErr && !isFetching) {
+            dispatch(setUser(userData));
+          }
+          if (userData?.isAgent) {
+            navigate('/user');
+          } else {
+            navigate('/explore');
+          }
+        }
+        Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
+      } catch (error) {
+        console.error('Failed to register user: ', error);
+      }
     }
   };
 
