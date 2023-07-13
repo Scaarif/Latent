@@ -86,6 +86,13 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+    reviewAgent: builder.mutation({
+      query: (review) => ({
+        url: `/agents/${review.agentId}/reviews`,
+        method: 'POST',
+        body: review.review,
+      }),
+    }),
   }),
 });
 
@@ -104,4 +111,5 @@ export const {
   useDeleteHouseMutation,
   useEditUserMutation,
   useDeleteUserMutation,
+  useReviewAgentMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application
