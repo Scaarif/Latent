@@ -56,6 +56,7 @@ class UserController {
    *       - no password
    *       - no isAgent
    *       - no phone
+   *       - all data
    * - user is registered as a Tenant or Agent, depending on the isAgent flag.
    *   If the email is already registered in the collection, an error is sent, else
    *   registration is successfull and the user is logged in.
@@ -94,7 +95,7 @@ class UserController {
       }), password, (err, agent) => {
         // console.log(agent); // SCAFF
         if (err && !agent) {
-          res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
+          res.status(400).json({ success: false, message: err.toString() });
         } else if (agent) {
           // agent created; log in the user
           // NOTE1: one way of authenticating; call login()
@@ -118,7 +119,7 @@ class UserController {
       }), password, (err, tenant) => {
         // console.log(tenant); // SCAFF
         if (err && !tenant) {
-          res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
+          res.status(400).json({ success: false, message: err.toString() });
         } else if (tenant) {
           // tenant created; log the tenant in
           req.login(tenant, (err) => {
