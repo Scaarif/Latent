@@ -8,10 +8,10 @@ const HouseCard = ({ house, loggedIn }) => {
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
     >
-      <img src={house.coverImage} alt="house" className="h-2/4 object-cover rounded-t-md" />
+      <img src={house.coverImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
       <div className="absolute z-10 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span
-          onClick={() => navigate(`/houses/${house.id}`)}
+          onClick={() => navigate(`/houses/${house._id}`)}
           className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer"
         >
           See more

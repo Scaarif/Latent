@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Filter, MobileFilter } from './Filter';
 import PaginatedListing from './PaginatedListing';
 
-const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap, toMap }) => {
+const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, isFetching, error, setUseMap, toMap }) => {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const [searchParams, setSearchParams] = useState({});
   return (
@@ -45,7 +45,7 @@ const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, setUseMap
       </div>
       <div className="flex flex-col md:mt-8">
         <h2 className="hidden md:block text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'}</h2>
-        <PaginatedListing searchParams={searchParams} />
+        <PaginatedListing searchParams={searchParams} houses={houses} isFetching={isFetching} error={error} />
       </div>
     </div>
   );
