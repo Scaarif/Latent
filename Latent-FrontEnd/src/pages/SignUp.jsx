@@ -91,7 +91,7 @@ const SignUp = () => {
           if (!usrErr && !isFetching) {
             dispatch(setUser(userData));
             console.log(userData);
-            if (userData?.isAgent) {
+            if (userData?.listings) {
               navigate('/user');
             } else {
               navigate('/explore');

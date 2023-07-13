@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { altHouses } from '../constants';
+// import { altHouses } from '../constants';
+import { useSelector } from 'react-redux';
 import { Filter, MobileFilter } from '../components/Filter';
 import PaginatedListing from '../components/PaginatedListing';
 
+import { useGetAllHousesQuery } from '../redux/services/latentAPI';
+
 const AgentHome = () => {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+  const { data: allHouses, isFetching, error } = useGetAllHousesQuery();
+  const thisAgent = useSelector((state) => state.user.user);
+  let agentHouses = [];
+  // const [agentHouses, setAgentHouses] = useState([]);
+  // console.log({ thisAgent });
+  if (!isFetching && !error) {
+    // filter out thisAgent's houses...
+    agentHouses = allHouses.data?.filter((house) => thisAgent.listings.includes(house._id));
+    // console.log({ houses });
+    // setAgentHouses(houses);
+  }
   return (
     <div className="w-full my-8 mx-2 md:mx-16">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-16 mb-8">
@@ -37,8 +51,8 @@ const AgentHome = () => {
         { showMobileFilter && <MobileFilter setShowMobileFilter={setShowMobileFilter} /> }
       </div>
       <div className="flex flex-col md:mt-8">
-        <h2 className="hidden md:block text-green text-center md:text-start">Currently listed vacancies</h2>
-        <PaginatedListing houses={houses} loggedIn="true" />
+        <h2 className="hidden md:block text-green text-center md:text-start">My currently listed vacancies</h2>
+        <PaginatedListing houses={agentHouses} loggedIn="true" />
       </div>
     </div>
   );

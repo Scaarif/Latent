@@ -84,10 +84,11 @@ const ProfileModal = ({ showProfile }) => {
 
 const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) => {
   const [showProfile, setShowProfile] = useState(false);
+  console.log({ isAgent });
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className={`${isAgent ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
+        <Link to="/user" className={`${loggedInUser.listings ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
         <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
         <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
       </div>
