@@ -53,7 +53,7 @@ As a registered agent, you can post house listings and they will appear in searc
 ![Image demonstrating house posting feature](https://github.com/Scaarif/Latent/.....)
 
 ### Seek a roommate
-Looking to cut rent costs? Feeling lonely amd in need of a companion? You can put your currently rented apartment up to be shared.
+Looking to cut rent costs? Feeling lonely and in need of a companion? You can put your currently rented apartment up to be shared.
 
 ![Image showing house sharing feature](https://github.com/Scaarif/Latent/.....)
 
@@ -101,7 +101,7 @@ The backend exposes the following RESTful APIs to the frontend to provide busine
 **/api/v1/houses**
 - `POST`: creates a new house listing
 - `PUT`: updates a house listing's data
-- `GET`: returns all house objects linked to an agent, or any query steing parameters
+- `GET`: returns all house objects linked to an agent, or any query string parameters
 - `DELETE`: removes an agent's house listing
 
 **/api/v1/agents/:agentId**
@@ -133,6 +133,9 @@ Greenbel is a software engineer who loves eating problems for breakfast, lunch a
 - [Maerteen Van Middelaar](https://twitter.com/maartenvm19), for his invaluable insights, being a software engineer of over 20 years
 - All Holberton School students of cohort 8 for their network of support
 - **YOU**, for taking the time to go through this documentation
+
+## Attribution
+<a href="https://www.freepik.com/free-photo/wood-sideboard-green-living-room-with-copy-space_36566024.htm#query=green%20home%20background&position=1&from_view=keyword&track=ais">Image by wuttichai1983</a> on Freepik
 
 ## License
 MIT License
