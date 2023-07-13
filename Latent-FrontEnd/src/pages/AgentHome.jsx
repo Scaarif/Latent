@@ -14,7 +14,7 @@ const AgentHome = () => {
   let agentHouses = [];
   // const [agentHouses, setAgentHouses] = useState([]);
   // console.log({ thisAgent });
-  if (!isFetching && !error) {
+  if (thisAgent.listings && !isFetching && !error) {
     // filter out thisAgent's houses...
     agentHouses = allHouses.data?.filter((house) => thisAgent.listings.includes(house._id));
     // console.log({ houses });

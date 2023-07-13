@@ -128,7 +128,7 @@ const House = () => {
                 onClick={() => navigate(`/user/${house.agentId}`)}
                 className="font-semibold text-slate-700 transition-colors hover:text-green cursor-pointer"
               >
-                {!loading && !err ? `${agent.firstName} ${agent.lastName}` : 'listing agent'}
+                {!loading && !err ? `${agent.firstName} ${agent.lastName}` : 'listing agent loading...'}
               </span>
             </div>
 
