@@ -69,8 +69,8 @@ export const latentAPI = createApi({
     }),
     editHouse: builder.mutation({
       query: (houseData) => ({
-        url: `/houses/${houseData.id}`,
-        method: 'POST',
+        url: `/houses/${houseData.get('id')}`,
+        method: 'PUT',
         body: houseData,
       }),
     }),
@@ -99,6 +99,7 @@ export const {
   useLogoutMutation,
   useResetPasswordMutation,
   usePostHouseMutation,
+  useEditHouseMutation,
   useBookAppointmentMutation,
   useDeleteHouseMutation,
   useEditUserMutation,
