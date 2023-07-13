@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 // import { houses } from '../constants';
 import HouseCard from '../components/HouseCard';
 import HousesListingTemplate from '../components/HousesListingTemplate';
-import { useGetHousesQuery } from '../redux/services/latentAPI';
+import { useGetHousesQuery, useGetAllHousesQuery } from '../redux/services/latentAPI';
 
 const MapFilter = () => (
   <div className="flex items-center justify-between">
@@ -116,15 +116,16 @@ const Explore = ({ isLoaded }) => {
   // const [useMap, setUseMap] = useState(true);
   const [useMap, setUseMap] = useState(false);
   const toMap = true;
-
-
+  const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const user = useSelector((state) => state.user);
   console.log('selector user: ', user);
 
   if (useMap) return <MapVersion setUseMap={setUseMap} isLoaded={isLoaded} />;
   return (
     <HousesListingTemplate
-      houses={[]}
+      houses={houses}
+      isFetching={isFetching}
+      error={error}
       header=""
       useMap={useMap}
       setUseMap={setUseMap}

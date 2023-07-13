@@ -43,16 +43,18 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   );
 };
 
-const PaginatedListing = ({ searchParams, itemsPerPage, loggedIn = null }) => {
+const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, houses, isFetching, error }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [housesPerPage, setHousesPerPage] = useState(6);
-  const houses = useGetHousesQuery({...searchParams, pageNum: currentPage, pageSize: housesPerPage});
-  const currentHouses = houses.currentData?.data || [];
-
+  const { data: houseResults, isFetching: loading, error: err } = useGetHousesQuery({ ...searchParams, pageNum: currentPage, pageSize: housesPerPage });
   useEffect(() => {
     if (itemsPerPage) setHousesPerPage(Number(itemsPerPage));
   }, []);
 
+  if (isFetching || loading) return (<div><span>Loading houses...</span></div>);
+  if (error || err) return (<div><span>Something went wrong, try again.</span></div>);
+  const currentHouses = Object.keys(searchParams).length ? houseResults.currentData?.data || [] : houses.data;
+  // console.log({ currentHouses });
   return (
     <div>
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">

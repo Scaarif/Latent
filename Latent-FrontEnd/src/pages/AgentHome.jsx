@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { houses } from '../constants';
+import { altHouses } from '../constants';
 import { Filter, MobileFilter } from '../components/Filter';
 import PaginatedListing from '../components/PaginatedListing';
 

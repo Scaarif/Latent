@@ -1,10 +1,10 @@
 import React from 'react';
 import HousesListingTemplate from '../components/HousesListingTemplate';
-import { houses } from '../constants';
+import { altHouses } from '../constants';
 
 const Cart = () => (
   <HousesListingTemplate
-    houses={houses}
+    houses={altHouses}
     header="Here are your favorites, ready to make a decision?"
     // useMap={useMap}
     leaveLink="Back to Exploring"

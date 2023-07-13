@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 
-import { houses } from '../constants';
+import { altHouses } from '../constants';
 
 const EditHouse = () => {
   const navigate = useNavigate();
   const { houseId } = useParams();
-  const house = houses.find((hse) => hse.id === Number(houseId));
+  const house = altHouses.find((hse) => hse.id === Number(houseId));
   // console.log({ house });
   const [values, setValues] = useState({
     // houseName: house.houseName,

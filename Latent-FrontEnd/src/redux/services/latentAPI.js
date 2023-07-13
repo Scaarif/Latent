@@ -7,21 +7,19 @@ export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:5000/api/v1',
-    // prepareHeaders: (headers, { getState }) => {
-    //   const { user } = getState();
-    //   if (user.cookie) {
-    //     const { cookie } = user.cookie;
-    //     if (cookie) {
-    //       headers.set('Cookie', cookie);
-    //     }
-    //   }
-    //   return headers;
-    // },
     credentials: 'include',
   }),
   endpoints: (builder) => ({
     getLoggedInUser: builder.query({ query: () => '/users' }),
     getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
+    getAllHouses: builder.query({ query: () => '/houses' }),
+    getHouses: builder.query({
+      query: (data) => ({
+        url: '/houses',
+        params: data,
+      }),
+    }),
+
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -63,10 +61,10 @@ export const latentAPI = createApi({
         body: houseData,
       }),
     }),
-    getHouses: builder.query({
-      query: (data) => ({
-        url: '/houses',
-        params: data,
+    bookAppointment: builder.mutation({
+      query: (houseId) => ({
+        url: `/appointment/${houseId}`,
+        method: 'POST',
       }),
     }),
   }),
@@ -75,10 +73,12 @@ export const latentAPI = createApi({
 export const {
   useGetLoggedInUserQuery,
   useGetAgentQuery,
+  useGetAllHousesQuery,
+  useGetHousesQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,
   useResetPasswordMutation,
   usePostHouseMutation,
-  useGetHousesQuery,
+  useBookAppointmentMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application

@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Pagination } from 'swiper/modules';
 import { TestimonialV2 } from '../components/Testimonial';
 import PaginatedListing from '../components/PaginatedListing';
-import { houses } from '../constants';
+import { altHouses } from '../constants';
 
 import { useGetAgentQuery } from '../redux/services/latentAPI';
 
