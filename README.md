@@ -7,16 +7,16 @@
   - [Rich Search Options](#rich-search-options)
   - [Agent Appointments](#agent-appointments)
   - [View Agent Rating](#view-agent-rating)
-  - [Advertise Houses for Rent](#advertise-for-rent)
+  - [Advertise Houses for Rent](#advertise-houses-for-rent)
   - [Seek a Roommate](#seek-a-roommate)
 - [Technology Stack](#technology-stack)
 - [Setup](#setup)
 - [API](#api)
-- [Authors](authors)
-  - [Joseph Alikah](#joseph)
-  - [Gideon Obiasor](#gideon)
-  - [Rahab Mary](#rahab)
-  - [Greenbel Eleghasim](#greenbel)
+- [Authors](#authors)
+  - [Joseph Alikah](#joseph-alikah)
+  - [Gideon Obiasor](#gideon-obiasor)
+  - [Rahab Mary](#rahab-mary)
+  - [Greenbel Eleghasim](#greenbel-eleghasim)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 
@@ -84,23 +84,29 @@ cd Latent/
 The backend exposes the following RESTful APIs to the frontend to provide business logic and database communication:
 
 **/api/v1/login**
-- `POST`: creates a login session for a user<br>
+- `POST`: creates a login session for a user
+
 **/api/v1/logout**
-- `POST`: clears a user's login session<br>
+- `POST`: clears a user's login session
+
 **/api/v1/users?userId=<>**
 - `POST`: creates a new user
 - `PUT`: updates a user's profile information
 - `GET`: returns a user's data
-- `DELETE`: removes a user's account and associated data from the database<br>
+- `DELETE`: removes a user's account and associated data from the database
+
 **/api/v1/reset-password**
-- `PUT`: handles changing of passwords, and resetting of forgotten ones<br>
+- `PUT`: handles changing of passwords, and resetting of forgotten ones
+
 **/api/v1/houses**
 - `POST`: creates a new house listing
 - `PUT`: updates a house listing's data
 - `GET`: returns all house objects linked to an agent, or any query steing parameters
-- `DELETE`: removes an agent's house listing<br>
+- `DELETE`: removes an agent's house listing
+
 **/api/v1/agents/:agentId**
-- `GET`: returns an agent's data without contact information<br>
+- `GET`: returns an agent's data without contact information
+
 **/api/v1/appointments/:houseId**
 - `POST`: establishes a user's interest in a house listing
 
