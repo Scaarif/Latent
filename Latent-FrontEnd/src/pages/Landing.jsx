@@ -18,7 +18,7 @@ import Button from '../components/Button';
 import HouseCard from '../components/HouseCard';
 import { Testimonial } from '../components/Testimonial';
 
-import { houses } from '../constants';
+import { altHouses } from '../constants';
 
 const Landing = ({ isLoaded }) => (
   <div className="w-full relative">
@@ -119,7 +119,7 @@ const Landing = ({ isLoaded }) => (
         <p className="text-center text-sm text-s_gray">See the currently listed vacancies just in your current location</p>
       </div>
       <div className="flex flex-wrap justify-center gap-4 mt-8">
-        {houses?.map((house, i) => <HouseCard key={i} house={house} roommate="true" />)}
+        {altHouses?.map((house, i) => <HouseCard key={i} house={house} roommate="true" />)}
         {/* <HouseCard loggedIn="true" /> */}
       </div>
       <div className="flex justify-end items-center p-8">

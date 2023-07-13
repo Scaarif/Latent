@@ -14,8 +14,8 @@ import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
-import { houses } from '../constants';
-// import { house1 } from '../assets';
+import { altHouses } from '../constants';
+import { useGetAllHousesQuery } from '../redux/services/latentAPI';
 
 const Rating = ({ setRating, rating }) => {
   const [starred, setStarred] = useState(false);
@@ -39,7 +39,7 @@ const Rating = ({ setRating, rating }) => {
 
 const House = () => {
   const { houseId } = useParams();
-  const house = houses.find((hse) => hse.id === Number(houseId));
+  const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const [showReviews, setShowReviews] = useState(false);
   const [rateAgent, setRateAgent] = useState(false);
   const [rating, setRating] = useState(1);
@@ -51,6 +51,14 @@ const House = () => {
     console.log(comment);
   };
   // console.log(houseId)
+  if (isFetching) return (<div><span>Loading house details ...</span></div>);
+  if (error) return (<div><span>Something went wrong, try again later.</span></div>);
+  // console.log(houses.data);
+  const house = houses.data?.find((hse) => hse._id === houseId);
+  // console.log({ house });
+  const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
+  // const images = altHouses[0].images;
+  console.log(images);
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
       <div className="flex flex-col gap-2">
@@ -81,16 +89,16 @@ const House = () => {
         {/* <div className="w-full flex flex-initial flex-col gap-2 border border-green"> */}
         <div className="md:col-span-2 gap-2 rounded-sm overflow-hidden">
           <div className="flex">
-            { house.images.length ? (
+            { images.length ? (
               <Swiper navigation modules={[Navigation]} className="mySwiper">
                 {
-                  house.images?.map((image, i) => (
+                  images?.map((image, i) => (
                     <SwiperSlide key={i}><img src={image} alt="house" className="max-h-[400px] object-cover h-full w-full" /></SwiperSlide>
                   ))
                 }
               </Swiper>
             ) : (
-              <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
+              <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
             )}
           </div>
           {/* agent details */}
@@ -185,7 +193,7 @@ const House = () => {
           </div>
           <div className="flex items-center gap-2 mt-2 p-2">
             <MdPushPin style={{ height: '20px', width: '20px', color: '#75BD97' }} />
-            <span className="text-s_gray">on the <span className="font-semibold">{house.floor}th</span> Floor</span>
+            <span className="text-s_gray">on the <span className="font-semibold">{`${house.numFloors}${house.numFloors === 1 ? 'st' : 'th'}`}</span> Floor</span>
           </div>
           <div className="flex items-center gap-2 p-2">
             <MdBedroomParent style={{ height: '20px', width: '20px', color: '#75BD97' }} />

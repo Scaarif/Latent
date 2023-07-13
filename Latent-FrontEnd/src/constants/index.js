@@ -1,6 +1,6 @@
 import { house1, house2, house3 } from '../assets';
 
-export const houses = [
+export const altHouses = [
   {
     id: 1,
     shared: true,

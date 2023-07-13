@@ -43,10 +43,10 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   );
 };
 
-const PaginatedListing = ({ searchParams, itemsPerPage, loggedIn = null, houses, isFetching, error }) => {
+const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, houses, isFetching, error }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [housesPerPage, setHousesPerPage] = useState(6);
-  const { data: houseResults, isFetching: loading, error:err } = useGetHousesQuery({ ...searchParams, pageNum: currentPage, pageSize: housesPerPage });
+  const { data: houseResults, isFetching: loading, error: err } = useGetHousesQuery({ ...searchParams, pageNum: currentPage, pageSize: housesPerPage });
   useEffect(() => {
     if (itemsPerPage) setHousesPerPage(Number(itemsPerPage));
   }, []);
