@@ -101,6 +101,7 @@ const SignUp = () => {
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
       } catch (error) {
         console.error('Failed to register user: ', error);
+        alert('Signup failed, try again');
       }
     }
   };

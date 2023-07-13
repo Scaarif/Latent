@@ -177,7 +177,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
+      { loggedInUser && Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">
