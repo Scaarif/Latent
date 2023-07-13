@@ -1,9 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
+import { useDeleteHouseMutation } from '../redux/services/latentAPI';
 
-const HouseCard = ({ house, loggedIn }) => {
+const ConfirmModal = ({ setShowModal, handleDelete }) => (
+  <div className="absolute top-12 flex flex-col gap-3 p-4 bg-white shadow-lg z-10 rounded-md">
+    <span className="text-s_gray font-semibold">Are you sure you want to delete this listing?</span>
+    <div className="flex justify-between items-center">
+      <span className="text-green bg-light_green border border-light_green p-1 px-2 rounded-md transition-colors hover:text-md_green" onClick={() => setShowModal(false)}>Cancel</span>
+      <span className="text-green bg-light_green border border-green p-1 px-2 rounded-md transition-colors hover:text-md_green" onClick={handleDelete}>Delete</span>
+    </div>
+  </div>
+);
+
+const HouseCard = ({ house }) => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.user);
+  const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDelete = async () => {
+    setShowModal(false); // close modal
+    if (!isLoading) {
+      try {
+        const res = await deleteHouse(house._id);
+        // console.log({ res });
+        if (res.data.success) {
+          alert('House deleted successfully');
+        }
+      } catch (error) {
+        console.log('delete house failed: ', error);
+      }
+    }
+  };
   return (
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
@@ -17,10 +47,10 @@ const HouseCard = ({ house, loggedIn }) => {
           See more
         </span>
       </div>
-      {loggedIn && (
+      {user?.listings && (
       <div className="absolute z-1 top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate(`/edit/${house._id || house.id}`)}>Edit</span>
-        <span className="px-2 py-1 border-l transition-colors hover:text-md_green cursor-pointer">Delete</span>
+        <span className="px-2 py-1 border-l transition-colors hover:text-md_green cursor-pointer" onClick={() => setShowModal(true)}>Delete</span>
       </div>
       ) }
       <div className="flex flex-col p-4 gap-2 text-s_gray">
@@ -51,6 +81,7 @@ const HouseCard = ({ house, loggedIn }) => {
         </div>
         ) }
       </div>
+      { showModal && <ConfirmModal setShowModal={setShowModal} handleDelete={handleDelete} />}
     </div>
   );
 };
