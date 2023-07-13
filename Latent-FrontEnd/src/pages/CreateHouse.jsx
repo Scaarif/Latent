@@ -122,7 +122,7 @@ const CreateHouse = () => {
       errorMessage:
         'Upload an image of the house',
       label: 'House Image',
-      required: true,
+      required: false,
     },
     {
       id: 12,
@@ -151,12 +151,17 @@ const CreateHouse = () => {
     data.shared = data.shared === 'Yes';
     data.electricity = true;
     data.water = true;
-    // data.country = country;
-    console.log(data);
+    data.numToilets = 1;
+    data.numBathrooms = Number(data.numBathrooms);
+    data.numRooms = Number(data.numRooms);
+    data.numFloors = Number(data.numFloors);
+    data.price = Number(data.price.split('-')[0]);
+    console.log(data, typeof (data.images));
     if (!isLoading) {
       try {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
+        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {
@@ -170,7 +175,15 @@ const CreateHouse = () => {
   };
 
   const onChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
+    if (e.target.name === 'coverImage') {
+      console.log('coverImage: ', e.target.files[0]);
+      setValues({ ...values, coverImage: e.target.files[0] });
+    } else if (e.target.name === 'images') {
+      console.log('images: ', Array.from(e.target.files));
+      setValues({ ...values, images: Array.from(e.target.files) });
+    } else {
+      setValues({ ...values, [e.target.name]: e.target.value });
+    }
   };
 
   return (
@@ -186,7 +199,7 @@ const CreateHouse = () => {
           <FormInput
             key={input.id}
             {...input}
-            value={values[input.name]}
+            value={input.type !== 'file' ? values[input.name] : ''}
             onChange={onChange}
           />
         ))}

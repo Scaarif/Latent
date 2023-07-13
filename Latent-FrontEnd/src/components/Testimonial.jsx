@@ -13,7 +13,7 @@ export const Testimonial = () => (
 );
 
 export const TestimonialV2 = () => (
-  <div className="flex flex-col md:w-[400px] space-y-2 p-4 bg-white rounded-md relative">
+  <div className="flex flex-col md:w-[400px] space-y-2 p-4 bg-white rounded-md relative mt-8 items-start">
     <span className="absolute -top-6 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
       <MdFormatQuote style={{ color: 'green', transform: 'rotate(180deg)', height: '24px', width: '24px' }} />
     </span>
@@ -29,7 +29,7 @@ export const TestimonialV2 = () => (
         style={{ color: '#339D65', height: '20px', width: '20px' }}
       />
     </div>
-    <span className="text-sm text-s_gray">“I had a wonderful experience working with Latent to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly." </span>
+    <span className="text-sm text-s_gray text-start">“I had a wonderful experience working with Latent to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly." </span>
 
   </div>
 );

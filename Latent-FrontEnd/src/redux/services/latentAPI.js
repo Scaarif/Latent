@@ -20,8 +20,8 @@ export const latentAPI = createApi({
     credentials: 'include',
   }),
   endpoints: (builder) => ({
-    getUser: builder.query({ query: (userId) => `/user?id=${userId}` }),
     getLoggedInUser: builder.query({ query: () => '/users' }),
+    getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -73,8 +73,8 @@ export const latentAPI = createApi({
 });
 
 export const {
-  useGetUserQuery,
   useGetLoggedInUserQuery,
+  useGetAgentQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,

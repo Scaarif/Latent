@@ -181,7 +181,7 @@ const House = () => {
           <div className="flex items-center gap-2 bg-light_green mt-2 p-2 rounded-sm">
             <MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} />
             <span className="font-semibold text-green">{house.price} ksh/mth</span>
-            <span className="font-semibold text-white bg-green px-4 py-1">Per Individual</span>
+            <span className={`${house.shared ? 'flex' : 'hidden'} font-semibold text-white bg-green px-4 py-1`}>Per Individual</span>
           </div>
           <div className="flex items-center gap-2 mt-2 p-2">
             <MdPushPin style={{ height: '20px', width: '20px', color: '#75BD97' }} />
