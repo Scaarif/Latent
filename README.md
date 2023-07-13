@@ -81,26 +81,26 @@ cd Latent/
 ```
 
 ## API {#api}
-The backend exposes the following RESTful APIs to provide business logic and database communication:
+The backend exposes the following RESTful APIs to the frontend to provide business logic and database communication:
 
 **/api/v1/login**
-- `POST`: creates a login session for a user
+- `POST`: creates a login session for a user<br>
 **/api/v1/logout**
-- `POST`: clears a user's login session
+- `POST`: clears a user's login session<br>
 **/api/v1/users?userId=<>**
 - `POST`: creates a new user
 - `PUT`: updates a user's profile information
 - `GET`: returns a user's data
-- `DELETE`: removes a user's account and associated data from the database
+- `DELETE`: removes a user's account and associated data from the database<br>
 **/api/v1/reset-password**
-- `PUT`: handles changing of passwords, and resetting of forgotten ones
+- `PUT`: handles changing of passwords, and resetting of forgotten ones<br>
 **/api/v1/houses**
 - `POST`: creates a new house listing
 - `PUT`: updates a house listing's data
 - `GET`: returns all house objects linked to an agent, or any query steing parameters
-- `DELETE`: removes an agent's house listing
+- `DELETE`: removes an agent's house listing<br>
 **/api/v1/agents/:agentId**
-- `GET`: returns an agent's data without contact information
+- `GET`: returns an agent's data without contact information<br>
 **/api/v1/appointments/:houseId**
 - `POST`: establishes a user's interest in a house listing
 
