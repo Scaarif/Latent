@@ -5,9 +5,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode, Pagination } from 'swiper/modules';
 import { TestimonialV2 } from '../components/Testimonial';
 import PaginatedListing from '../components/PaginatedListing';
-import { altHouses } from '../constants';
+// import { altHouses } from '../constants';
 
-import { useGetAgentQuery } from '../redux/services/latentAPI';
+import { useGetAgentQuery, useGetAllHousesQuery } from '../redux/services/latentAPI';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -18,23 +18,25 @@ import 'swiper/css/pagination';
 
 const Profile = () => {
   const navigate = useNavigate();
-  // const { agentId } = useParams();
-  const houseId = 1;
-  const agentId = '64ad8b37aaf270628b847598';
+  const { id: agentId } = useParams();
+  console.log(agentId);
+  // const agentId = '64ad8b37aaf270628b847598';
   const { data: agent, isFetching, error } = useGetAgentQuery(agentId);
-  const [agentHouses, setAgentHouses] = useState([]);
+  // filter agent listings from houseListings
+  const { data: allHouses, isFetching: loading, error: err } = useGetAllHousesQuery();
+  let agentHouses = null;
 
   if (isFetching) return (<div className="flex w-full h-screen items-center justify-center"><span className="text-green text-xl font-bold">Loading agent info...</span></div>);
   if (error) {
     console.log('get agent failed: ', error);
-    return (<div className="flex flex-col w-full h-screen items-center justify-center"><span>Sorry, something went wrong, try again later...</span><span className="text-green cursor-pointer hover:text-md_green" onClick={() => navigate(`/houses/${houseId}`)}>Go back</span></div>);
+    // return (<div className="flex flex-col w-full h-screen items-center justify-center"><span>Sorry, something went wrong, try again later...</span><span className="text-green cursor-pointer hover:text-md_green" onClick={() => navigate(`/houses/${houseId}`)}>Go back</span></div>);
+    return (<div className="flex flex-col w-full h-screen items-center justify-center"><span>Sorry, something went wrong, try again later...</span><span className="text-green cursor-pointer hover:text-md_green" onClick={() => navigate('/explore')}>Go back</span></div>);
   }
   console.log('agent: ', agent);
-  // filter agent listings from houseListings
-  const { data: allHouses, isFetching: loading, error: err } = usegetHousesQuery();
   if (!loading && !err) {
-    const aListing = allHouses.filter((house) => house.agentId === agentId);
-    setAgentHouses(aListing);
+    console.log({ allHouses });
+    agentHouses = allHouses.data?.filter((house) => house.agentId === agentId);
+    console.log({ agentHouses });
   }
   return (
     <div className="flex flex-col border-green w-full mb-8 m-4 md:mx-16">
@@ -54,7 +56,7 @@ const Profile = () => {
           <span className="text-sm p-1 px-2 bg-light_green">Agent</span>
         </span>
         <span className="text-sm text-s_gray transition-colors hover:text-md_green">
-          <a href="#listings">12 House Listings</a>
+          <a href="#listings">{`${agentHouses.length} House Listings`}</a>
         </span>
       </div>
       <div className="flex flex-col space-y-8 my-8 py-8">
@@ -91,7 +93,7 @@ const Profile = () => {
       </div>
       <div id="listings" className="flex flex-col md:mb-8">
         <h2 className="text-lg text-s_gray text-center">{`${agent.firstName} ${agent.lastName}'s listed vacancies`}</h2>
-        { agentHouses ? (<PaginatedListing houses={houses} itemsPerPage="3" />) : (
+        { agentHouses ? (<PaginatedListing houses={agentHouses} itemsPerPage="3" />) : (
           <div><span>{`${agent.firstName} ${agent.lastName} has no listed houses for now...`}</span></div>) }
       </div>
     </div>

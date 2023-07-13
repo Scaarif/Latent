@@ -61,6 +61,12 @@ export const latentAPI = createApi({
         body: houseData,
       }),
     }),
+    deleteHouse: builder.mutation({
+      query: (houseId) => ({
+        url: `/houses/${houseId}`,
+        method: 'DELETE',
+      }),
+    }),
     bookAppointment: builder.mutation({
       query: (houseId) => ({
         url: `/appointment/${houseId}`,
@@ -81,4 +87,5 @@ export const {
   useResetPasswordMutation,
   usePostHouseMutation,
   useBookAppointmentMutation,
+  useDeleteHouseMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application

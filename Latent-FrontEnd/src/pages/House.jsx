@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore, MdStar } from 'react-icons/md';
 import { IoMdSend } from 'react-icons/io';
 
@@ -15,7 +15,7 @@ import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
 import { altHouses } from '../constants';
-import { useGetAllHousesQuery, useBookAppointmentMutation } from '../redux/services/latentAPI';
+import { useGetAllHousesQuery, useBookAppointmentMutation, useGetAgentQuery } from '../redux/services/latentAPI';
 
 const Rating = ({ setRating, rating }) => {
   const [starred, setStarred] = useState(false);
@@ -38,6 +38,7 @@ const Rating = ({ setRating, rating }) => {
 };
 
 const House = () => {
+  const navigate = useNavigate();
   const { houseId } = useParams();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const [bookAppointment, { isLoading }] = useBookAppointmentMutation();
@@ -70,10 +71,13 @@ const House = () => {
   if (error) return (<div><span>Something went wrong, try again later.</span></div>);
   // console.log(houses.data);
   const house = houses.data?.find((hse) => hse._id === houseId);
-  // console.log({ house });
+  console.log({ house });
+  const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house.agentId);
   const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
   // const images = altHouses[0].images;
   console.log(images);
+  if (loading) console.log('loading agent details in housePage');
+  if (err) console.log('loading agent details in housePage failed: ', err);
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
       <div className="flex flex-col gap-2">
@@ -120,7 +124,12 @@ const House = () => {
           <div className="flex flex-col gap-4 bg-white mt-4 p-4">
             <div className="flex gap-2 text-sm">
               <span className="text-s_gray">Listed by</span>
-              <Link to="/user/1" className="font-semibold text-slate-700 transition-colors hover:text-green">Wahura Wamaingi</Link>
+              <span
+                onClick={() => navigate(`/user/${house.agentId}`)}
+                className="font-semibold text-slate-700 transition-colors hover:text-green cursor-pointer"
+              >
+                {!loading && !err ? `${agent.firstName} ${agent.lastName}` : 'listing agent'}
+              </span>
             </div>
 
             {/* Rate the agent's service */}

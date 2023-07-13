@@ -223,7 +223,7 @@ const Login = ({reset}) => {
           if (!isLoading) {
             // console.log({ userData });
             dispatch(setUser(userData));
-            if (userData?.isAgent) {
+            if (userData?.listings) {
               navigate('/user');
             } else {
               navigate('/explore');

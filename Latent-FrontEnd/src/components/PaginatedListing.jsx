@@ -53,7 +53,7 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
 
   if (isFetching || loading) return (<div><span>Loading houses...</span></div>);
   if (error || err) return (<div><span>Something went wrong, try again.</span></div>);
-  const currentHouses = Object.keys(searchParams).length ? houseResults.currentData?.data || [] : houses.data;
+  const currentHouses = Object.keys(searchParams).length ? houseResults.currentData?.data || [] : houses.data || houses;
   // console.log({ currentHouses });
   return (
     <div>
