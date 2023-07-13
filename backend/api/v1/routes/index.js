@@ -46,7 +46,10 @@ router.post('/agents/:agentId/reviews', UserController.postReview);
  */
 
 router.get('/ping', (req, res) => {
-  res.json({ success: true, message: 'pong' });
+  if (req.isAuthenticated()) {
+    return res.json({ success: true, message: 'auth pong' });
+  }
+  return res.json({ success: true, message: 'pong' });
 });
 
 /**

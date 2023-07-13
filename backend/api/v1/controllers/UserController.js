@@ -35,14 +35,39 @@ function capitalize(str) {
 }
 
 class UserController {
+  // TODO: wrap method code in try/catch to handled currently uncaugth errors
+  // TODO: implement email blacklist; can be stored in redis.
   /**
    * Create a new user entry with the provided details.
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the
    * ...creation and log-in of a new user, or failure.
+   *
+   * Algorithm:
+   *
+   * - req.body should contain firstName, lastName, email, password, and
+   *   isAgent as required properties, and phone as an optional property.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - no firstName
+   *       - no lastName
+   *       - no email
+   *       - no password
+   *       - no isAgent
+   *       - no phone
+   *       - all data
+   * - user is registered as a Tenant or Agent, depending on the isAgent flag.
+   *   If the email is already registered in the collection, an error is sent, else
+   *   registration is successfull and the user is logged in.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - already-registered email
+   *     - that user is logged-in after successfull registration
+   *     - that user document is actually created in DB
    */
   static async postUser(req, res) {
+    // TODO: check blacklisted emails
     // console.log('login controller called'); // SCAFF
     const {
       firstName,
@@ -70,7 +95,7 @@ class UserController {
       }), password, (err, agent) => {
         // console.log(agent); // SCAFF
         if (err && !agent) {
-          res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
+          res.status(400).json({ success: false, message: err.toString() });
         } else if (agent) {
           // agent created; log in the user
           // NOTE1: one way of authenticating; call login()
@@ -94,7 +119,7 @@ class UserController {
       }), password, (err, tenant) => {
         // console.log(tenant); // SCAFF
         if (err && !tenant) {
-          res.status(400).json({ success: false, message: 'failed registration from likely duplicate email' });
+          res.status(400).json({ success: false, message: err.toString() });
         } else if (tenant) {
           // tenant created; log the tenant in
           req.login(tenant, (err) => {
@@ -120,6 +145,26 @@ class UserController {
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the authentication of a user, or failure.
+   *
+   * Algorithm:
+   *
+   * - req.body should contain email and password as required properties.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - no email
+   *       - no password
+   * - passport takes care of authentication.
+   *   If authentication fails (likely due to no/invalid email and/or password),
+   *   error is sent, else the user is logged in.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - wrong email
+   *       - wrong password
+   *     - that the user is logged in on successfull auth
+   * - if user is already logged in, error is sent
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user already logged in
    */
   static async postLogin(req, res, next) {
     // authenticate with the registered local strategy
@@ -128,27 +173,31 @@ class UserController {
     // If (err, user, info) callback,
     // ...or options, not set, authenticate will automatically respond with 401.
     // Passport tries each specified strategy, until one successfully authenticates, or all fail.
-    passport.authenticate(['tenantStrategy', 'agentStrategy'], (err, user/* , info */) => {
-      if (err) {
-        // some server error
-        res.status(500).json({ success: false, message: err.toString() });
-      } else if (!user) {
-        // authentication failed
-        res.status(401).json({ success: false, message: 'authentication failed' });
-      } else {
-        // console.log(Object.entries(user)); // SCAFF
-        // auth successfull
-        req.login(user, (err) => {
-          if (err) {
-            return res.status(401).json({ success: false, message: err.toString() });
-          }
-          // successfull log in
-          return res.status(200).json({ success: true, message: 'authenticated' });
-        });
-        // req.login(user, next);
-        // res.status(200).json({ success: true, message: 'authenticated' });
-      }
-    })(req, res, next);
+    // TODO: response if user already authenticated
+    if (!req.isAuthenticated()) {
+      passport.authenticate(['tenantStrategy', 'agentStrategy'], (err, user/* , info */) => {
+        if (err) {
+          // some server error
+          res.status(500).json({ success: false, message: err.toString() });
+        } else if (!user) {
+          // authentication failed
+          res.status(401).json({ success: false, message: 'authentication failed' });
+        } else {
+          // auth successfull
+          req.login(user, (err) => {
+            if (err) {
+              return res.status(401).json({ success: false, message: err.toString() });
+            }
+            // successfull log in
+            return res.status(200).json({ success: true, message: 'authenticated' });
+          });
+        }
+      })(req, res, next);
+      return undefined;
+    }
+
+    // user already authenticated
+    return res.status(401).json({ success: false, message: 'already authenticated' });
   }
 
   /**
@@ -156,6 +205,17 @@ class UserController {
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the log-out of a user, or failure.
+   *
+   * Algorithm:
+   *
+   * - an authenticated user is logged out using req.logout provided by passport.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - successfull logout
+   * - if the user is not logged in to begin with, error is sent
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user not logged in already
    */
   static async postLogout(req, res) {
     if (req.isAuthenticated()) {
@@ -178,6 +238,23 @@ class UserController {
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to a response with a contactless Agent object.
+   *
+   * Algorithm:
+   *
+   * - req.params should contain a required agentId property.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - no agentId
+   * - if the user is logged in, the agentId is used to fetch and send agent info without
+   *   salt, hash, email, and phone properties.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - invalid agentId
+   *     - that the returned object doesn't have salt, hash, email, and phone properties defined
+   * - if the user is logged out, send error.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user not logged in
    */
   static async getAgent(req, res) {
     // retrieve agentId string from URI
@@ -223,17 +300,54 @@ class UserController {
    * Algorithm:
    *
    * oldPassword and newPassword are always expected in the request body (form).
-   * If both are set, they'll be processed. If any of them is missing, check for email is done.
+   * If both are set, attempt is made to change the password.
+   * If password is changed correctly, user is logged out.
+   * If oldPassword is incorrect, error is sent.
+   * If any of them is missing, check for email is done.
+   * TEST:
+   *  - response/behaviour on:
+   *    - user is authenticated and:
+   *      - no oldPassword
+   *      - no newPassword
+   *      - both oldPassword and newPassword are present and:
+   *        - wrong oldPassword
+   *        - successfull password change and logout
    *
    * If email is set, then then it is done in one of two steps:
    * Step1 --> password is forgotten, the user is logged out,
-   * and their email is provided in a form for OTP delivery. Email will be in body.
+   * and their email is provided in a form (for OTP delivery) along with firstName and lastName.
+   * All three are expected in req.body.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is not authenticated and:
+   *       - no email
+   *       - no firstName
+   *       - no lastName
    * Step2 --> OTP has been delivered, and is being
-   * provided with the email (again) for reset. Email will be in query string.
+   * provided for password reset.
+   * email, firstName, lastName, and otp are expected in req.query.
+   * newPassword is expected in req.body
    *
    * If no otp, but the email, firstName and lastName are set, it is assumed this is
-   * the first step, and the OTP needs to be sent. If the four are present (step2), then
+   * the first step, and the OTP needs to be sent.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is not authenticated and:
+   *       - no otp, but with email, firstName, and lastName set
+   *       - otp successfully sent to email
+   *
+   * If the four are present (step2), along with newPassword, then
    * we proceed to verifying the OTP, resetting the password, and logging out the user.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is not authenticated and:
+   *       - otp, email, firstName and lastName are present and:
+   *         - no newPassword
+   *         - valid OTP:
+   *           - user doc is found, password is reset, and user is logged out
+   *           - user doc is not found and password is not reset
+   *         - invalid OTP
+   *   - that password is actually reset (e.g. user is logged out)
    *
    * Otherwise (if no oldPassword and newPassword, or no email), error is sent.
    *
@@ -345,6 +459,11 @@ class UserController {
 
       if (email && token && firstName && lastName) {
         // email, otp, firstName and lastName provided; attempt pwd reset
+        // ensure newPassword is provided
+        if (!newPassword) {
+          return res.status(400).json({ success: false, message: 'newPassword not provided in form' });
+        }
+
         // verify token
         // TODO: verify against mail on linking implementation
         // TODO: invalidate the token on first use. E.g. unlink
@@ -414,6 +533,25 @@ class UserController {
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the update of an authenticated user's profile.
+   *
+   * Algorithm:
+   *
+   * - if the user is authenticated,
+   *   firstName, lastName, and phone are expected optional properties of req.body.
+   *   Any one of them that is not undefined will be updated.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user authenticated and:
+   *         - no firstName
+   *         - no lastName
+   *         - no phone
+   *         - successfull update
+   *         - error during update
+   *     - that data is actually updated in database
+   * - if user is not authenticated, error is sent.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user not authenticated
    */
   static async putUser(req, res) {
     if (req.isAuthenticated()) {
@@ -442,11 +580,14 @@ class UserController {
       Object.assign(doc, updateObj);
       try {
         await doc.save();
-        res.status(201).json({ success: true, message: 'updated successfully' });
+        return res.status(201).json({ success: true, message: 'updated successfully' });
       } catch (err) {
-        res.status(401).json({ success: false, message: err.toString() });
+        return res.status(401).json({ success: false, message: err.toString() });
       }
     }
+
+    // user not authenticated
+    return res.status(401).json({ success: false, message: 'user not logged in' });
   }
 
   /**
@@ -454,6 +595,19 @@ class UserController {
    * @param {Object} req - The HTTP request object.
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the data of the logged-in user.
+   *
+   * Algorithm:
+   *
+   * - if user is authenticated, their data is returned less their mongodb _id, salt, and hash.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user is authenticated:
+   *         - that a data object is sent
+   *         - that the object does not contain _id, salt, and hash properties
+   * - if not logged in, error is sent.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user not authenticated
    */
   static async getUser(req, res) {
     // console.log('USER INSTANCE:', req.user.constructor, req.user instanceof Tenant); // SCAFF
@@ -463,6 +617,12 @@ class UserController {
       delete user._id;
       delete user.salt;
       delete user.hash;
+      if (req.user.listings instanceof Array) {
+        // an agent; indicate
+        user.isAgent = true;
+      } else {
+        user.isAgent = false;
+      }
       return res.json(user);
     }
 
@@ -476,8 +636,40 @@ class UserController {
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the removal
    * ...of all documents and records relating to a user.
+   *
+   * Algorithm:
+   *
+   * - if userId is provided, it is assumed to be by an
+   *   admin user, and attempt is made to remove the account.
+   *   If the ID is not valid, error is sent.
+   *   If no user doc is found with the ID, error is sent.
+   *   Note that at present, if no user doc is found,
+   *   the requesting user's account is deleted instead, if they are logged in.
+   *   userId is expected in req.query.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - invalid userId
+   *       - no user doc found for userId (next IF)
+   *       - successfull removal of user account
+   *     - that all linked house listing and Rating docs are actually removed from the
+   *       database, on successfull removal of the user account
+   * - if userId is not provided, or no user doc found for it,
+   *   the requesting user will have their account deleted.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user is authenticated
+   *         - successfull removal of user account
+   *     - that all linked house listing and Rating docs are actually removed from the
+   *       database, on successfull removal of user account
+   *
+   * - if user is not authenticated, error is sent.
+   *   TEST:
+   *     - response/behaviour on:
+   *       - user not authenticated
    */
   static async deleteUser(req, res) {
+    // TODO: add email of deleted user to blacklist
+    // TODO: create special admin user account for using userId
     // retrieve userId query param, if present
     let { userId } = req.query;
     if (userId) {
@@ -563,6 +755,63 @@ class UserController {
    * @param {Object} res - The HTTP response object.
    * @returns {Promise} - A Promise that resolves to the
    * ...addition of a review to Agent.reviews and creation of a Rating.
+   *
+   * Algorithm:
+   *
+   * This route will handle creation and update of user reviews on an agent.
+   * A review is composed of a rating and a comment.
+   * Three input are expected: rating and comment as [sometimes] required and
+   * optional properties of req.body respectively, and agentId as a required URI parameter.
+   * rating is only required if the user has posted no previous review on the specified agent.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is authenticated and:
+   *       - no/invalid agentId
+   *
+   * If the user is authenticated and has a previous review, it will be updated with the
+   * comment and rating, if they are defined.
+   * rating is not required in this case.
+   * Agent.rating will be re-calculated if rating is
+   * provided and it's different from the previous one.
+   * Also, the linked Rating doc will be updated with the new rating, if provided.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is authenticated and:
+   *       - user has previous review and:
+   *         - no rating
+   *         - invalid rating
+   *         - no comment
+   *         - successfull update of review and Rating.tenantRating,
+   *         and recalculation of Agent.rating
+   *         - no linked Rating doc
+   *   - that review, Agent.rating, and Rating.tenantRating are affected in DB on update
+   *
+   * If the user is logged in and doesn't have a previous review,
+   * a new one will be created and pushed to Agent.reviews.
+   * rating is required in this case.
+   * Agent.rating will be re-calculated. Also, a new Rating doc will be created with the new rating
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is authenticated and:
+   *       - user does not have previous review and:
+   *         - no rating
+   *         - invalid rating
+   *         - no comment
+   *         - successfull creation of review and Rating.tenantRating,
+   *         and recalculation of Agent.rating
+   *         - failed creation of Rating doc
+   *   - that review, Agent.rating, and rating doc are affected in DB on creation
+   *
+   * If the user doesn't provide a rating and doesn't have a previous review as well, error is sent
+   * TEST:
+   *   - response/behaviour on:
+   *     - user is authenticated and:
+   *       - no rating and no previous review subdoc
+   *
+   * If user is not authenticated, error is sent.
+   * TEST:
+   *   - response/behaviour on:
+   *     - user not authenticated
    */
   static async postReview(req, res) {
     // IF user is authenticated continue
@@ -643,7 +892,7 @@ class UserController {
           // +++++Rating doc found+++++
 
           // update linked rating doc
-          ratingDoc.tenantRating = rating;
+          ratingDoc.tenantRating = rating || oldRating;
           // save rating doc
           await ratingDoc.save();
           return res.status(201).json({ success: true, message: 'review successfully updated' });
@@ -663,18 +912,18 @@ class UserController {
         };
 
         // ------push POJO to doc.reviews and save doc
-        // ------IF save successful (no validation/server error)
+        // ------IF save successfull (no validation/server error)
         // --------create a Rating doc with the rating and IDs
         // --------save the doc
         // --------IF save successfull, return success; ELSE error
         // ------ELSE return error
         agentDoc.reviews.push(reviewDoc);
         try {
+          // TODO: save agentDoc and ratingDoc in separate
+          // ...try/catch blocks for better error handling.
           await agentDoc.save();
 
           // new review; update Agent.rating
-          // TODO: update Agent.reviews.rating and
-          // recalculate Agent.rating when review is later edited/updated
           const totalReviews = agentDoc.reviews.length;
           const prevTotal = agentDoc.rating * (totalReviews - 1);
           const newRating = Number(rating);
