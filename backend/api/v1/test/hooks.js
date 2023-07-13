@@ -1,8 +1,21 @@
 const request = require('request');
+const mongoose = require('mongoose');
 const Tenant = require('../models/Tenant');
 const Agent = require('../models/Agent');
 
-console.log('IN root hook plugin...'); // SCAFF
+// console.log('IN root hook plugin...'); // SCAFF
+
+const MONGO_URI = 'mongodb://localhost/testdb';
+
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('connected to MongoDB!');
+  })
+  .catch((err) => console.log(err.message));
 
 // register root hooks to be executed for all test files
 exports.mochaHooks = {
