@@ -40,20 +40,19 @@ export const Filter = (props) => {
   const { setSearchParams } = props;
   const applyFilter = () => {
     let params = {};
-    if (values.agentName) {
-      const [agentFirstname, agentLastname] = values.agentName.split(' ');
-      params = { agentFirstname, agentLastname };
-      console.log({ params });
-      console.log({ values });
-    }
-    for (const field of ['rooms', 'country', 'state', 'city', 'minPrice', 'maxPrice']) {
+    for (const field of ['numRooms', 'country', 'state', 'city', 'minPrice', 'maxPrice']) {
       if (values[field] && values[field] !== '') {
         params[field] = values[field];
       }
-      if (['maxPrice', 'rooms'].includes(field)) {
-        delete params[field];
-      }
+      // if (['maxPrice', 'rooms'].includes(field)) {
+      //   delete params[field]; // why?
+      // }
     }
+    if (values.agentName) {
+      const [agentFirstname, agentLastname] = values.agentName.split(' ');
+      params = { agentFirstname, agentLastname };
+    }
+    // console.log({ params });
     setSearchParams(params);
   }
   return (
