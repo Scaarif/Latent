@@ -245,7 +245,7 @@ class HouseController {
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
-      const images = req.files.images.map((file) => file.path);
+      const images = req.files.images?.map((file) => file.path);
 
       // Create an object with the properties to be updated in the database.
       const updateObject = {

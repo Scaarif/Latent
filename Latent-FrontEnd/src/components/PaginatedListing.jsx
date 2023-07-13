@@ -52,7 +52,7 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
     if (itemsPerPage) setHousesPerPage(Number(itemsPerPage));
   }, []);
 
-  console.log({ searchParams });
+  // console.log({ searchParams });
   if (isFetching || loading) return (<div><span>Loading houses...</span></div>);
   if (error || err) {
     if (err) console.log({ err });
@@ -60,7 +60,7 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
   }
   // const currentHouses = Object.keys(searchParams).length ? houseResults?.data || [] : houses.data || houses;
   const currentHouses = houseResults?.data || (houses.data || houses);
-  console.log({ houseResults });
+  // console.log({ houseResults });
   return (
     <div>
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
