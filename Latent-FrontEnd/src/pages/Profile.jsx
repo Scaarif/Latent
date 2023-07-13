@@ -8,8 +8,8 @@ import { houses } from '../constants';
 import { useGetAgentQuery } from '../redux/services/latentAPI';
 
 const Profile = () => {
-  const { data: agent, isFetching, error } = useGetAgentQuery(4);
-  // const agentId = 1;
+  const agentId = '64ad8b37aaf270628b847598';
+  const { data: agent, isFetching, error } = useGetAgentQuery(agentId);
   if (isFetching) return (<div><span>Loading agent info...</span></div>);
   if (error) {
     console.log('get agent failed: ', error);
