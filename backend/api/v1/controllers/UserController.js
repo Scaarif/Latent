@@ -174,27 +174,30 @@ class UserController {
     // ...or options, not set, authenticate will automatically respond with 401.
     // Passport tries each specified strategy, until one successfully authenticates, or all fail.
     // TODO: response if user already authenticated
-    passport.authenticate(['tenantStrategy', 'agentStrategy'], (err, user/* , info */) => {
-      if (err) {
-        // some server error
-        res.status(500).json({ success: false, message: err.toString() });
-      } else if (!user) {
-        // authentication failed
-        res.status(401).json({ success: false, message: 'authentication failed' });
-      } else {
-        // console.log(Object.entries(user)); // SCAFF
-        // auth successfull
-        req.login(user, (err) => {
-          if (err) {
-            return res.status(401).json({ success: false, message: err.toString() });
-          }
-          // successfull log in
-          return res.status(200).json({ success: true, message: 'authenticated' });
-        });
-        // req.login(user, next);
-        // res.status(200).json({ success: true, message: 'authenticated' });
-      }
-    })(req, res, next);
+    if (!req.isAuthenticated()) {
+      passport.authenticate(['tenantStrategy', 'agentStrategy'], (err, user/* , info */) => {
+        if (err) {
+          // some server error
+          res.status(500).json({ success: false, message: err.toString() });
+        } else if (!user) {
+          // authentication failed
+          res.status(401).json({ success: false, message: 'authentication failed' });
+        } else {
+          // auth successfull
+          req.login(user, (err) => {
+            if (err) {
+              return res.status(401).json({ success: false, message: err.toString() });
+            }
+            // successfull log in
+            return res.status(200).json({ success: true, message: 'authenticated' });
+          });
+        }
+      })(req, res, next);
+      return undefined;
+    }
+
+    // user already authenticated
+    return res.status(401).json({ success: false, message: 'already authenticated' });
   }
 
   /**
@@ -614,6 +617,12 @@ class UserController {
       delete user._id;
       delete user.salt;
       delete user.hash;
+      if (req.user.listings instanceof Array) {
+        // an agent; indicate
+        user.isAgent = true;
+      } else {
+        user.isAgent = false;
+      }
       return res.json(user);
     }
 
