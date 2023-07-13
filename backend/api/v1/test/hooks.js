@@ -45,6 +45,11 @@ exports.mochaHooks = {
       url: 'http://localhost:5000/api/v1/users',
       body: tData,
     };
+
+    // logout from any active session
+    const url = `${this.baseUrl}/logout`;
+    this.rq.post(url, () => {});
+
     baseRequest.post(reqOpts, (err, res, bdy) => {
       if (res.statusCode === 201) {
         // tenant creation success;
