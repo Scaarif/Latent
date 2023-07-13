@@ -52,7 +52,10 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
   }, []);
 
   if (isFetching || loading) return (<div><span>Loading houses...</span></div>);
-  if (error || err) return (<div><span>Something went wrong, try again.</span></div>);
+  if (error || err) {
+    if (err) console.log({ err });
+    return (<div><span>Something went wrong, try again.</span></div>);
+  }
   const currentHouses = Object.keys(searchParams).length ? houseResults.currentData?.data || [] : houses.data || houses;
   // console.log({ currentHouses });
   return (
@@ -61,6 +64,7 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
         {currentHouses?.map((house, i) => (
           <HouseCard key={i} house={house} loggedIn={loggedIn} />
         ))}
+        { !currentHouses.length && <div className="flex flex-col items-center justify-center"><span className="text-green">No listings to show...</span></div> }
       </div>
       <Pagination
         totalHouses={houses.length}
