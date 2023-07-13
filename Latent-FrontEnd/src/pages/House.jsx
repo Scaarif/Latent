@@ -15,7 +15,7 @@ import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
 import { altHouses } from '../constants';
-import { useGetAllHousesQuery } from '../redux/services/latentAPI';
+import { useGetAllHousesQuery, useBookAppointmentMutation } from '../redux/services/latentAPI';
 
 const Rating = ({ setRating, rating }) => {
   const [starred, setStarred] = useState(false);
@@ -40,6 +40,8 @@ const Rating = ({ setRating, rating }) => {
 const House = () => {
   const { houseId } = useParams();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
+  const [bookAppointment, { isLoading }] = useBookAppointmentMutation();
+  const [booked, setBooked] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [rateAgent, setRateAgent] = useState(false);
   const [rating, setRating] = useState(1);
@@ -49,6 +51,19 @@ const House = () => {
   const handleCommenting = (e) => {
     setComment(e.target.value);
     console.log(comment);
+  };
+
+  const handleContactRequest = async () => {
+    if (!isLoading) {
+      try {
+        const res = await bookAppointment(houseId);
+        console.log({ res });
+        // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
+        setBooked(true);
+      } catch (err) {
+        console.log('requesting contacts failed: ', err);
+      }
+    }
   };
   // console.log(houseId)
   if (isFetching) return (<div><span>Loading house details ...</span></div>);
@@ -207,8 +222,10 @@ const House = () => {
           <span className="text-s_gray text-sm">{ house.description || 'Located in one of the safest areas of Nairobi, the apartment comes with  reliable piped water, complimentary borehole water and reliable electricity supply. Garbage collection and cleaning services are readily and affordably available. We have  a children playground in the compound as well as a mall just outside...' }</span>
           <div className="flex flex-col gap-1 py-16">
             <span className="text-sm text-s_gray">interested?</span>
-            <span className="text-center text-white bg-green px-4 py-2 transition-colors
+            <span
+              className="text-center text-white bg-green px-4 py-2 transition-colors
             hover:text-light_green cursor-pointer rounded-sm"
+              onClick={handleContactRequest}
             >
               Request for agent contact Information
             </span>
