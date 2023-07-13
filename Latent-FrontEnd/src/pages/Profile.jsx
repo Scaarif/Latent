@@ -77,11 +77,12 @@ const Profile = () => {
               className="mySwiper"
             >
               {
-          [1, 2, 3, 4].map((review, i) => (
-            <SwiperSlide key={i} className="rounded-md">
-              <TestimonialV2 />
-            </SwiperSlide>
-          ))
+          // agent.reviews?.map((review, i) => (
+            [1, 2, 3, 4].map((review, i) => (
+              <SwiperSlide key={i} className="rounded-md">
+                <TestimonialV2 />
+              </SwiperSlide>
+            ))
           }
             </Swiper>
           ) : (
