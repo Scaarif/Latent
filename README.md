@@ -1,5 +1,5 @@
 # Latent - House-finding Made Easy
-![Latent cover image](https://github.com/Scaarif/Latent/.....)
+![Latent cover image](https://github.com/Scaarif/Latent/blob/readme/latent_cover.jpg)
 
 ## Table of contents
 - [Introduction](#introduction)
