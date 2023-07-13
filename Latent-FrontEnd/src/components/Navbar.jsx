@@ -99,7 +99,7 @@ const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) =>
           onClick={() => setShowProfile(!showProfile)}
           className="flex group items-center space-x-2"
         >
-          <span className="text-sm text-green bg-bg_color rounded-full p-2 group-hover:text-md_green">JD</span>
+          <span className="text-sm text-green text-uppercase bg-bg_color rounded-full p-2 group-hover:text-md_green ">{`${loggedInUser.firstName[0]}${loggedInUser.lastName[0]}`}</span>
           <span className="text-green group-hover:text-md_green">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</span>
         </div>
 
