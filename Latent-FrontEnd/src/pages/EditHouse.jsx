@@ -125,7 +125,7 @@ const EditHouse = () => {
       errorMessage:
         'Upload an image of the house',
       label: 'House Image',
-      required: true,
+      required: false,
     },
     {
       id: 11,
@@ -165,11 +165,8 @@ const EditHouse = () => {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
         formData.delete('images'); // incorrectly set
-        data.images.map((image) => {
-          console.log('appending to formData:', image);
-          formData.append('images', image);
-        });
-        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
+        data.images.slice(0, 3).map((image) => formData.append('images', image));
+        // console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
         const res = await editHouse(formData).unwrap();
         console.log('edit house res: ', res);
         if (res.success) {

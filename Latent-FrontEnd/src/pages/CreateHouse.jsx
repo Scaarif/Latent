@@ -167,8 +167,8 @@ const CreateHouse = () => {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
         formData.delete('images'); // incorrectly set
-        data.images.map((image) => formData.append('images', image)); // correctly set value
-        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
+        data.images?.slice(0, 3).map((image) => formData.append('images', image)); // correctly set value
+        // console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {
