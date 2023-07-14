@@ -2,7 +2,7 @@
 const House = require('../models/House');
 const Agent = require('../models/Agent');
 const Tenant = require('../models/Tenant');
-const bookHouseQueue = require('../jobs/queue');
+const { bookHouseQueue } = require('../jobs/queue');
 
 class HouseController {
   /**
@@ -306,6 +306,7 @@ class HouseController {
       // Extract necessary information from the house
       const { agentId, description, address } = house;
       // Create a job data to send mail
+      console.log(req.user);
       const bookingJobData = {
         agentId,
         tenantId: req.user._id,

@@ -93,6 +93,7 @@ passport.deserializeUser(async (user, done) => {
 // enable body-parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 
 // setup logger
 app.use(logger('dev'));
