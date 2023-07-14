@@ -10,11 +10,11 @@ export const latentAPI = createApi({
     baseUrl: 'http://localhost:3001/api/v1',
     credentials: 'include',
   }),
-  tagTypes: ['User'],
+  tagTypes: ['User', 'House'],
   endpoints: (builder) => ({
-    getLoggedInUser: builder.query({ query: () => '/users', providesTags: ['User'] }),
+    getLoggedInUser: builder.query({ query: () => '/users', providesTags: ['User', 'House'] }),
     getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
-    getAllHouses: builder.query({ query: () => '/houses' }),
+    getAllHouses: builder.query({ query: () => '/houses', providesTags: ['House'] }),
     getHouses: builder.query({
       query: (data) => ({
         url: '/houses',
@@ -71,6 +71,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: houseData,
       }),
+      invalidatesTags: ['User', 'House'], // user.listings needs to be updated, as does allHouses, so fetch...
     }),
     editHouse: builder.mutation({
       query: (houseData) => ({

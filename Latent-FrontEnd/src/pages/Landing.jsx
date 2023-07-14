@@ -18,9 +18,13 @@ import Button from '../components/Button';
 import HouseCard from '../components/HouseCard';
 import { Testimonial } from '../components/Testimonial';
 
-import { altHouses } from '../constants';
+import { useGetAllHousesQuery } from '../redux/services/latentAPI';
 
-const Landing = ({ isLoaded }) => (
+// import { altHouses } from '../constants';
+
+const Landing = ({ isLoaded }) => {
+  const { data, isFetching, error } = useGetAllHousesQuery();
+  return (
   <div className="w-full relative">
 
     {/* Hero section */}
@@ -119,7 +123,7 @@ const Landing = ({ isLoaded }) => (
         <p className="text-center text-sm text-s_gray">See the currently listed vacancies just in your current location</p>
       </div>
       <div className="flex flex-wrap justify-center gap-4 mt-8">
-        {altHouses?.map((house, i) => <HouseCard key={i} house={house} roommate="true" />)}
+        {!error && !isFetching && data.data?.slice(0, 6).map((house, i) => <HouseCard key={i} house={house} roommate="true" />)}
         {/* <HouseCard loggedIn="true" /> */}
       </div>
       <div className="flex justify-end items-center p-8">
@@ -204,6 +208,6 @@ const Landing = ({ isLoaded }) => (
     </div>
 
   </div>
-);
+)};
 
 export default Landing;

@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-// import { altHouses } from '../constants';
-import { useSelector } from 'react-redux';
 import { Filter, MobileFilter } from '../components/Filter';
 import PaginatedListing from '../components/PaginatedListing';
 
-import { useGetAllHousesQuery } from '../redux/services/latentAPI';
+import { useGetAllHousesQuery, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 
 const AgentHome = () => {
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const { data: allHouses, isFetching, error } = useGetAllHousesQuery();
-  const thisAgent = useSelector((state) => state.user.user);
+  const { data: thisAgent, isFetching: gettingAgent, error: agentErr } = useGetLoggedInUserQuery();
   let agentHouses = [];
-  // const [agentHouses, setAgentHouses] = useState([]);
-  // console.log({ thisAgent });
-  if (thisAgent.listings && !isFetching && !error) {
+  if (!gettingAgent && !agentErr && thisAgent.listings && !isFetching && !error) {
     // filter out thisAgent's houses...
     agentHouses = allHouses.data?.filter((house) => thisAgent.listings.includes(house._id));
     // console.log({ houses });

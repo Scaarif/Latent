@@ -15,7 +15,13 @@ import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
 import { altHouses } from '../constants';
-import { useGetAllHousesQuery, useBookAppointmentMutation, useGetAgentQuery, useReviewAgentMutation } from '../redux/services/latentAPI';
+import {
+  useGetAllHousesQuery,
+  useBookAppointmentMutation,
+  useGetAgentQuery,
+  useReviewAgentMutation,
+  useGetLoggedInUserQuery,
+} from '../redux/services/latentAPI';
 
 const Rating = ({ setRating, rating, i }) => {
   const [starred, setStarred] = useState(false);
@@ -39,6 +45,7 @@ const Rating = ({ setRating, rating, i }) => {
 const House = () => {
   const navigate = useNavigate();
   const { houseId } = useParams();
+  const { data: user, isFetching: gettingUser, error: userErr } = useGetLoggedInUserQuery();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const [bookAppointment, { isLoading }] = useBookAppointmentMutation();
   const [reviewAgent, { isReviewing }] = useReviewAgentMutation();
@@ -49,19 +56,6 @@ const House = () => {
   const [comment, setComment] = useState('');
   const [hovered, setHovered] = useState(false);
 
-  const handleContactRequest = async () => {
-    if (!isLoading) {
-      try {
-        const res = await bookAppointment(houseId);
-        console.log({ res });
-        // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
-        setBooked(true);
-        alert('request recieved, check your email for the contact information');
-      } catch (err) {
-        console.log('requesting contacts failed: ', err);
-      }
-    }
-  };
   // console.log(houseId)
   if (isFetching) return (<div><span>Loading house details ...</span></div>);
   if (error) return (<div><span>Something went wrong, try again later.</span></div>);
@@ -74,7 +68,27 @@ const House = () => {
   // console.log(images);
   if (loading) console.log('loading agent details in housePage');
   if (err) console.log('loading agent details in housePage failed: ', err);
-  
+
+  // determine if user (currently logged in) is the house owner
+  const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
+
+  const handleContactRequest = async () => {
+    if (!isLoading && !owner) {
+      try {
+        const res = await bookAppointment(houseId);
+        console.log({ res });
+        // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
+        setBooked(true);
+        alert('request recieved, check your email for the contact information');
+      } catch (err) {
+        console.log('requesting contacts failed: ', err);
+      }
+    }
+    if (owner) {
+      alert('You are the house lister...');
+    }
+  };
+
   const handleCommenting = (e) => {
     setComment(e.target.value);
     console.log(comment);
@@ -84,7 +98,7 @@ const House = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isReviewing && comment) {
+    if (!isReviewing && !owner && comment) {
       try {
         const res = await reviewAgent({ agentId: house.agentId, review: { comment, rating: 4 } });
         // console.log({ res });
@@ -98,7 +112,8 @@ const House = () => {
         alert('Reviewing failed, try again...');
       }
     }
-  }
+  };
+
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
       <div className="flex flex-col gap-2">
@@ -155,7 +170,7 @@ const House = () => {
 
             {/* Rate the agent's service */}
 
-            <div className="flex flex-col py-4">
+            <div className={`${owner ? 'hidden' : 'flex'} flex-col py-4`}>
               <div className="flex items-center gap-2">
                 <span className="text-center text-green py-2 transition-colors
                 hover:text-md_green cursor-pointer rounded-sm z-10"
@@ -251,7 +266,7 @@ const House = () => {
           </div>
           <span className="py-4 font-semibold text-slate-600">About this House</span>
           <span className="text-s_gray text-sm">{ house.description || 'Located in one of the safest areas of Nairobi, the apartment comes with  reliable piped water, complimentary borehole water and reliable electricity supply. Garbage collection and cleaning services are readily and affordably available. We have  a children playground in the compound as well as a mall just outside...' }</span>
-          <div className="flex flex-col gap-1 py-16">
+          <div className={`${owner ? 'hidden' : 'flex'} flex-col gap-1 py-16`}>
             <span className="text-sm text-s_gray">interested?</span>
             <span
               className="text-center text-white bg-green px-4 py-2 transition-colors
