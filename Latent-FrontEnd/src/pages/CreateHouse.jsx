@@ -17,8 +17,9 @@ const CreateHouse = () => {
     numFloors: '',
     description: '',
     shared: '',
-    coverImage: '',
-    images: '',
+    coverImage: [],
+    images: [],
+    altImages: [],
   });
 
   const inputs = [
@@ -138,6 +139,9 @@ const CreateHouse = () => {
     },
   ];
 
+  const [cover, otherImages] = inputs.slice(-2);
+  // console.log({ cover }, { otherImages });
+
   const [postHouse, { isLoading }] = usePostHouseMutation();
 
   const handleSubmit = async (e) => {
@@ -227,14 +231,24 @@ const CreateHouse = () => {
         <h1 className="flex md:pl-0 gap-1 items-center py-4 text-lg font-semibold text-green">
           Post a house
         </h1>
-        {inputs.map((input) => (
+        {inputs.slice(0, -2).map((input) => (
           <FormInput
             key={input.id}
             {...input}
             value={input.type !== 'file' ? values[input.name] : ''}
+            // value={values[input.name]}
             onChange={onChange}
           />
         ))}
+        <FormInput
+          {...cover}
+          onChange={onChange}
+        />
+        <FormInput
+          {...otherImages}
+          onChange={onChange}
+        />
+        {/* <input type="file" name="altImages" multiple onChange={onChange} /> */}
         <button
           type="submit"
           className="w-[280px] md:w-full mt-8 bg-green rounded-md text-white p-3

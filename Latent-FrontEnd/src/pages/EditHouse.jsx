@@ -130,7 +130,7 @@ const EditHouse = () => {
     },
     {
       id: 11,
-      name: 'houseImages',
+      name: 'images',
       type: 'file',
       placeholder: 'more images',
       errorMessage:

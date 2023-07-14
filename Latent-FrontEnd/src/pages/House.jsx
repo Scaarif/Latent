@@ -84,8 +84,8 @@ const House = () => {
         // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
         setBooked(true);
         alert('request recieved, check your email for the contact information');
-      } catch (err) {
-        console.log('requesting contacts failed: ', err);
+      } catch (tryErr) {
+        console.log('requesting contacts failed: ', tryErr);
       }
     }
     if (owner) {

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
-import { useDeleteHouseMutation } from '../redux/services/latentAPI';
+import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { altHouses } from '../constants';
 
 const ConfirmModal = ({ setShowModal, handleDelete }) => (
@@ -17,7 +16,8 @@ const ConfirmModal = ({ setShowModal, handleDelete }) => (
 
 const HouseCard = ({ house }) => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user.user);
+  // const user = useSelector((state) => state.user.user);
+  const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
   const [showModal, setShowModal] = useState(false);
 
@@ -51,7 +51,7 @@ const HouseCard = ({ house }) => {
           See more
         </span>
       </div>
-      {user?.listings && (
+      {!isFetching && !error && user?.listings?.includes(house._id) && (
       <div className="absolute z-1 top-2 right-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate(`/edit/${house._id || house.id}`)}>Edit</span>
         <span className="px-2 py-1 border-l transition-colors hover:text-md_green cursor-pointer" onClick={() => setShowModal(true)}>Delete</span>
