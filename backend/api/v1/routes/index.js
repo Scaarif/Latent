@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get('/houses', HouseController.getHouse);
+router.get('/houses/:id', HouseController.getImages);
 router.delete('/houses/:houseId', HouseController.deleteHouse);
 router.put(
   '/houses/:houseId',

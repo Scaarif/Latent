@@ -4,7 +4,7 @@ const fs = require("fs");
 // Set up local storage for images
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
-    const filePath = `/home/scaarifintl/reactapps/Latent/backend/api/v1/uploads`;
+    const filePath = `${__dirname}/public/uploads`;
     await fs.promises.mkdir(filePath, { recursive: true });
     cb(null, filePath);
   },
