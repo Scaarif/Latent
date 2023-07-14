@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import FormInput from '../components/FormInput';
-import { usePostHouseMutation } from '../redux/services/latentAPI';
+import { useGetLoggedInUserQuery, usePostHouseMutation } from '../redux/services/latentAPI';
 
 const CreateHouse = () => {
   const navigate = useNavigate();
+  const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [values, setValues] = useState({
     name: '',
     address: '',
@@ -188,6 +189,35 @@ const CreateHouse = () => {
     }
   };
 
+  if (isFetching) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">Loading ...</span>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be logged in to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/login')}>login</span>
+        </div>
+      </div>
+    );
+  }
+  if (!user?.isAgent) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be an agent to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Continue exploring</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex w-full items-center justify-center my-8">
       <form

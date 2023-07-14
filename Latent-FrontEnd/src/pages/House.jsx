@@ -73,6 +73,10 @@ const House = () => {
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
 
   const handleContactRequest = async () => {
+    if (err) {
+      alert('You have to be logged in to get contact info');
+      navigate('/login');
+    }
     if (!isLoading && !owner) {
       try {
         const res = await bookAppointment(houseId);
@@ -90,6 +94,10 @@ const House = () => {
   };
 
   const handleCommenting = (e) => {
+    if (!gettingUser && userErr) {
+      alert('You have to be logged in to review')
+      navigate('/login');
+    }
     setComment(e.target.value);
     console.log(comment);
   };
