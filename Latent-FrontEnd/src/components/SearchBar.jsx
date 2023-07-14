@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
-// import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Autocomplete } from '@react-google-maps/api';
 
 import Button from './Button';
 
 const SearchBar = ({ name, isLoaded }) => {
+  const navigate = useNavigate();
   const locationRef = useRef();
   const [agent, setAgent] = useState('');
   const [priceRange, setPriceRange] = useState('');
@@ -14,6 +15,7 @@ const SearchBar = ({ name, isLoaded }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    navigate('/explore');
     // setLocation(locationRef.current?.value);
     const data = new FormData(e.target);
     data.set('agentName', agent);

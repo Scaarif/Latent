@@ -44,7 +44,7 @@ const HousesListingTemplate = ({ header, subHeader, leaveLink, houses, isFetchin
         { showMobileFilter && <MobileFilter setShowMobileFilter={setShowMobileFilter} /> }
       </div>
       <div className="flex flex-col md:mt-8">
-        <h2 className="hidden md:block text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'}</h2>
+        <h2 className="hidden md:block text-green text-center md:text-start">{ subHeader || 'Currently listed vacancies'} <span>{`(${houses?.data?.length || houses?.length} total)`}</span></h2>
         <PaginatedListing searchParams={searchParams} houses={houses} isFetching={isFetching} error={error} />
       </div>
     </div>
