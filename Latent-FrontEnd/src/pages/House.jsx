@@ -15,17 +15,16 @@ import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
 import { altHouses } from '../constants';
-import { useGetAllHousesQuery, useBookAppointmentMutation, useGetAgentQuery } from '../redux/services/latentAPI';
+import { useGetAllHousesQuery, useBookAppointmentMutation, useGetAgentQuery, useReviewAgentMutation } from '../redux/services/latentAPI';
 
-const Rating = ({ setRating, rating }) => {
+const Rating = ({ setRating, rating, i }) => {
   const [starred, setStarred] = useState(false);
+  let stars = [...rating];
   const handleClick = () => {
     setStarred(!starred);
     if (starred) {
-      setRating(rating + 1);
-    } else {
-      setRating(rating - 1);
-    }
+      if (!rating.includes(i)) setRating(stars.push(i));
+    } else if (!starred && rating.includes(i)) setRating(stars.filter((x) => x !== i));
     // console.log(rating);
   };
 
@@ -42,17 +41,13 @@ const House = () => {
   const { houseId } = useParams();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const [bookAppointment, { isLoading }] = useBookAppointmentMutation();
+  const [reviewAgent, { isReviewing }] = useReviewAgentMutation();
   const [booked, setBooked] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [rateAgent, setRateAgent] = useState(false);
-  const [rating, setRating] = useState(1);
+  const [rating, setRating] = useState([]);
   const [comment, setComment] = useState('');
   const [hovered, setHovered] = useState(false);
-
-  const handleCommenting = (e) => {
-    setComment(e.target.value);
-    console.log(comment);
-  };
 
   const handleContactRequest = async () => {
     if (!isLoading) {
@@ -61,6 +56,7 @@ const House = () => {
         console.log({ res });
         // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
         setBooked(true);
+        alert('request recieved, check your email for the contact information');
       } catch (err) {
         console.log('requesting contacts failed: ', err);
       }
@@ -71,13 +67,38 @@ const House = () => {
   if (error) return (<div><span>Something went wrong, try again later.</span></div>);
   // console.log(houses.data);
   const house = houses.data?.find((hse) => hse._id === houseId);
-  console.log({ house });
+  // console.log({ house });
   const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house.agentId);
   const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
   // const images = altHouses[0].images;
-  console.log(images);
+  // console.log(images);
   if (loading) console.log('loading agent details in housePage');
   if (err) console.log('loading agent details in housePage failed: ', err);
+  
+  const handleCommenting = (e) => {
+    setComment(e.target.value);
+    console.log(comment);
+  };
+
+  // console.log({ rating });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isReviewing && comment) {
+      try {
+        const res = await reviewAgent({ agentId: house.agentId, review: { comment, rating: 4 } });
+        // console.log({ res });
+        if (res.data.success) {
+          alert('Review successfully submitted!');
+          setComment(''); // clear textarea
+          setRateAgent(false); // close the 'rating-box'
+        }
+      } catch (errr) {
+        console.error('Reviewing failed: ', errr);
+        alert('Reviewing failed, try again...');
+      }
+    }
+  }
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
       <div className="flex flex-col gap-2">
@@ -128,7 +149,7 @@ const House = () => {
                 onClick={() => navigate(`/user/${house.agentId}`)}
                 className="font-semibold text-slate-700 transition-colors hover:text-green cursor-pointer"
               >
-                {!loading && !err ? `${agent.firstName} ${agent.lastName}` : 'listing agent'}
+                {!loading && !err ? `${agent.firstName} ${agent.lastName}` : 'listing agent loading...'}
               </span>
             </div>
 
@@ -149,12 +170,13 @@ const House = () => {
               {
   rateAgent
                 && (
-                <div className="flex flex-col md:mx-4 p-2 md:p-4">
+                <form onSubmit={handleSubmit} className="flex flex-col md:mx-4 p-2 md:p-4">
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star, i) => (
                       <Rating
                         key={i}
                         rating={rating}
+                        i={i}
                         setRating={setRating}
                       />
                     ))}
@@ -171,15 +193,15 @@ const House = () => {
                       placeholder="leave a comment"
                       className="border mt-2 rounded p-2 text-slate-600 focus:outline-none focus:border-light_green"
                     />
-                    <span className="border-y border-x rounded px-4 py-2">
+                    <button type="submit" className="border-y border-x rounded px-4 py-2">
                       <IoMdSend
                         onMouseEnter={() => setHovered(true)}
                         onMouseLeave={() => setHovered(false)}
                         style={{ color: hovered ? 'green' : 'gray', width: '20px', height: '20px' }}
                       />
-                    </span>
+                    </button>
                   </div>
-                </div>
+                </form>
                 )
 }
             </div>

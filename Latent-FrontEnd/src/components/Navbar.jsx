@@ -7,16 +7,73 @@ import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
 // import { rootUrl } from '../constants';
-import { useLogoutMutation } from '../redux/services/latentAPI';
+import { useLogoutMutation, useDeleteUserMutation, useEditUserMutation } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
-const ProfileModal = ({ showProfile }) => {
+const ProfileModal = ({ showProfile, loggedInUser }) => {
+  const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [editUser, { isEditing }] = useEditUserMutation();
+  const [deleteUser, { isDeleting }] = useDeleteUserMutation();
+  // const [userData, setUserData] = useState({
+  //   name: `${loggedInUser.firstName} ${loggedInUser.lastName}`,
+  //   email: loggedInUser.email,
+  // });
+  const [email, setEmail] = useState('');
+  const [name_, setName] = useState('');
 
-  const handleEdit = (e) => {
-    console.log('editing profile to: ', e.target.value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    console.log('edit', name, ' ', value);
+    if (name === 'email') {
+      setEmail(value);
+    } else if (name === 'name') {
+      setName(value);
+    }
   };
+
+  const handleEdit = async () => {
+    setEdit(!edit);
+    if (edit) {
+      // save changes
+      const editedUser = {};
+      if (email !== loggedInUser.email) editedUser.email = email;
+      const [firstName, lastName] = name_.split(' ');
+      if (firstName !== loggedInUser.firstName) editedUser.firstName = firstName;
+      if (lastName !== loggedInUser.lastName) editedUser.lastName = lastName;
+      // console.log({ editedUser });
+      if (editedUser && !isEditing) {
+        try {
+          const res = await editUser(editedUser);
+          console.log({ res });
+          if (res.data.success) {
+            alert('Profile successfully updated!')
+          }
+        } catch (error) {
+          console.error('editing a user failed: ', error);
+          alert('edit profile failed, try again...')
+        }
+      }
+    }
+  };
+
+  const handleDelete = async () => {
+    setShowConfirmation(false); // close modal
+    if (!isDeleting) {
+      try {
+        const res = await deleteUser();
+        // console.log({ res });
+        if (res.data.success) {
+          alert('account successfully deleted!');
+          navigate('/');
+        }
+      } catch (error) {
+        console.log('Delete user/account failed: ', error);
+        alert('Deleting your account failed, try again...');
+      }
+    }
+  }
 
   return (
     <div className={`absolute smooth-transition ${showProfile ? 'right-4' : '-right-full'} top-16 flex flex-col gap-2 bg-white p-4 py-6 rounded-md shadow-lg`}>
@@ -28,30 +85,36 @@ const ProfileModal = ({ showProfile }) => {
         {edit ? (
           <input
             type="text"
-            value="john doe"
-            onChange={handleEdit}
+            name="name"
+            placeholder="Full name"
+            // value={userData.name}
+            value={name_}
+            onChange={handleChange}
             className="col-span-2 text-s_gray border border-light_green focus:outline-none pl-2 rounded-sm"
           />
         ) : (
-          <span className="col-span-2 text-s_gray">Jane Doe</span>)}
+          <span className="col-span-2 text-s_gray">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</span>)}
       </div>
       <div className="grid grid-cols-3 gap-1 ">
         <span className="col-span-1">Email</span>
         {edit ? (
           <input
             type="text"
-            value="johndoe@gmail.com"
-            onChange={handleEdit}
+            name="email"
+            placeholder="Your Email"
+            // value={userData.email}
+            value={email}
+            onChange={handleChange}
             className="col-span-2 text-s_gray border border-light_green focus:outline-none pl-2 rounded-sm"
           />
         ) : (
-          <span className="col-span-2 text-s_gray">johndoe@gmail.com</span>)}
+          <span className="col-span-2 text-s_gray">{loggedInUser.email}</span>)}
       </div>
       <div className="flex items-center justify-between">
         <span
           className="rounded-sm text-sm text-green bg-light_green p-1 px-2 cursor-pointer transition-colors
       hover:text-md_green"
-          onClick={() => setEdit(!edit)}
+          onClick={handleEdit}
         >{edit ? 'Save' : 'Edit'}
         </span>
         <span
@@ -73,7 +136,7 @@ const ProfileModal = ({ showProfile }) => {
           <span
             className="rounded-sm text-sm text-green bg-light_green p-1 px-2 cursor-pointer transition-colors
       hover:text-md_green"
-            onClick={() => setShowConfirmation(false)}
+            onClick={handleDelete}
           >Delete
           </span>
         </div>
@@ -99,13 +162,14 @@ const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) =>
           onClick={() => setShowProfile(!showProfile)}
           className="flex group items-center space-x-2"
         >
-          <span className="text-sm text-green bg-bg_color rounded-full p-2 group-hover:text-md_green">JD</span>
+          <span className="text-sm text-green text-uppercase bg-bg_color rounded-full p-2 group-hover:text-md_green ">{`${loggedInUser.firstName[0]}${loggedInUser.lastName[0]}`}</span>
           <span className="text-green group-hover:text-md_green">{`${loggedInUser.firstName} ${loggedInUser.lastName}`}</span>
         </div>
 
         <span className="text-green hover:text-md_green border-l px-2" onClick={handleLogout}>Logout</span>
       </div>
       <ProfileModal
+        loggedInUser={loggedInUser}
         showProfile={showProfile}
       />
 
@@ -177,7 +241,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
+      { loggedInUser && Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
 import { useDeleteHouseMutation } from '../redux/services/latentAPI';
+import { altHouses } from '../constants';
 
 const ConfirmModal = ({ setShowModal, handleDelete }) => (
   <div className="absolute top-12 flex flex-col gap-3 p-4 bg-white shadow-lg z-10 rounded-md">
@@ -34,11 +35,14 @@ const HouseCard = ({ house }) => {
       }
     }
   };
+  const random = Math.floor(Math.random() * (4 - 1)) + 1;
+  const altImage = altHouses[0].images[random - 1];
   return (
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
     >
-      <img src={house.coverImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
+      {/* <img src={house.coverImage || altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" /> */}
+      <img src={altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
       <div className="absolute z-10 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span
           onClick={() => navigate(`/houses/${house._id || house.id}`)}

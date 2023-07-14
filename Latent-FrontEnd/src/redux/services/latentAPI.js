@@ -27,6 +27,19 @@ export const latentAPI = createApi({
         body: user,
       }),
     }),
+    editUser: builder.mutation({
+      query: (user) => ({
+        url: '/users',
+        method: 'PUT',
+        body: user,
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: () => ({
+        url: '/users',
+        method: 'DELETE',
+      }),
+    }),
     login: builder.mutation({
       query: (user) => ({
         url: '/login',
@@ -56,8 +69,8 @@ export const latentAPI = createApi({
     }),
     editHouse: builder.mutation({
       query: (houseData) => ({
-        url: `/houses/${houseData.id}`,
-        method: 'POST',
+        url: `/houses/${houseData.get('id')}`,
+        method: 'PUT',
         body: houseData,
       }),
     }),
@@ -73,6 +86,13 @@ export const latentAPI = createApi({
         method: 'POST',
       }),
     }),
+    reviewAgent: builder.mutation({
+      query: (review) => ({
+        url: `/agents/${review.agentId}/reviews`,
+        method: 'POST',
+        body: review.review,
+      }),
+    }),
   }),
 });
 
@@ -86,6 +106,10 @@ export const {
   useLogoutMutation,
   useResetPasswordMutation,
   usePostHouseMutation,
+  useEditHouseMutation,
   useBookAppointmentMutation,
   useDeleteHouseMutation,
+  useEditUserMutation,
+  useDeleteUserMutation,
+  useReviewAgentMutation,
 } = latentAPI; // export the entire api slice ... Only one api slice is allowed per server & application

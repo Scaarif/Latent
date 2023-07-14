@@ -165,11 +165,13 @@ const CreateHouse = () => {
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {
+          alert('House posted successfully');
           // navigate back to user listings
           navigate('/user');
         }
       } catch (error) {
         console.error('Failed to post house: ', error);
+        alert('House posting failed, try again...');
       }
     }
   };
