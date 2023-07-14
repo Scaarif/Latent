@@ -36,6 +36,7 @@ export const latentAPI = createApi({
         method: 'PUT',
         body: user,
       }),
+      invalidatesTags: ['User'], // user details changed, so fetch...
     }),
     deleteUser: builder.mutation({
       query: () => ({

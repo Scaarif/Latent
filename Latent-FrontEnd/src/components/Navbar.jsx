@@ -43,7 +43,7 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
       if (firstName !== loggedInUser.firstName) editedUser.firstName = firstName;
       if (lastName !== loggedInUser.lastName) editedUser.lastName = lastName;
       // console.log({ editedUser });
-      if (editedUser && !isEditing) {
+      if (Object.keys(editedUser).length && !isEditing) {
         try {
           const res = await editUser(editedUser);
           console.log({ res });
@@ -73,11 +73,11 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
         alert('Deleting your account failed, try again...');
       }
     }
-  }
+  };
 
   return (
     <div className={`absolute smooth-transition ${showProfile ? 'right-4' : '-right-full'} top-16 flex flex-col gap-2 bg-white p-4 py-6 rounded-md shadow-lg`}>
-      <span className="text-center rounded-sm transition-colors hover:text-md_green cursor-pointer bg-light_green py-2">
+      <span className={`${loggedInUser.isAgent ? 'hidden' : 'block'} text-center rounded-sm transition-colors hover:text-md_green cursor-pointer bg-light_green py-2`}>
         Become an agent
       </span>
       <div className="grid grid-cols-3 gap-1 ">
