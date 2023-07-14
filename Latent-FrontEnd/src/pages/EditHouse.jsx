@@ -126,7 +126,7 @@ const EditHouse = () => {
       errorMessage:
         'Upload an image of the house',
       label: 'House Image',
-      required: false,
+      required: true,
     },
     {
       id: 11,
@@ -136,10 +136,12 @@ const EditHouse = () => {
       errorMessage:
         'Upload more images of the house',
       label: 'More House Images',
-      required: false,
+      required: true,
       multiple: true,
     },
   ];
+
+  const [cover, otherImages] = inputs.slice(-2);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -230,7 +232,7 @@ const EditHouse = () => {
         <h1 className="flex md:pl-0 gap-1 items-center py-4 text-lg font-semibold text-green">
           Edit house details
         </h1>
-        {inputs.map((input) => (
+        {inputs.slice(0, -2).map((input) => (
           <FormInput
             key={input.id}
             {...input}
@@ -238,6 +240,14 @@ const EditHouse = () => {
             onChange={onChange}
           />
         ))}
+        <FormInput
+          {...cover}
+          onChange={onChange}
+        />
+        <FormInput
+          {...otherImages}
+          onChange={onChange}
+        />
         <div className="flex flex-col md:flex-row items-center gap-4 md:justify-between w-full">
           <button
             type="button"
