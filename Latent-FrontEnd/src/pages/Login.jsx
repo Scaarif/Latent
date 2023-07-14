@@ -12,7 +12,7 @@ import {
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const paramObj = {}
+  const paramObj = {};
   for (const [key, value] of searchParams) {
     paramObj[key] = value;
   }
@@ -86,9 +86,13 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
           onChange={onChange}
         />
       ))}
-     <div className="w-full pl-12 md:pl-0">
-        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
-        hover:bg-md_green rounded-md">Reset Password</button>
+      <div className="w-full pl-12 md:pl-0">
+        <button
+          type="submit"
+          className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
+        hover:bg-md_green rounded-md"
+        >Reset Password
+        </button>
       </div>
     </form>
   );
@@ -118,7 +122,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       type: 'text',
       placeholder: 'First name',
       errorMessage:
-        "First Name should contain only characters and should be at least one character long!",
+        'First Name should contain only characters and should be at least one character long!',
       label: 'First Name',
       pattern: '^[A-Za-z]+$',
       required: true,
@@ -129,7 +133,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       type: 'text',
       placeholder: 'Last name',
       errorMessage:
-        "Last Name should contain only characters and should be at least three character long!",
+        'Last Name should contain only characters and should be at least three character long!',
       label: 'Last Name',
       pattern: '^[A-Za-z]+$',
       required: true,
@@ -161,22 +165,22 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       className={`absolute top-0 smooth-transition ${showEmailModal ? 'left-0 md:left-8' : '-left-[100%]'} bg-white z-10 flex flex-col
         items-center w-full md:w-1/2 h-full py-10 md:px-16 gap-2 md:rounded-md md:shadow-lg`}
     >
-        {inputs.map((input) => (
-          <FormInput
-            key={input.id}
-            {...input}
-            value={values[input.name]}
-            onChange={onChange}
-          />
-        ))}
-        <div className="w-full pl-12 md:pl-0">
-            <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
-        </div>
+      {inputs.map((input) => (
+        <FormInput
+          key={input.id}
+          {...input}
+          value={values[input.name]}
+          onChange={onChange}
+        />
+      ))}
+      <div className="w-full pl-12 md:pl-0">
+        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
+      </div>
     </form>
   );
 };
 
-const Login = ({reset}) => {
+const Login = () => {
   const [login, { isLoading }] = useLoginMutation();
   const getCurrentUser = useGetLoggedInUserQuery();
   const dispatch = useDispatch();
@@ -186,7 +190,7 @@ const Login = ({reset}) => {
     password: '',
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(reset);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const inputs = [
     {
@@ -232,7 +236,7 @@ const Login = ({reset}) => {
         }
       } catch (error) {
         console.error('Login failed: ', error);
-        alert('Login failed, try again...')
+        alert('Login failed, try again...');
       }
     }
   };
