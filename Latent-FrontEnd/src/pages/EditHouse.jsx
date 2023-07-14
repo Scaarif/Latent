@@ -1,21 +1,29 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
+
+import { useEditHouseMutation, useGetAllHousesQuery } from '../redux/services/latentAPI';
 
 import { altHouses } from '../constants';
 
 const EditHouse = () => {
   const navigate = useNavigate();
   const { houseId } = useParams();
-  const house = altHouses.find((hse) => hse.id === Number(houseId));
+  const { data: houses, isFetching, error } = useGetAllHousesQuery();
+  const house = (houses?.data || []).find((hse) => hse._id === houseId);
+  if (!house) {
+    console.log("House not found");
+    return (<Navigate to="/explore"/>);
+  }
+  const emptyFile = new File([], 'empty');
   // console.log({ house });
   const [values, setValues] = useState({
     // houseName: house.houseName,
     address: house.address,
     houseType: house.houseType,
     price: house.price,
-    location: house.location,
-    numBedrooms: house.numRooms,
+    location: [house.location.city, house.location.city, house.location.city].join(', '),
+    numRooms: house.numRooms,
     numBathrooms: house.numBathrooms,
     description: house.description,
     isShared: house.isShared ? 'yes' : 'no',
@@ -30,9 +38,11 @@ const EditHouse = () => {
     // numBathrooms: '',
     // description: '',
     // isShared: '',
-    coverImage: '',
+    coverImage: emptyFile,
     houseImages: '',
   });
+
+  const [editHouse, {requestProcessing}] = useEditHouseMutation();
 
   const inputs = [
     {
@@ -82,7 +92,7 @@ const EditHouse = () => {
     },
     {
       id: 6,
-      name: 'numBedrooms',
+      name: 'numRooms',
       type: 'number',
       placeholder: 'Bedrooms',
       errorMessage: 'Number of bedrooms must be a number, [0] for bedsitter',
@@ -127,7 +137,7 @@ const EditHouse = () => {
       errorMessage:
         'Upload an image of the house',
       label: 'House Image',
-      required: true,
+      required: false,
     },
     {
       id: 11,
@@ -145,12 +155,31 @@ const EditHouse = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ values });
+    let data = {...values};
+    if (!requestProcessing) {
+      const formData = new FormData();
+      delete data.location;
+      const [city, state, country] = values.location.split(', ');
+      data.city = city;
+      data.state = state;
+      data.country = country;
+      Object.keys(data).forEach((key) => formData.append(key, data[key]));
+      console.log("Modifying house:", { houseId, formData });
+      editHouse({formData, houseId});
+    }
     // navigate back to user listings
     navigate('/user');
   };
 
   const onChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
+    if (e.target.name === 'coverImage') {
+      console.log(e.target.files[0]);
+      setValues({ ...values, coverImage: e.target.files[0] });
+    } else if (e.target.name === 'images') {
+      setValues({ ...values, images: Array.from(e.target.files) });
+    } else {
+      setValues({ ...values, [e.target.name]: e.target.value });
+    }
   };
 
   return (
@@ -166,7 +195,7 @@ const EditHouse = () => {
           <FormInput
             key={input.id}
             {...input}
-            value={values[input.name]}
+            value={input.type !== 'file' ? values[input.name] : ''}
             onChange={onChange}
           />
         ))}
