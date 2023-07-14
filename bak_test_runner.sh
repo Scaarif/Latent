@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Setup script for the project - Latent
 
+# cd backend/api && touch in_api_directory
+# cd "$CWD" || return
+
 # Start MongoDB
 mongoOn=$(pgrep -f /usr/bin/mongod)
 if [ ! "$mongoOn" ]
@@ -25,7 +28,7 @@ fi
 # sleep 5  # too much?
 
 # Save working directory (project root)
-# CWD=$(pwd)
+CWD=$(pwd)
 
 # Run backend server and job queue in background
 # TODO: log rotation
@@ -39,15 +42,18 @@ ENVIRON='test' npm start >> server.log &
 sleep 8  # too much?
 
 # run tests in backend
+# ./backend/api/v1/node_modules/.bin/mocha --require ./backend/api/v1/test/hooks.js --exit ./backend/api/v1/test ; pkill -f backend/api/v1/server.js ; pkill -f backend/api/v1/jobs/processJobs.js
 npm test
-# sleep 5
 
 # Return to root
-# cd "$CWD" || return
+cd "$CWD" || return
+pwd
 
 # Kill running test process
+ps ax
 pkill -f jobs/processJobs.js
 for pid in $(pgrep -f server.js)
 do
+  echo "$pid"
   kill "$pid"
 done
