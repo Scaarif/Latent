@@ -69,75 +69,79 @@ class UserController {
   static async postUser(req, res) {
     // TODO: check blacklisted emails
     // console.log('login controller called'); // SCAFF
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      password,
-      isAgent,
-    } = req.body; // TODO: app.use(express.json())
-
-    // ensure password is present
-    if (!password) {
-      return res.status(400).json({ success: false, message: 'password missing' });
-    }
-
-    // register
-    if (isAgent && isAgent.toLowerCase() === 'true') {
-      // create an Agent doc
-      Agent.register(new Agent({
-        // array attr, like reviews, will be init to []
-        firstName: capitalize(firstName),
-        lastName: capitalize(lastName),
+    if (!req.isAuthenticated()) {
+      const {
+        firstName,
+        lastName,
         email,
         phone,
-      }), password, (err, agent) => {
-        // console.log(agent); // SCAFF
-        if (err && !agent) {
-          res.status(400).json({ success: false, message: err.toString() });
-        } else if (agent) {
-          // agent created; log in the user
-          // NOTE1: one way of authenticating; call login()
-          req.login(agent, (err) => {
-            if (err) {
-              return res.status(401).json({ success: false, message: err.toString() });
-            }
-            // successfull log in
-            return res.status(201).json({ success: true, message: 'created and logged-in successfully' });
-          });
-        }
-      });
-      // res.end();
-    } else if (isAgent && isAgent.toLowerCase() === 'false') {
-      // create a Tenant doc
-      Tenant.register(new Tenant({
-        firstName: capitalize(firstName),
-        lastName: capitalize(lastName),
-        email,
-        phone,
-      }), password, (err, tenant) => {
-        // console.log(tenant); // SCAFF
-        if (err && !tenant) {
-          res.status(400).json({ success: false, message: err.toString() });
-        } else if (tenant) {
-          // tenant created; log the tenant in
-          req.login(tenant, (err) => {
-            if (err) {
-              return res.status(401).json({ success: false, message: err.toString() });
-            }
-            // successfull log in
-            return res.status(201).json({ success: true, message: 'created and logged-in successfully' });
-          });
-        }
-      });
-      // res.end();
-    } else if (!isAgent) {
-      // isAgent not set
-      return res.status(400).json({ success: false, message: 'isAgent missing' });
+        password,
+        isAgent,
+      } = req.body; // TODO: app.use(express.json())
+
+      // ensure password is present
+      if (!password) {
+        return res.status(400).json({ success: false, message: 'password missing' });
+      }
+
+      // register
+      if (isAgent && isAgent.toLowerCase() === 'true') {
+        // create an Agent doc
+        Agent.register(new Agent({
+          // array attr, like reviews, will be init to []
+          firstName: capitalize(firstName),
+          lastName: capitalize(lastName),
+          email,
+          phone,
+        }), password, (err, agent) => {
+          // console.log(agent); // SCAFF
+          if (err && !agent) {
+            res.status(400).json({ success: false, message: err.toString() });
+          } else if (agent) {
+            // agent created; log in the user
+            // NOTE1: one way of authenticating; call login()
+            req.login(agent, (err) => {
+              if (err) {
+                return res.status(401).json({ success: false, message: err.toString() });
+              }
+              // successfull log in
+              return res.status(201).json({ success: true, message: 'created and logged-in successfully' });
+            });
+          }
+        });
+        // res.end();
+      } else if (isAgent && isAgent.toLowerCase() === 'false') {
+        // create a Tenant doc
+        Tenant.register(new Tenant({
+          firstName: capitalize(firstName),
+          lastName: capitalize(lastName),
+          email,
+          phone,
+        }), password, (err, tenant) => {
+          // console.log(tenant); // SCAFF
+          if (err && !tenant) {
+            res.status(400).json({ success: false, message: err.toString() });
+          } else if (tenant) {
+            // tenant created; log the tenant in
+            req.login(tenant, (err) => {
+              if (err) {
+                return res.status(401).json({ success: false, message: err.toString() });
+              }
+              // successfull log in
+              return res.status(201).json({ success: true, message: 'created and logged-in successfully' });
+            });
+          }
+        });
+        // res.end();
+      } else if (!isAgent) {
+        // isAgent not set
+        return res.status(400).json({ success: false, message: 'isAgent missing' });
+      }
+      return undefined;
     }
 
-    return undefined;
+    // user logged in; needs to logout first
+    return res.status(401).json({ success: false, message: 'user must be logged out' });
   }
 
   /**
