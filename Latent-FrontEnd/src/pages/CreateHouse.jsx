@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import { usePostHouseMutation } from '../redux/services/latentAPI';
 

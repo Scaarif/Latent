@@ -282,6 +282,7 @@ class HouseController {
 
       return res.status(200).json({ success: true, message: 'House updated' });
     } catch (err) {
+      console.log(err);
       return res.status(400).json({ success: false, message: err.message });
     }
   }

@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import { useEditHouseMutation, useGetAllHousesQuery } from '../redux/services/latentAPI';
-
-// import { altHouses } from '../constants';
 
 const EditHouse = () => {
   const navigate = useNavigate();
   const { houseId } = useParams();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
+  const house = (houses?.data || []).find((hse) => hse._id === houseId);
+  if (!house) {
+    console.log("House not found");
+    return (<Navigate to="/explore"/>);
+  }
   const [editHouse, { isEditing }] = useEditHouseMutation();
-  let house = {};
+  const emptyFile = new File([], 'empty');
   if (isFetching) return (<div><span>Loading house details...</span></div>);
   if (error) return (<div><span>Sorry, something went wrong. Try again later...</span></div>);
-  house = houses.data?.find((hse) => hse._id === houseId);
-  // console.log({ house });
-  // console.log(data.data);
-  // console.log({ houseId });
   const [values, setValues] = useState({
     address: house.address,
     houseType: house.houseType,
@@ -27,7 +26,7 @@ const EditHouse = () => {
     numBathrooms: house.numBathrooms,
     description: house.description,
     shared: house.shared ? 'Yes' : 'No',
-    coverImage: null,
+    coverImage: emptyFile,
     images: null,
     name: house.name,
   });
