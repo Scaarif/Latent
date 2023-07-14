@@ -13,7 +13,10 @@ const allRoutes = require('./routes/index');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/latent';
+let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/latent';
+if (process.env.ENVIRON === 'test') {
+  MONGO_URI = 'mongodb://localhost/testdb';
+}
 
 // Initialize redis client.
 const redisClient = createClient();

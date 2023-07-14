@@ -2,7 +2,7 @@
 const House = require('../models/House');
 const Agent = require('../models/Agent');
 const Tenant = require('../models/Tenant');
-const bookHouseQueue = require('../jobs/queue');
+const { bookHouseQueue } = require('../jobs/queue');
 
 class HouseController {
   /**
@@ -48,7 +48,7 @@ class HouseController {
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
-	    // console.log('images: ', req.files.images)
+
       const images = req.files.images?.map((file) => file.path);
 
       // const agentId = req.user._id;
@@ -326,6 +326,42 @@ class HouseController {
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }
+  }
+
+   /**
+   * Serves image files (coverImage and images) to users 
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   */
+  static async getImages(req, res) {
+    const houseId = req.params.id;
+    if (!houseId) return res.status(400).json({success: false, message: 'Missing house id'})
+    const house = await House.findById(houseId);
+    
+    if (!house) {
+      return res.status(404).send('House not found');
+    }
+    
+    // Check if the request includes the 'coverImage' parameter
+    if (req.query.coverImage) return res.sendFile(house.coverImage);
+    
+    // Check if the request includes the 'images' parameter
+    if (req.query.images) {
+      
+      // Set the response headers to force a download
+      res.set('Content-Type', 'application/octet-stream');
+      res.set('Content-Disposition', 'attachment; filename="images.zip"');
+
+      // Iterate over the image paths and initiate the download for each file
+      house.images.forEach(imagePath => {
+        res.download(imagePath);
+      });
+
+      return;
+  }
+  
+  // Return a default response if the 'images' query parameter is not provided
+  res.status(400).send('Invalid request');
   }
 }
 

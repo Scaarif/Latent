@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get('/houses', HouseController.getHouse);
+router.get('/houses/:id', HouseController.getImages);
 router.delete('/houses/:houseId', HouseController.deleteHouse);
 router.put(
   '/houses/:houseId',
@@ -46,7 +47,10 @@ router.post('/agents/:agentId/reviews', UserController.postReview);
  */
 
 router.get('/ping', (req, res) => {
-  res.json({ success: true, message: 'pong' });
+  if (req.isAuthenticated()) {
+    return res.json({ success: true, message: 'auth pong' });
+  }
+  return res.json({ success: true, message: 'pong' });
 });
 
 /**
