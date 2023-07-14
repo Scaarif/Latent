@@ -6,11 +6,13 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/v1',
+    // baseUrl: 'http://localhost:5000/api/v1',
+    baseUrl: 'http://localhost:3001/api/v1',
     credentials: 'include',
   }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
-    getLoggedInUser: builder.query({ query: () => '/users' }),
+    getLoggedInUser: builder.query({ query: () => '/users', providesTags: ['User'] }),
     getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
     getAllHouses: builder.query({ query: () => '/houses' }),
     getHouses: builder.query({
@@ -46,12 +48,14 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
+      invalidatesTags: ['User'],
     }),
     logout: builder.mutation({
       query: () => ({
         url: '/logout',
         method: 'POST',
       }),
+      invalidatesTags: ['User'],
     }),
     resetPassword: builder.mutation({
       query: (data) => ({

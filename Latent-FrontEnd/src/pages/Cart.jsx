@@ -10,7 +10,7 @@ const Cart = () => {
   let houses = [];
 
   if (!isFetching && !error) {
-    houses = data.data?.filter((house) => user.cart.includes(house._id));
+    houses = data.data?.filter((house) => user?.cart?.includes(house._id));
     console.log({ houses });
   }
   // if ()
