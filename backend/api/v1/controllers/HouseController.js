@@ -39,6 +39,8 @@ class HouseController {
         houseType,
       } = req.body;
 
+//      console.log('req body: ', req.body);
+
       // Extract paths to coverImage and optional images array
       const coverImage = req.files.coverImage[0].path;
       if (!coverImage) {
@@ -46,6 +48,7 @@ class HouseController {
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
+
       const images = req.files.images?.map((file) => file.path);
 
       // const agentId = req.user._id;
