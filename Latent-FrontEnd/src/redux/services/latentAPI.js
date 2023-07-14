@@ -28,6 +28,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
+      invalidatesTags: ['User'], // user auto-authenticated, so fetch...
     }),
     editUser: builder.mutation({
       query: (user) => ({
@@ -48,14 +49,14 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['User'], // currentUser (not in cache) so fetch to update cache
     }),
     logout: builder.mutation({
       query: () => ({
         url: '/logout',
         method: 'POST',
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['User'], // current user invalid ... fetch to update cache (to invalid)
     }),
     resetPassword: builder.mutation({
       query: (data) => ({
