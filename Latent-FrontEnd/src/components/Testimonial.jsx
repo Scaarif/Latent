@@ -13,7 +13,7 @@ export const Testimonial = () => (
 );
 
 export const TestimonialV2 = ({ review }) => (
-  <div className="flex flex-col md:w-[400px] space-y-2 p-4 bg-white rounded-md relative mt-8 items-start">
+  <div className="flex flex-col space-y-2 p-4 bg-white rounded-md relative mt-8 items-start">
     <span className="absolute -top-6 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
       <MdFormatQuote style={{ color: 'green', transform: 'rotate(180deg)', height: '24px', width: '24px' }} />
     </span>

@@ -125,8 +125,9 @@ const House = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const stars = (rating.filter((i) => i === 1)).length;
     if (!isReviewing && !owner && comment) {
-      const review = { comment, rating: (rating.filter((i) => i === 1)).length };
+      const review = { comment, rating: stars };
       try {
         const res = await reviewAgent({ agentId: house.agentId, review });
         // console.log({ res });
@@ -137,7 +138,7 @@ const House = () => {
         }
       } catch (errr) {
         console.error('Reviewing failed: ', errr);
-        alert('Reviewing failed, try again...');
+        alert(`Reviewing failed. Try again. ${!stars && 'At least one star required...'}`);
       }
     }
   };
