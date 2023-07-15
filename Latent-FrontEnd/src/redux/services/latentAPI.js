@@ -10,10 +10,10 @@ export const latentAPI = createApi({
     // baseUrl: 'http://localhost:3001/api/v1',
     credentials: 'include',
   }),
-  tagTypes: ['User', 'House'],
+  tagTypes: ['User', 'House', 'Agent'],
   endpoints: (builder) => ({
     getLoggedInUser: builder.query({ query: () => '/users', providesTags: ['User', 'House'] }),
-    getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
+    getAgent: builder.query({ query: (agentId) => `/agents/${agentId}`, providesTags: ['Agent'] }),
     getAllHouses: builder.query({ query: () => '/houses', providesTags: ['House'] }),
     getHouses: builder.query({
       query: (data) => ({
@@ -99,6 +99,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: review.review,
       }),
+      invalidatesTags: ['Agent'], // new review needs to be updated in agentReviews, refetch agent...
     }),
   }),
 });

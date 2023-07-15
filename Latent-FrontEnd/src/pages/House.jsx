@@ -23,15 +23,19 @@ import {
   useGetLoggedInUserQuery,
 } from '../redux/services/latentAPI';
 
-const Rating = ({ setRating, rating, i }) => {
+const Rating = ({ setRating, rating, idx }) => {
   const [starred, setStarred] = useState(false);
-  let stars = [...rating];
   const handleClick = () => {
     setStarred(!starred);
+    const newRating = [...rating];
     if (starred) {
-      if (!rating.includes(i)) setRating(stars.push(i));
-    } else if (!starred && rating.includes(i)) setRating(stars.filter((x) => x !== i));
-    // console.log(rating);
+      newRating[idx] = 0; // selected
+      console.log('de-selected');
+    } else {
+      newRating[idx] = 1; // selected
+      console.log('selected');
+    }
+    setRating(newRating);
   };
 
   return (
@@ -52,7 +56,7 @@ const House = () => {
   const [booked, setBooked] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [rateAgent, setRateAgent] = useState(false);
-  const [rating, setRating] = useState([]);
+  const [rating, setRating] = useState([0, 0, 0, 0, 0]);
   const [comment, setComment] = useState('');
   const [hovered, setHovered] = useState(false);
 
@@ -97,11 +101,11 @@ const House = () => {
 
   const handleCommenting = (e) => {
     if (!gettingUser && userErr) {
-      alert('You have to be logged in to review')
+      alert('You have to be logged in to review');
       navigate('/login');
     }
     setComment(e.target.value);
-    console.log(comment);
+    // console.log(comment);
   };
 
   // console.log({ rating });
@@ -109,8 +113,9 @@ const House = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isReviewing && !owner && comment) {
+      const review = { comment, rating: (rating.filter((i) => i === 1)).length };
       try {
-        const res = await reviewAgent({ agentId: house.agentId, review: { comment, rating: 4 } });
+        const res = await reviewAgent({ agentId: house.agentId, review });
         // console.log({ res });
         if (res.data.success) {
           alert('Review successfully submitted!');
@@ -197,11 +202,11 @@ const House = () => {
                 && (
                 <form onSubmit={handleSubmit} className="flex flex-col md:mx-4 p-2 md:p-4">
                   <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star, i) => (
+                    {rating.map((star, i) => (
                       <Rating
                         key={i}
                         rating={rating}
-                        i={i}
+                        idx={i}
                         setRating={setRating}
                       />
                     ))}
@@ -238,18 +243,17 @@ const House = () => {
               />
             </div>
             <div className={`flex flex-col gap-4 py-4 smooth-transition ${showReviews ? 'h-full opacity-1' : 'h-0 opacity-0'}`}>
-              <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4 border-b">
-                <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
-                <span className="self-end font-semibold text-s_gray">Felix Jimoh</span>
-              </div>
-              <div className="flex flex-col gap-2 justify-start text-sm md:pr-16 pr-4 pb-4 border-b">
-                <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
-                <span className="self-end font-semibold text-s_gray">Scaarif Ngache`</span>
-              </div>
-              <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4">
-                <span className="text-s_gray">“I had a wonderful experience working with Wamaingi to find my new home. The agent really took the time to understand what was important to me and helped me find a home that was not only beautiful but also suited me, perfectly.” </span>
-                <span className="self-end font-semibold text-s_gray">Alison James</span>
-              </div>
+              {
+                !err && !loading ? ( agent?.reviews?.map((review, i) => (
+                  <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4 border-b" key={i}>
+                    <span className="text-s_gray">{`“${review.comment}”`}</span>
+                    <span className="self-end font-semibold text-s_gray">C'mon Mann</span>
+                  </div>
+                ))) : (
+                  <span className="text-green">Loading...</span>
+                )
+
+}
             </div>
           </div>
         </div>
