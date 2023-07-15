@@ -52,7 +52,7 @@ const House = () => {
   const { houseId } = useParams();
   const { data: user, isFetching: gettingUser, error: userErr } = useGetLoggedInUserQuery();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
-  const [bookAppointment, { isLoading }] = useBookAppointmentMutation();
+  const [bookAppointment, { booking }] = useBookAppointmentMutation();
   const [reviewAgent, { isReviewing }] = useReviewAgentMutation();
   const [booked, setBooked] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
@@ -87,8 +87,6 @@ const House = () => {
   if (loading) console.log('loading agent details in housePage');
   if (err) console.log('loading agent details in housePage failed: ', err);
 
-  // console.log({ house });
-
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
   // const [showModal, setShowModal] = useState(false);
@@ -98,7 +96,7 @@ const House = () => {
       alert('You have to be logged in to get contact info');
       navigate('/login');
     }
-    if (!isLoading && !owner) {
+    if (!booking && !owner) {
       try {
         const res = await bookAppointment(houseId);
         console.log({ res });
