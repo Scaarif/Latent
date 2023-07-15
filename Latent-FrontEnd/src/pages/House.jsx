@@ -14,6 +14,7 @@ import 'swiper/css/navigation';
 import { Navigation } from 'swiper/modules';
 
 import PaginatedListing from '../components/PaginatedListing';
+// import ConfirmDelete from '../components/ConfirmDelete';
 import { altHouses } from '../constants';
 import {
   useGetAllHousesQuery,
@@ -66,17 +67,31 @@ const House = () => {
   // console.log(houses.data);
   const house = houses.data?.find((hse) => hse._id === houseId);
   // console.log({ house });
+  if (!house) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          { !gettingUser && !userErr && user.isAgent ? (
+            <><span className="text-slate-600 font-semibold">House deleted.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/user')}>Back my listings</span></>
+          ) : (
+            <><span className="text-slate-600 font-semibold">House not found.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Back to exploring</span></>
+          )}
+        </div>
+      </div>
+
+    );
+  }
   const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house.agentId);
   const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
-  // const images = altHouses[0].images;
-  // console.log(images);
+
   if (loading) console.log('loading agent details in housePage');
   if (err) console.log('loading agent details in housePage failed: ', err);
 
   // console.log({ house });
 
-  // determine if user (currently logged in) is the house owner
+  // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
+  // const [showModal, setShowModal] = useState(false);
 
   const handleContactRequest = async () => {
     if (err) {
@@ -87,7 +102,7 @@ const House = () => {
       try {
         const res = await bookAppointment(houseId);
         console.log({ res });
-        // if successful - alert user than they successfully booked at appointment - they should check their email... (toast)
+        // if successful - alert user that they successfully booked at appointment - they should check their email... (toast)
         setBooked(true);
         alert('request recieved, check your email for the contact information');
       } catch (tryErr) {
@@ -244,7 +259,7 @@ const House = () => {
             </div>
             <div className={`flex flex-col gap-4 py-4 smooth-transition ${showReviews ? 'h-full opacity-1' : 'h-0 opacity-0'}`}>
               {
-                !err && !loading ? ( agent?.reviews?.map((review, i) => (
+                !err && !loading ? (agent?.reviews?.map((review, i) => (
                   <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4 border-b" key={i}>
                     <span className="text-s_gray">{`“${review.comment}”`}</span>
                     <span className="self-end font-semibold text-s_gray">C'mon Mann</span>
@@ -288,6 +303,23 @@ const House = () => {
               onClick={handleContactRequest}
             >
               Request for agent contact Information
+            </span>
+          </div>
+          <div className={`${owner ? 'flex' : 'hidden'} flex-col md:flex-row md:justify-between items-center gap-1 py-16 relative`}>
+            {/* <span
+              className="text-center text-green bg-light_green px-4 py-2 transition-colors
+            hover:text-md_green cursor-pointer rounded-sm"
+              onClick={() => setShowModal(true)}
+            >
+              Delete House
+            </span>
+            { showModal && <ConfirmDelete houseId={houseId} setShowModal={setShowModal} /> } */}
+            <span
+              className="text-center text-green bg-light_green px-4 py-2 transition-colors
+            hover:text-md_green cursor-pointer rounded-sm"
+              onClick={() => navigate(`/edit/${houseId}`)}
+            >
+              Edit house details
             </span>
           </div>
         </div>

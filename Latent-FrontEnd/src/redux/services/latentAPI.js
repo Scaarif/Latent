@@ -86,6 +86,7 @@ export const latentAPI = createApi({
         url: `/houses/${houseId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['User', 'House'], // user.listings needs to be updated, as does allHouses, so fetch...
     }),
     bookAppointment: builder.mutation({
       query: (houseId) => ({

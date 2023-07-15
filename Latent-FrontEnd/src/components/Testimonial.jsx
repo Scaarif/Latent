@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdFormatQuote, MdStar, MdStarBorder } from 'react-icons/md';
+import { MdFormatQuote, MdStar } from 'react-icons/md';
 
 export const Testimonial = () => (
   <div className="flex flex-col md:w-[400px] space-y-2 p-4 rounded-md relative pb-16">
