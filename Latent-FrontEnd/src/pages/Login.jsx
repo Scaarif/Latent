@@ -7,12 +7,13 @@ import {
   useLoginMutation,
   useGetLoggedInUserQuery,
   useResetPasswordMutation,
+  useLogoutMutation,
 } from '../redux/services/latentAPI';
 
 const ResetPassword = ({ showResetModal, setShowResetModal }) => {
   const [resetPassword, { passwordResetting }] = useResetPasswordMutation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const paramObj = {}
+  const paramObj = {};
   for (const [key, value] of searchParams) {
     paramObj[key] = value;
   }
@@ -86,9 +87,13 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
           onChange={onChange}
         />
       ))}
-     <div className="w-full pl-12 md:pl-0">
-        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
-        hover:bg-md_green rounded-md">Reset Password</button>
+      <div className="w-full pl-12 md:pl-0">
+        <button
+          type="submit"
+          className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors
+        hover:bg-md_green rounded-md"
+        >Reset Password
+        </button>
       </div>
     </form>
   );
@@ -118,7 +123,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       type: 'text',
       placeholder: 'First name',
       errorMessage:
-        "First Name should contain only characters and should be at least one character long!",
+        'First Name should contain only characters and should be at least one character long!',
       label: 'First Name',
       pattern: '^[A-Za-z]+$',
       required: true,
@@ -129,7 +134,7 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       type: 'text',
       placeholder: 'Last name',
       errorMessage:
-        "Last Name should contain only characters and should be at least three character long!",
+        'Last Name should contain only characters and should be at least three character long!',
       label: 'Last Name',
       pattern: '^[A-Za-z]+$',
       required: true,
@@ -161,24 +166,25 @@ const ForgotPassword = ({ showEmailModal, setShowEmailModal, setShowResetModal }
       className={`absolute top-0 smooth-transition ${showEmailModal ? 'left-0 md:left-8' : '-left-[100%]'} bg-white z-10 flex flex-col
         items-center w-full md:w-1/2 h-full py-10 md:px-16 gap-2 md:rounded-md md:shadow-lg`}
     >
-        {inputs.map((input) => (
-          <FormInput
-            key={input.id}
-            {...input}
-            value={values[input.name]}
-            onChange={onChange}
-          />
-        ))}
-        <div className="w-full pl-12 md:pl-0">
-            <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
-        </div>
+      {inputs.map((input) => (
+        <FormInput
+          key={input.id}
+          {...input}
+          value={values[input.name]}
+          onChange={onChange}
+        />
+      ))}
+      <div className="w-full pl-12 md:pl-0">
+        <button type="submit" className="ml-2 md:ml-0 bg-green text-white py-2 px-16 transition-colors hover:bg-md_green rounded-md">Submit</button>
+      </div>
     </form>
   );
 };
 
-const Login = ({reset}) => {
-  const [login, { isLoading }] = useLoginMutation();
-  const getCurrentUser = useGetLoggedInUserQuery();
+const Login = () => {
+  const [login, { loggingIn }] = useLoginMutation();
+  const [logout, { loggingOut }] = useLogoutMutation();
+  const { data: currentUser, isFetching, error } = useGetLoggedInUserQuery();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [values, setValues] = useState({
@@ -186,7 +192,7 @@ const Login = ({reset}) => {
     password: '',
   });
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showResetModal, setShowResetModal] = useState(reset);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const inputs = [
     {
@@ -213,26 +219,27 @@ const Login = ({reset}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log({ values });
-    if (!isLoading) {
+    console.log({ values });
+    if (!loggingIn) {
       try {
         const res = await login(values);
-        if (!res.error) {
+        console.log({ res });
+        if (res.data?.success || res.error.data.message === 'already authenticated') {
           // set user state
-          const userData = getCurrentUser.currentData;
-          if (!isLoading) {
-            // console.log({ userData });
-            dispatch(setUser(userData));
-            if (userData?.listings) {
-              navigate('/user');
+          if (!isFetching && !error) {
+            console.log({ currentUser });
+            dispatch(setUser(currentUser));
+            if (currentUser?.listings) {
+              navigate('/user'); // user is an agent
             } else {
-              navigate('/explore');
+              navigate('/explore'); // normal user
             }
           }
+          navigate('/explore'); // assume normal user
         }
-      } catch (error) {
-        console.error('Login failed: ', error);
-        alert('Login failed, try again...')
+      } catch (err) {
+        console.error('Login failed: ', err);
+        alert('Login failed, try again...');
       }
     }
   };
@@ -241,6 +248,28 @@ const Login = ({reset}) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
+  const handleLogout = async () => {
+    if (!loggingOut) {
+      try {
+        const res = await logout();
+        console.log('logout from login: ', { res });
+        if (res.data.success) navigate('/explore');
+      } catch (err) {
+        console.error('logout (from login page) failed: ', err);
+      }
+    }
+  };
+
+  // check if user's already logged in and redirect if so?
+  if (!isFetching && !error) {
+    return (
+      <div className="flex flex-col gap-2 w-full justify-center items-center h-screen">
+        <span className="text-slate-600 font-semibold">{`You are already logged in as ${currentUser.firstName}`}</span>
+        <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={handleLogout}>Logout</span>
+        <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate(`${currentUser.isAgent ? '/user' : '/explore'}`)}>Explore Listings</span>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-row-reverse w-full my-8 relative">
       <form

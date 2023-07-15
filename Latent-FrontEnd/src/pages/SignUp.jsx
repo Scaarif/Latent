@@ -91,12 +91,13 @@ const SignUp = () => {
           if (!usrErr && !isFetching) {
             dispatch(setUser(userData));
             console.log(userData);
-            if (userData?.listings) {
+            if (userData?.isAgent) {
               navigate('/user');
             } else {
               navigate('/explore');
             }
           }
+          navigate('/explore'); // assume normal user
         }
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
       } catch (error) {

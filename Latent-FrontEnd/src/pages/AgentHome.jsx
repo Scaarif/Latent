@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-// import { altHouses } from '../constants';
-import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
 import { Filter, MobileFilter } from '../components/Filter';
 import PaginatedListing from '../components/PaginatedListing';
 
-import { useGetAllHousesQuery } from '../redux/services/latentAPI';
+import { useGetAllHousesQuery, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 
 const AgentHome = () => {
+  const navigate = useNavigate();
   const [showMobileFilter, setShowMobileFilter] = useState(false);
   const { data: allHouses, isFetching, error } = useGetAllHousesQuery();
-  const thisAgent = useSelector((state) => state.user.user);
+  const { data: thisAgent, isFetching: gettingAgent, error: agentErr } = useGetLoggedInUserQuery();
   let agentHouses = [];
-  // const [agentHouses, setAgentHouses] = useState([]);
-  // console.log({ thisAgent });
-  if (thisAgent.listings && !isFetching && !error) {
+  if (!gettingAgent && !agentErr && thisAgent.listings && !isFetching && !error) {
     // filter out thisAgent's houses...
     agentHouses = allHouses.data?.filter((house) => thisAgent.listings.includes(house._id));
     // console.log({ houses });
     // setAgentHouses(houses);
+  }
+  // reroute if user's not an agent
+  if (gettingAgent) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">Loading ...</span>
+        </div>
+      </div>
+    );
+  }
+  if (agentErr) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be logged in to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/login')}>Login</span>
+        </div>
+      </div>
+    );
+  } if (!gettingAgent && !thisAgent?.isAgent) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be an agent to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Continue exploring</span>
+        </div>
+      </div>
+    );
   }
   return (
     <div className="w-full my-8 mx-2 md:mx-16">

@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
-import { useEditHouseMutation, useGetAllHousesQuery } from '../redux/services/latentAPI';
+import { useEditHouseMutation, useGetAllHousesQuery, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 
 const EditHouse = () => {
   const navigate = useNavigate();
   const { houseId } = useParams();
+  const { data: user, isFetching: loading, error: err } = useGetLoggedInUserQuery();
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
   const house = (houses?.data || []).find((hse) => hse._id === houseId);
   if (!house) {
     console.log("House not found");
-    return (<Navigate to="/explore"/>);
+    return (<Navigate to="/explore" />);
   }
   const [editHouse, { isEditing }] = useEditHouseMutation();
   const emptyFile = new File([], 'empty');
@@ -128,16 +129,18 @@ const EditHouse = () => {
     },
     {
       id: 11,
-      name: 'houseImages',
+      name: 'images',
       type: 'file',
       placeholder: 'more images',
       errorMessage:
         'Upload more images of the house',
       label: 'More House Images',
-      required: false,
+      required: true,
       multiple: true,
     },
   ];
+
+  const [cover, otherImages] = inputs.slice(-2);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -161,7 +164,9 @@ const EditHouse = () => {
       try {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
-        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
+        formData.delete('images'); // incorrectly set
+        data.images.slice(0, 3).map((image) => formData.append('images', image));
+        // console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
         const res = await editHouse(formData).unwrap();
         console.log('edit house res: ', res);
         if (res.success) {
@@ -190,6 +195,35 @@ const EditHouse = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">Loading ...</span>
+        </div>
+      </div>
+    );
+  }
+  if (err) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be logged in to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/login')}>login</span>
+        </div>
+      </div>
+    );
+  }
+  if (!user?.isAgent) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be an agent to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Continue exploring</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex w-full items-center justify-center my-8">
       <form
@@ -199,7 +233,7 @@ const EditHouse = () => {
         <h1 className="flex md:pl-0 gap-1 items-center py-4 text-lg font-semibold text-green">
           Edit house details
         </h1>
-        {inputs.map((input) => (
+        {inputs.slice(0, -2).map((input) => (
           <FormInput
             key={input.id}
             {...input}
@@ -207,6 +241,14 @@ const EditHouse = () => {
             onChange={onChange}
           />
         ))}
+        <FormInput
+          {...cover}
+          onChange={onChange}
+        />
+        <FormInput
+          {...otherImages}
+          onChange={onChange}
+        />
         <div className="flex flex-col md:flex-row items-center gap-4 md:justify-between w-full">
           <button
             type="button"
