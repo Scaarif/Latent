@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
@@ -7,7 +7,7 @@ import { logo } from '../assets';
 import Button from './Button';
 import MobileMenu from './MobileMenu';
 // import { rootUrl } from '../constants';
-import { useLogoutMutation, useDeleteUserMutation, useEditUserMutation } from '../redux/services/latentAPI';
+import { useLogoutMutation, useDeleteUserMutation, useEditUserMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
 const ProfileModal = ({ showProfile, loggedInUser }) => {
@@ -43,7 +43,7 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
       if (firstName !== loggedInUser.firstName) editedUser.firstName = firstName;
       if (lastName !== loggedInUser.lastName) editedUser.lastName = lastName;
       // console.log({ editedUser });
-      if (editedUser && !isEditing) {
+      if (Object.keys(editedUser).length && !isEditing) {
         try {
           const res = await editUser(editedUser);
           console.log({ res });
@@ -73,11 +73,11 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
         alert('Deleting your account failed, try again...');
       }
     }
-  }
+  };
 
   return (
     <div className={`absolute smooth-transition ${showProfile ? 'right-4' : '-right-full'} top-16 flex flex-col gap-2 bg-white p-4 py-6 rounded-md shadow-lg`}>
-      <span className="text-center rounded-sm transition-colors hover:text-md_green cursor-pointer bg-light_green py-2">
+      <span className={`${loggedInUser.isAgent ? 'hidden' : 'block'} text-center rounded-sm transition-colors hover:text-md_green cursor-pointer bg-light_green py-2`}>
         Become an agent
       </span>
       <div className="grid grid-cols-3 gap-1 ">
@@ -198,11 +198,9 @@ const NavbarLinks = () => (
 );
 
 const Navbar = () => {
-  // const [loggedInUser, setLoggedInUser] = useState(null);
-  const loggedInUser = useSelector((state) => state.user.user);
   const isAgent = useSelector((state) => state.user.isAgent);
-  // const tState = useSelector((state) => state);
-  console.log('loggedInuser: ', loggedInUser);
+  // const user = useSelector((state) => state.user.user);
+  const { data: loggedInUser, isFetching, error } = useGetLoggedInUserQuery();
   const [logout, { isLoading }] = useLogoutMutation();
   const currentRoute = useLocation();
   const navigate = useNavigate();
@@ -212,28 +210,30 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   // const [isAgent, setIsAgent] = useState(false);
 
-  // const isLanding = currentRoute.pathname === '/';
-  // console.log({ user });
+  // useEffect(() => {
+  //   console.log('re-rendering');
+  // }, [currentRoute, user]);
+
+  if (!isFetching && !error) {
+    console.log('user from Navbar: ', { loggedInUser });
+  }
+  if (error) console.log('getting user err: ', { error });
 
   const handleLogout = async () => {
     if (!isLoading) {
-      const res = await logout();
-      console.log({ res });
-      if (!res.error) {
-        // clear user
-        dispatch(setUser({}));
-        navigate('/'); // navigate back to landing
+      try {
+        const res = await logout();
+        console.log('logout from navbar: ', { res });
+        if (res.data.success) {
+          // clear user
+          dispatch(setUser({}));
+          console.log('after logout: ', { loggedInUser }, ' and isAgent: ', isAgent);
+          navigate('/'); // navigate back to landing
+        }
+      } catch (err) {
+        console.error('logout from navbar failed: ', { err });
       }
     }
-    // if (!isLoading) {
-    //   const res = await logout();
-    //   console.log({ res });
-    //   if (res.data?.sucess || res.success) {
-    //     // clear user
-    //     dispatch(setUser(null));
-    //     navigate('/'); // navigate back to landing
-    //   }
-    // }
   };
 
   return (
@@ -241,7 +241,7 @@ const Navbar = () => {
       <Link to="/">
         <img src={logo} alt="logo" className="h-12" />
       </Link>
-      { loggedInUser && Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
+      { !error && loggedInUser && Object.keys(loggedInUser).length ? (<LoggedInNavbarLinks active={currentRoute.pathname} loggedInUser={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />) : (<NavbarLinks />) }
       {/* Humbugger */}
 
       <div className="flex md:hidden items-center">

@@ -51,6 +51,7 @@ exports.mochaHooks = {
     this.rq.post(url, () => {});
 
     baseRequest.post(reqOpts, (err, res, bdy) => {
+      // console.log('#########', err, res, bdy); // SCAFF
       if (res.statusCode === 201) {
         // tenant creation success;
         // logout tenant and...
@@ -58,28 +59,30 @@ exports.mochaHooks = {
           if (err) {
             done(err);
           }
-        });
-        // ...create agent
-        reqOpts.body = aData;
-        baseRequest.post(reqOpts, (err, res, bdy) => {
-          if (res.statusCode !== 201) {
-            console.log(res.statusCode, bdy);
-          }
+          // ...create agent
+          reqOpts.body = aData;
+          baseRequest.post(reqOpts, (err, res, bdy) => {
+            if (res.statusCode !== 201) {
+              console.log('issues creating dummy agent......'); // SCAFF
+              console.log(res.statusCode, bdy);
+            }
 
-          if (err) {
-            done(err);
-          } else {
-            // logout agent
-            baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
-              if (err) {
-                done(err);
-              }
-            });
-            done();
-          }
+            if (err) {
+              done(err);
+            } else {
+              // logout agent
+              baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
+                if (err) {
+                  done(err);
+                }
+              });
+              done();
+            }
+          });
         });
       } else {
         // tenant creation failed
+        console.log('issues creating dummy tenant......'); // SCAFF
         console.log(res.statusCode, bdy);
 
         if (err) {

@@ -7,12 +7,14 @@ export const latentAPI = createApi({
   reducerPath: 'latentAPI',
   baseQuery: fetchBaseQuery({
     baseUrl: 'http://localhost:5000/api/v1',
+    // baseUrl: 'http://localhost:3001/api/v1',
     credentials: 'include',
   }),
+  tagTypes: ['User', 'House', 'Agent'],
   endpoints: (builder) => ({
-    getLoggedInUser: builder.query({ query: () => '/users' }),
-    getAgent: builder.query({ query: (agentId) => `/agents/${agentId}` }),
-    getAllHouses: builder.query({ query: () => '/houses' }),
+    getLoggedInUser: builder.query({ query: () => '/users', providesTags: ['User', 'House'] }),
+    getAgent: builder.query({ query: (agentId) => `/agents/${agentId}`, providesTags: ['Agent'] }),
+    getAllHouses: builder.query({ query: () => '/houses', providesTags: ['House'] }),
     getHouses: builder.query({
       query: (data) => ({
         url: '/houses',
@@ -26,6 +28,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
+      invalidatesTags: ['User'], // user auto-authenticated, so fetch...
     }),
     editUser: builder.mutation({
       query: (user) => ({
@@ -33,6 +36,7 @@ export const latentAPI = createApi({
         method: 'PUT',
         body: user,
       }),
+      invalidatesTags: ['User'], // user details changed, so fetch...
     }),
     deleteUser: builder.mutation({
       query: () => ({
@@ -46,12 +50,14 @@ export const latentAPI = createApi({
         method: 'POST',
         body: user,
       }),
+      invalidatesTags: ['User'], // currentUser (not in cache) so fetch to update cache
     }),
     logout: builder.mutation({
       query: () => ({
         url: '/logout',
         method: 'POST',
       }),
+      invalidatesTags: ['User'], // current user invalid ... fetch to update cache (to invalid)
     }),
     resetPassword: builder.mutation({
       query: (data) => ({
@@ -66,6 +72,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: houseData,
       }),
+      invalidatesTags: ['User', 'House'], // user.listings needs to be updated, as does allHouses, so fetch...
     }),
     editHouse: builder.mutation({
       query: (houseData) => ({
@@ -79,6 +86,7 @@ export const latentAPI = createApi({
         url: `/houses/${houseId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['User', 'House'], // user.listings needs to be updated, as does allHouses, so fetch...
     }),
     bookAppointment: builder.mutation({
       query: (houseId) => ({
@@ -92,6 +100,7 @@ export const latentAPI = createApi({
         method: 'POST',
         body: review.review,
       }),
+      invalidatesTags: ['Agent'], // new review needs to be updated in agentReviews, refetch agent...
     }),
   }),
 });

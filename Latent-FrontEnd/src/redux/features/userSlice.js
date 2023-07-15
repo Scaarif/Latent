@@ -6,16 +6,14 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     user: {},
-    isAgent: true,
+    isAgent: false,
   },
   reducers: {
     setUser: (state, action) => {
       // console.log('payload: ', action.payload);
       state.user = action.payload;
       // console.log('state.user: ', state.user);
-      if (action.payload?.isAgent) {
-        state.isAgent = action.payload?.isAgent;
-      }
+      state.isAgent = action.payload?.isAgent;
     },
   },
 });

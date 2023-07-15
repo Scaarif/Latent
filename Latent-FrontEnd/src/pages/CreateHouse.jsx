@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
-import { usePostHouseMutation } from '../redux/services/latentAPI';
+import { useGetLoggedInUserQuery, usePostHouseMutation } from '../redux/services/latentAPI';
 
 const CreateHouse = () => {
   const navigate = useNavigate();
+  const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [values, setValues] = useState({
     name: '',
     address: '',
@@ -16,8 +17,9 @@ const CreateHouse = () => {
     numFloors: '',
     description: '',
     shared: '',
-    coverImage: '',
-    images: '',
+    coverImage: [],
+    images: [],
+    altImages: [],
   });
 
   const inputs = [
@@ -137,6 +139,9 @@ const CreateHouse = () => {
     },
   ];
 
+  const [cover, otherImages] = inputs.slice(-2);
+  // console.log({ cover }, { otherImages });
+
   const [postHouse, { isLoading }] = usePostHouseMutation();
 
   const handleSubmit = async (e) => {
@@ -161,7 +166,9 @@ const CreateHouse = () => {
       try {
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
-        console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
+        formData.delete('images'); // incorrectly set
+        data.images?.slice(0, 3).map((image) => formData.append('images', image)); // correctly set value
+        // console.log(formData.get('numToilets'), formData.get('price'), formData.get('coverImage'), formData.get('images'));
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {
@@ -188,6 +195,35 @@ const CreateHouse = () => {
     }
   };
 
+  if (isFetching) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">Loading ...</span>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be logged in to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/login')}>login</span>
+        </div>
+      </div>
+    );
+  }
+  if (!user?.isAgent) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-slate-600 font-semibold">You must be an agent to access this page</span>
+          <span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Continue exploring</span>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex w-full items-center justify-center my-8">
       <form
@@ -197,14 +233,24 @@ const CreateHouse = () => {
         <h1 className="flex md:pl-0 gap-1 items-center py-4 text-lg font-semibold text-green">
           Post a house
         </h1>
-        {inputs.map((input) => (
+        {inputs.slice(0, -2).map((input) => (
           <FormInput
             key={input.id}
             {...input}
             value={input.type !== 'file' ? values[input.name] : ''}
+            // value={values[input.name]}
             onChange={onChange}
           />
         ))}
+        <FormInput
+          {...cover}
+          onChange={onChange}
+        />
+        <FormInput
+          {...otherImages}
+          onChange={onChange}
+        />
+        {/* <input type="file" name="altImages" multiple onChange={onChange} /> */}
         <button
           type="submit"
           className="w-[280px] md:w-full mt-8 bg-green rounded-md text-white p-3

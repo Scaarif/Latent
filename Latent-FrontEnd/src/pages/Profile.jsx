@@ -34,12 +34,12 @@ const Profile = () => {
   }
   console.log('agent: ', agent);
   if (!loading && !err) {
-    console.log({ allHouses });
+    // console.log({ allHouses });
     agentHouses = allHouses.data?.filter((house) => house.agentId === agentId);
-    console.log({ agentHouses });
+    // console.log({ agentHouses });
   }
   return (
-    <div className="flex flex-col border-green w-full mb-8 m-4 md:mx-16">
+    <div className="flex flex-col border-green w-full mb-8 m-4 md:mx-16 overflow-hidden">
       <div className="flex flex-col gap-2">
         <Link
           to="/explore"
@@ -64,7 +64,7 @@ const Profile = () => {
           <span className="px-1.5">{`${agent.firstName} ${agent.lastName}'s`}</span>
           services
         </h2>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-2">
+        <div className="w-full overflow-hidden flex flex-col md:flex-row gap-4 md:gap-2">
           { agent.reviews.length ? (
             <Swiper
               slidesPerView={3}
@@ -77,12 +77,12 @@ const Profile = () => {
               className="mySwiper"
             >
               {
-          // agent.reviews?.map((review, i) => (
-            [1, 2, 3, 4].map((review, i) => (
-              <SwiperSlide key={i} className="rounded-md">
-                <TestimonialV2 />
-              </SwiperSlide>
-            ))
+                // [1, 2, 3, 4].map((review, i) => (
+              agent.reviews?.map((review, i) => (
+                <SwiperSlide key={i} className="rounded-md overflow-hidden">
+                  <TestimonialV2 review={review} />
+                </SwiperSlide>
+              ))
           }
             </Swiper>
           ) : (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const FormInput = (props) => {
   const [focused, setFocused] = useState(false);
@@ -15,9 +15,7 @@ const FormInput = (props) => {
         {...inputProps}
         onChange={onChange}
         onBlur={handleFocus}
-        onFocus={() =>
-        inputProps.name === "confirmPassword" && setFocused(true)
-        }
+        onFocus={() => inputProps.name === 'confirmPassword' && setFocused(true)}
         focused={focused.toString()}
         className="p-3 my-3 mx-0 rounded-md border border-gray-1000 focus:outline-none focus:border-md_green"
       />
