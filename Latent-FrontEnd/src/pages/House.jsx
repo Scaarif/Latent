@@ -69,7 +69,8 @@ const House = () => {
   if (error) return (<div><span>Something went wrong, try again later.</span></div>);
   // console.log(houses.data);
   const house = houses.data?.find((hse) => hse._id === houseId);
-  // console.log({ house });
+  // console.log({ houses });
+  const similar = houses.data.filter((hs) => hs._id !== houseId);
   if (!house) {
     return (
       <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
@@ -347,7 +348,7 @@ const House = () => {
 
       <div id="listings" className="flex flex-col py-8 md:mb-8 md:-mx-16 bg-light_green">
         <h2 className="text-lg font-semibold text-slate-600 text-center md:text-start md:px-16">Similar listings</h2>
-        <PaginatedListing houses={houses} itemsPerPage="3" />
+        <PaginatedListing houses={similar} itemsPerPage="3" />
       </div>
     </div>
   );
