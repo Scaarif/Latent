@@ -93,6 +93,7 @@ export const latentAPI = createApi({
         url: `/appointment/${houseId}`,
         method: 'POST',
       }),
+      invalidatesTags: ['User'], // user's cart changes, so refetch...
     }),
     reviewAgent: builder.mutation({
       query: (review) => ({

@@ -43,7 +43,7 @@ const HouseCard = ({ house }) => {
     >
       {/* <img src={altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" /> */}
       <img src={house.coverImage || altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
-      <div className="absolute z-10 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
+      <div className="absolute z-1 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span
           onClick={() => navigate(`/houses/${house._id || house.id}`)}
           className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer"
@@ -79,7 +79,7 @@ const HouseCard = ({ house }) => {
         </div>
         {/* roommate flag */}
         {house.shared && (
-        <div className="absolute top-[190px] -right-2 bg-green text-white text-sm px-4 pr-6 py-1 flex items-center space-x-2 rounded-md">
+        <div className="absolute top-[170px] -right-2 bg-green text-white text-sm px-4 pr-6 py-1 flex items-center space-x-2 rounded-md">
           <span><MdGroupAdd style={{ height: '20px', width: '20px', color: 'white' }} className="inline-block" /></span>
           <span>Roommates</span>
         </div>

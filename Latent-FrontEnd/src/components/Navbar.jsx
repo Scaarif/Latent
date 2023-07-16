@@ -266,8 +266,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
 
-      <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />
+      <div className={`md:hidden absolute z-10 top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
+        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} error={error} />
       </div>
     </div>
   );
