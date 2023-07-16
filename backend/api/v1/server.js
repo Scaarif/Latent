@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const logger = require('morgan');
 const cors = require('cors');
+const path = require('path');
 const RedisStore = require('connect-redis').default;
 const { createClient } = require('redis');
 // const path = require('path');
@@ -39,6 +40,9 @@ const sessionConfig = {
   store: redisStore,
 };
 app.use(session(sessionConfig));
+
+// Serve static files from the "uploads" folder
+app.use(express.static('public')) 
 
 // initialize app with passport
 app.use(passport.initialize());
@@ -93,7 +97,6 @@ passport.deserializeUser(async (user, done) => {
 // enable body-parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
 
 // setup logger
 app.use(logger('dev'));

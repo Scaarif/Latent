@@ -42,21 +42,22 @@ class HouseController {
 //      console.log('req body: ', req.body);
 
       // Extract paths to coverImage and optional images array
-      const coverImage = req.files.coverImage[0].path;
+      console.log(req.files.coverImage[0]);
+      const coverImage = `http:localhost:5000/${req.files.coverImage[0].filename}`;
       if (!coverImage) {
         return res
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
 
-      const images = req.files.images?.map((file) => file.path);
+      const images = req.files.images?.map((file) => file.filename);
 
       // const agentId = req.user._id;
 
       // Create a new house object with the extracted data.
       const newHouse = {
         agentId,
-        location: { country, state, city },
+        location: { country: country.trim(), state: state.trim(), city: city.trim() },
         coverImage,
         images,
         description,
@@ -125,10 +126,10 @@ class HouseController {
         const { agentFirstname, agentLastname } = req.query;
         if (agentFirstname && agentLastname) {
           const agent = await Agent.findOne({
-            firstName: agentFirstname,
-            lastName: agentLastname,
+            firstName: agentFirstname.trim(),
+            lastName: agentLastname.trim(),
           });
-          const agentId = agent._id;
+          const agentId = agent?._id;
           params.agentId = agentId;
         }
 
@@ -167,8 +168,10 @@ class HouseController {
 
       // Implement pagination
       const count = await House.countDocuments(params);
+      console.log(count)
       const totalPages = Math.ceil(count / pageSize);
 
+      console.log(params)
       const result = await House.find(params)
         .skip(skip)
         .limit(pageSize);

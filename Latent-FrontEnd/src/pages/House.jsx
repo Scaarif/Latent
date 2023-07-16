@@ -182,7 +182,7 @@ const House = () => {
                 }
               </Swiper>
             ) : (
-              <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
+              <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full"/>
             )}
           </div>
           {/* agent details */}
