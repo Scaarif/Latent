@@ -717,6 +717,7 @@ class UserController {
         return res.json({ success: true, message: 'account unlinking complete' });
         // TODO: END1
       }
+      return undefined;
     }
 
     if (req.isAuthenticated()) {
@@ -910,7 +911,11 @@ class UserController {
         // no previous review; create and link new review
         // ------prepare a POJO with comment and rating
         const reviewDoc = {
-          userId: req.user._id,
+          user: {
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            id: req.user._id,
+          },
           rating,
           comment,
         };
