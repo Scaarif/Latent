@@ -82,7 +82,7 @@ const House = () => {
     );
   }
   const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house.agentId);
-  const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
+  const images = [house.coverImage, ...house.images] // Object.keys(house.images).length ? house.images : altHouses[0].images;
 
   if (loading) console.log('loading agent details in housePage');
   if (err) console.log('loading agent details in housePage failed: ', err);
@@ -177,7 +177,7 @@ const House = () => {
               <Swiper navigation modules={[Navigation]} className="mySwiper">
                 {
                   images?.map((image, i) => (
-                    <SwiperSlide key={i}><img src={image} alt="house" className="min-h-[400px] max-h-[400px] object-cover h-full w-full bg-slate-300" /></SwiperSlide>
+                    <SwiperSlide key={i}><img src={image} alt="house" className="min-h-[400px] max-h-[400px] object-cover h-full mx-auto bg-slate-300" /></SwiperSlide>
                   ))
                 }
               </Swiper>

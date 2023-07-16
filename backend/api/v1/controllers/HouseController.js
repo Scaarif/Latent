@@ -43,14 +43,14 @@ class HouseController {
 
       // Extract paths to coverImage and optional images array
       console.log(req.files.coverImage[0]);
-      const coverImage = `http://localhost:5000/${req.files.coverImage[0].filename}`;
+      const coverImage = `http://${req.get('host')}/${req.files.coverImage[0].filename}`;
       if (!coverImage) {
         return res
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
 
-      const images = req.files.images?.map((file) => `http://localhost:5000/${file.filename}`);
+      const images = req.files.images?.map((file) => `http://${req.get('host')}/${file.filename}`);
 
       // const agentId = req.user._id;
 
