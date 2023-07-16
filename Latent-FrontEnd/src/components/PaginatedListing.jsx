@@ -8,7 +8,7 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   for (let i = 1; i <= Math.ceil(totalHouses / housesPerPage); i++) {
     pages.push(i);
   }
-  console.log({ pages }, { currentPage });
+  // console.log({ pages }, { currentPage });
   return (
     <div className={`${pages.length > 1 ? 'flex' : 'hidden'} items-center justify-center gap-2 mt-8`}>
       <div className="bg-light_green border border-light_green cursor-pointer items-center px-2 py-2 rounded-full">
@@ -64,7 +64,7 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
   // const currentHouses = houseResults?.data || (houses.data || houses);
   // console.log({ houseResults });
   const startIndex = currentPage === 1 ? (currentPage * housesPerPage) - housesPerPage : ((currentPage * housesPerPage) - 1) - housesPerPage;
-  console.log({ startIndex });
+  // console.log({ startIndex });
   return (
     <div className="items-center justify-center">
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">

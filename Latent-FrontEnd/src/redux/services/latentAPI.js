@@ -21,7 +21,13 @@ export const latentAPI = createApi({
         params: data,
       }),
     }),
-
+    getHouseImages: builder.query({
+      query: (data) => ({
+        url: `/houses/${data.houseId}`,
+        params: data.params,
+        responseType: 'blob',
+      }),
+    }),
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -111,6 +117,7 @@ export const {
   useGetAgentQuery,
   useGetAllHousesQuery,
   useGetHousesQuery,
+  useGetHouseImagesQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,

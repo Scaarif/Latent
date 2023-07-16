@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
 import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
@@ -19,6 +19,11 @@ const HouseCard = ({ house }) => {
   // const user = useSelector((state) => state.user.user);
   const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
+  // fetch the house's images
+  // const obj = { houseId: house._id, params: { coverImage: 'coverImage' } };
+  // const { data: image, isFetching: gettingImages, error: imageErr } = useGetHouseImagesQuery(obj);
+  const [url, setUrl] = useState('');
+
   const [showModal, setShowModal] = useState(false);
 
   const handleDelete = async () => {
@@ -30,19 +35,40 @@ const HouseCard = ({ house }) => {
         if (res.data.success) {
           alert('House deleted successfully');
         }
-      } catch (error) {
-        console.log('delete house failed: ', error);
+      } catch (err) {
+        console.log('delete house failed: ', err);
       }
     }
   };
   const random = Math.floor(Math.random() * (4 - 1)) + 1;
   const altImage = altHouses[0].images[random - 1];
+
+  // if (imageErr) {
+  //   console.log({ imageErr });
+  //   if (imageErr.originalStatus === 200) {
+  //     // console.log(imageErr.data); // image data is in there --- figure out how to access it
+  //   }
+  // } else if (gettingImages) {
+  //   console.log(`Fetching ${house._id}'s images`);
+  // } else { console.log(URL.createObjectURL(image)); }
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage`)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // console.log({ blob });
+        setUrl(URL.createObjectURL(blob));
+        // console.log({ url });
+      })
+      .catch((fetchErr) => console.error(fetchErr));
+  }, []);
+
   return (
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
     >
       {/* <img src={altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" /> */}
-      <img src={house.coverImage || altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
+      <img src={url || altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
       <div className="absolute z-1 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span
           onClick={() => navigate(`/houses/${house._id || house.id}`)}

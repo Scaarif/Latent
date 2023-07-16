@@ -147,7 +147,7 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
 
 const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) => {
   const [showProfile, setShowProfile] = useState(false);
-  console.log({ isAgent });
+  // console.log({ isAgent });
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
@@ -210,13 +210,9 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   // const [isAgent, setIsAgent] = useState(false);
 
-  // useEffect(() => {
-  //   console.log('re-rendering');
-  // }, [currentRoute, user]);
-
-  if (!isFetching && !error) {
-    console.log('user from Navbar: ', { loggedInUser });
-  }
+  // if (!isFetching && !error) {
+  //   console.log('user from Navbar: ', { loggedInUser });
+  // }
   if (error) console.log('getting user err: ', { error });
 
   const handleLogout = async () => {
