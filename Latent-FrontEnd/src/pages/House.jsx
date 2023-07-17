@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { MdArrowForwardIos, MdLocationOn, MdPayment, MdPushPin, MdBedroomParent, MdBathroom, MdExpandMore, MdStar } from 'react-icons/md';
 import { IoMdSend } from 'react-icons/io';
 
@@ -32,10 +33,10 @@ const Rating = ({ setRating, rating, idx }) => {
     const newRating = [...rating];
     if (starred) {
       newRating[idx] = 0; // selected
-      console.log('de-selected');
+      // console.log('de-selected');
     } else {
       newRating[idx] = 1; // selected
-      console.log('selected');
+      // console.log('selected');
     }
     setRating(newRating);
   };
@@ -61,50 +62,37 @@ const House = () => {
   const [rating, setRating] = useState([0, 0, 0, 0, 0]);
   const [comment, setComment] = useState('');
   const [hovered, setHovered] = useState(false);
-  const [url, setUrl] = useState('');
-  const [urls, setUrls] = useState([]);
+  // const [url, setUrl] = useState('');
+  // const [urls, setUrls] = useState([]);
 
   // console.log(houseId)
-  if (isFetching) return (<div><span>Loading house details ...</span></div>);
-  if (error) return (<div><span>Something went wrong, try again later.</span></div>);
   // console.log(houses.data);
-  const house = houses.data?.find((hse) => hse._id === houseId);
+  const house = houses?.data?.find((hse) => hse._id === houseId);
   // console.log({ houses });
-  const similar = houses.data.filter((hs) => hs._id !== houseId);
-  if (!house) {
-    return (
-      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
-        <div className="flex flex-col items-center justify-center gap-2">
-          { !gettingUser && !userErr && user.isAgent ? (
-            <><span className="text-slate-600 font-semibold">House deleted.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/user')}>Back my listings</span></>
-          ) : (
-            <><span className="text-slate-600 font-semibold">House not found.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Back to exploring</span></>
-          )}
-        </div>
-      </div>
+  const similar = houses?.data.filter((hs) => hs._id !== houseId);
 
-    );
-  }
-  const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house.agentId);
-  const images = Object.keys(house.images).length ? house.images : altHouses[0].images;
+  const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house?.agentId);
+  const images = house && Object.keys(house?.images).length ? house.images : altHouses[0].images;
 
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
 
-  useEffect(() => {
-    fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage&images=images`)
-      .then((response) => response.blob())
-      .then((blob) => {
-        // blob.map((img) => console.log(URL.createObjectURL(img)));
-        const urlStr = URL.createObjectURL(blob);
-        setUrl(urlStr);
-        // console.log({ url }, typeof (url));
-        setUrls(urls.push(urlStr));
-        console.log({ urls }, typeof (urls[0]));
-      })
-      .catch((fetchErr) => console.error(fetchErr));
-  // }, [houseId]);
-  }, []);
+  // useEffect(() => {
+  //   if (house) {
+  //     fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage&images=images`)
+  //       .then((response) => response.blob())
+  //       .then((blob) => {
+  //       // blob.map((img) => console.log(URL.createObjectURL(img)));
+  //         const urlStr = URL.createObjectURL(blob);
+  //         setUrl(urlStr);
+  //         // console.log({ url }, typeof (url));
+  //         setUrls(urls.push(urlStr));
+  //         console.log({ urls }, typeof (urls[0]));
+  //       })
+  //       .catch((fetchErr) => console.error(fetchErr));
+  //   }
+  // // }, [houseId]);
+  // }, []);
 
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
@@ -112,7 +100,7 @@ const House = () => {
 
   const handleContactRequest = async () => {
     if (err) {
-      alert('You have to be logged in to get contact info');
+      toast.error('You have to be logged in to get contact info');
       navigate('/login');
     }
     if (!booking && !owner) {
@@ -121,19 +109,19 @@ const House = () => {
         console.log({ res });
         // if successful - alert user that they successfully booked at appointment - they should check their email... (toast)
         setBooked(true);
-        alert('request recieved, check your email for the contact information');
+        toast.success('request recieved, check your email for the contact information');
       } catch (tryErr) {
         console.log('requesting contacts failed: ', tryErr);
       }
     }
     if (owner) {
-      alert('You are the house lister...');
+      toast.warning('You are the house lister...');
     }
   };
 
   const handleCommenting = (e) => {
     if (!gettingUser && userErr) {
-      alert('You have to be logged in to review');
+      toast.warning('You have to be logged in to review');
       navigate('/login');
     }
     setComment(e.target.value);
@@ -151,16 +139,33 @@ const House = () => {
         const res = await reviewAgent({ agentId: house.agentId, review });
         // console.log({ res });
         if (res.data.success) {
-          alert('Review successfully submitted!');
+          toast.success('Review successfully submitted!');
           setComment(''); // clear textarea
           setRateAgent(false); // close the 'rating-box'
         }
       } catch (errr) {
         console.error('Reviewing failed: ', errr);
-        alert(`Reviewing failed. Try again. ${!stars && 'At least one star required...'}`);
+        toast.error(`Reviewing failed. Try again. ${!stars && 'At least one star required...'}`);
       }
     }
   };
+
+  if (isFetching) return (<div><span>Loading house details ...</span></div>);
+  if (error) return (<div><span>Something went wrong, try again later.</span></div>);
+  if (!house) {
+    return (
+      <div className="w-full my-8 mx-2 md:mx-16 h-screen flex flex-col gap-2 items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
+          { !gettingUser && !userErr && user.isAgent ? (
+            <><span className="text-slate-600 font-semibold">House deleted.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/user')}>Back my listings</span></>
+          ) : (
+            <><span className="text-slate-600 font-semibold">House not found.</span><span className="text-green transition-colors hover:text-md_green cursor-pointer" onClick={() => navigate('/explore')}>Back to exploring</span></>
+          )}
+        </div>
+      </div>
+
+    );
+  }
 
   return (
     <div className="flex flex-col border-green w-full mt-4 mx-2 md:mx-16">
@@ -192,17 +197,17 @@ const House = () => {
         {/* <div className="w-full flex flex-initial flex-col gap-2 border border-green"> */}
         <div className="md:col-span-2 gap-2 rounded-sm overflow-hidden">
           <div className="flex">
-            { urls.length && images?.length ? (
+            { images?.length ? (
               <Swiper navigation modules={[Navigation]} className="mySwiper">
                 {
-                  urls?.map((image, i) => (
+                  images.map((image, i) => (
                     <SwiperSlide key={i}><img src={image} alt="house" className="min-h-[400px] max-h-[400px] object-cover h-full w-full bg-slate-300" /></SwiperSlide>
                   ))
                 }
               </Swiper>
             ) : (
               // <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
-              <img src={url} alt="house1" className="max-h-[400px] object-cover w-full" />
+              <img src={altHouses[0].images[0]} alt="house1" className="max-h-[400px] object-cover w-full" />
             )}
           </div>
           {/* agent details */}
