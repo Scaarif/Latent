@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { altHouses } from '../constants';
 
@@ -33,10 +34,11 @@ const HouseCard = ({ house }) => {
         const res = await deleteHouse(house._id);
         // console.log({ res });
         if (res.data.success) {
-          alert('House deleted successfully');
+          toast.success('House deleted successfully');
         }
       } catch (err) {
         console.log('delete house failed: ', err);
+        toast.error('failed to delete, try again.');
       }
     }
   };

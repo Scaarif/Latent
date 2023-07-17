@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import FormInput from '../components/FormInput';
 import { useGetLoggedInUserQuery, usePostHouseMutation } from '../redux/services/latentAPI';
 
@@ -124,7 +125,7 @@ const CreateHouse = () => {
       errorMessage:
         'Upload an image of the house',
       label: 'House Image',
-      required: false,
+      required: true,
     },
     {
       id: 12,
@@ -134,7 +135,7 @@ const CreateHouse = () => {
       errorMessage:
         'Upload more images of the house',
       label: 'More House Images',
-      required: false,
+      required: true,
       multiple: true,
     },
   ];
@@ -172,13 +173,13 @@ const CreateHouse = () => {
         const res = await postHouse(formData).unwrap();
         console.log('post house res: ', res);
         if (res.success) {
-          alert('House posted successfully');
+          toast.success('House posted successfully');
           // navigate back to user listings
           navigate('/user');
         }
       } catch (error) {
         console.error('Failed to post house: ', error);
-        alert('House posting failed, try again...');
+        toast.error('House posting failed, try again...');
       }
     }
   };

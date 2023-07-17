@@ -86,6 +86,7 @@ export const latentAPI = createApi({
         method: 'PUT',
         body: houseData,
       }),
+      invalidatesTags: ['House'], // allHouses affected (figure out how to refetch only `this` house using [id and args] ), so fetch...
     }),
     deleteHouse: builder.mutation({
       query: (houseId) => ({

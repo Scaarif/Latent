@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import FormInput from '../components/FormInput';
 import { useEditHouseMutation, useGetAllHousesQuery, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 
@@ -170,13 +171,13 @@ const EditHouse = () => {
         const res = await editHouse(formData).unwrap();
         console.log('edit house res: ', res);
         if (res.success) {
-          alert('House edited successfully');
+          toast.success('House edited successfully');
           // navigate back to user listings
           navigate('/user');
         }
       } catch (err) {
         console.error('Failed to edit house: ', err);
-        alert('House editing failed, try again...');
+        toast.error('House editing failed, try again...');
       }
     }
     // navigate back to user listings

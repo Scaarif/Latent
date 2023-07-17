@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import FormInput from '../components/FormInput';
 import { setUser } from '../redux/features/userSlice';
 import {
@@ -236,10 +237,12 @@ const Login = () => {
             }
           }
           navigate('/explore'); // assume normal user
+        } else {
+          toast.error('Login failed, enter correct details');
         }
       } catch (err) {
-        console.error('Login failed: ', err);
-        alert('Login failed, try again...');
+        // console.error('Login failed: ', err);
+        toast.error('Login failed, try again...');
       }
     }
   };
