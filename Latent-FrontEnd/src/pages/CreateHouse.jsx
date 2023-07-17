@@ -154,7 +154,7 @@ const CreateHouse = () => {
     data.city = city;
     data.state = state.split(' ')[1];
     data.country = country.split(' ')[1];
-    data.shared = data.shared === 'Yes';
+    data.shared = data.shared === 'Yes'.toLowerCase();
     data.electricity = true;
     data.water = true;
     data.numToilets = 1;
