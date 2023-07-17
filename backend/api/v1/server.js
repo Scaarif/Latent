@@ -40,6 +40,9 @@ const sessionConfig = {
 };
 app.use(session(sessionConfig));
 
+// Serve static files from the public folder
+app.use(express.static('public'));
+
 // initialize app with passport
 app.use(passport.initialize());
 // authenticate session
