@@ -77,25 +77,9 @@ const House = () => {
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
 
-  // useEffect(() => {
-  //   if (house) {
-  //     fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage&images=images`)
-  //       .then((response) => response.blob())
-  //       .then((blob) => {
-  //       // blob.map((img) => console.log(URL.createObjectURL(img)));
-  //         const urlStr = URL.createObjectURL(blob);
-  //         setUrl(urlStr);
-  //         // console.log({ url }, typeof (url));
-  //         setUrls(urls.push(urlStr));
-  //         console.log({ urls }, typeof (urls[0]));
-  //       })
-  //       .catch((fetchErr) => console.error(fetchErr));
-  //   }
-  // // }, [houseId]);
-  // }, []);
-
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
+  const inCart = !gettingUser && !userErr && user.cart?.includes(houseId);
   // const [showModal, setShowModal] = useState(false);
 
   const handleContactRequest = async () => {
@@ -319,7 +303,7 @@ const House = () => {
           </div>
           <span className="py-4 font-semibold text-slate-600">About this House</span>
           <span className="text-s_gray text-sm">{ house.description || 'Located in one of the safest areas of Nairobi, the apartment comes with  reliable piped water, complimentary borehole water and reliable electricity supply. Garbage collection and cleaning services are readily and affordably available. We have  a children playground in the compound as well as a mall just outside...' }</span>
-          <div className={`${owner ? 'hidden' : 'flex'} flex-col gap-1 py-16`}>
+          <div className={`${owner || inCart ? 'hidden' : 'flex'} flex-col gap-1 py-16`}>
             <span className="text-sm text-s_gray">interested?</span>
             <span
               className="text-center text-white bg-green px-4 py-2 transition-colors
@@ -327,6 +311,15 @@ const House = () => {
               onClick={handleContactRequest}
             >
               Request for agent contact Information
+            </span>
+          </div>
+          <div className={`${inCart ? 'flex' : 'hidden'} flex-col gap-1 py-16`}>
+            <span
+              className="text-center text-white bg-green px-4 py-2 transition-colors
+            hover:text-light_green cursor-pointer rounded-sm"
+              onClick={() => navigate('/user/cart')}
+            >
+              Already in your cart, see what else is in there...
             </span>
           </div>
           <div className={`${owner ? 'flex' : 'hidden'} flex-col md:flex-row md:justify-between items-center gap-1 py-16 relative`}>
