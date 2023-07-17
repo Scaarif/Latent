@@ -45,7 +45,7 @@ bookHouseQueue.process(async (job) => {
       subject: 'House inspection',
       text: `${agentMessage}`,
     }];
-    // console.log(mailOptions);
+    console.log(mailOptions);
     mailOptions.forEach(async (mailOption) => {
       await sendEmail(mailOption);
     });
