@@ -30,7 +30,11 @@ const agentSchema = new Schema({
   }],
   reviews: [{
     // will be automatically converted to an array of subdocs
-    userId: Schema.Types.ObjectId,
+    user: {
+      id: Schema.Types.ObjectId,
+      firstName: String,
+      lastName: String,
+    },
     rating: {
       type: Number,
       enum: [1, 2, 3, 4, 5],
