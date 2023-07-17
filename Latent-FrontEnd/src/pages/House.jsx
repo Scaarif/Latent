@@ -62,8 +62,8 @@ const House = () => {
   const [rating, setRating] = useState([0, 0, 0, 0, 0]);
   const [comment, setComment] = useState('');
   const [hovered, setHovered] = useState(false);
-  const [url, setUrl] = useState('');
-  const [urls, setUrls] = useState([]);
+  // const [url, setUrl] = useState('');
+  // const [urls, setUrls] = useState([]);
 
   // console.log(houseId)
   // console.log(houses.data);
@@ -77,22 +77,22 @@ const House = () => {
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
 
-  useEffect(() => {
-    if (house) {
-      fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage&images=images`)
-        .then((response) => response.blob())
-        .then((blob) => {
-        // blob.map((img) => console.log(URL.createObjectURL(img)));
-          const urlStr = URL.createObjectURL(blob);
-          setUrl(urlStr);
-          // console.log({ url }, typeof (url));
-          setUrls(urls.push(urlStr));
-          console.log({ urls }, typeof (urls[0]));
-        })
-        .catch((fetchErr) => console.error(fetchErr));
-    }
-  // }, [houseId]);
-  }, []);
+  // useEffect(() => {
+  //   if (house) {
+  //     fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage&images=images`)
+  //       .then((response) => response.blob())
+  //       .then((blob) => {
+  //       // blob.map((img) => console.log(URL.createObjectURL(img)));
+  //         const urlStr = URL.createObjectURL(blob);
+  //         setUrl(urlStr);
+  //         // console.log({ url }, typeof (url));
+  //         setUrls(urls.push(urlStr));
+  //         console.log({ urls }, typeof (urls[0]));
+  //       })
+  //       .catch((fetchErr) => console.error(fetchErr));
+  //   }
+  // // }, [houseId]);
+  // }, []);
 
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
@@ -197,17 +197,17 @@ const House = () => {
         {/* <div className="w-full flex flex-initial flex-col gap-2 border border-green"> */}
         <div className="md:col-span-2 gap-2 rounded-sm overflow-hidden">
           <div className="flex">
-            { urls.length && images?.length ? (
+            { images?.length ? (
               <Swiper navigation modules={[Navigation]} className="mySwiper">
                 {
-                  urls?.map((image, i) => (
+                  images.map((image, i) => (
                     <SwiperSlide key={i}><img src={image} alt="house" className="min-h-[400px] max-h-[400px] object-cover h-full w-full bg-slate-300" /></SwiperSlide>
                   ))
                 }
               </Swiper>
             ) : (
               // <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
-              <img src={url} alt="house1" className="max-h-[400px] object-cover w-full" />
+              <img src={altHouses[0].images[0]} alt="house1" className="max-h-[400px] object-cover w-full" />
             )}
           </div>
           {/* agent details */}
