@@ -42,21 +42,21 @@ class HouseController {
 //      console.log('req body: ', req.body);
 
       // Extract paths to coverImage and optional images array
-      const coverImage = req.files.coverImage[0].path;
+      const coverImage = `http://${req.get('host')}/${req.files.coverImage[0].filename}`;
       if (!coverImage) {
         return res
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
 
-      const images = req.files.images?.map((file) => file.path);
+      const images = req.files.images?.map((file) => `http://${req.get('host')}/${file.filename}`);
 
       // const agentId = req.user._id;
 
       // Create a new house object with the extracted data.
       const newHouse = {
         agentId,
-        location: { country, state, city },
+        location: { country: country.trim(), state: state.trim(), city: city.trim() },
         coverImage,
         images,
         description,
