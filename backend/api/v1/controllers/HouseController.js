@@ -239,17 +239,17 @@ class HouseController {
       } = req.body;
 
       // Extract image paths.
-      const coverImage = req.files.coverImage[0].path;
+      const coverImage = `http://${req.get('host')}/${req.files.coverImage[0].filename}`;
       if (!coverImage) {
         return res
           .status(400)
           .json({ success: false, message: 'coverImage required' });
       }
-      const images = req.files.images?.map((file) => file.path);
+      const images = req.files.images?.map((file) => `http://${req.get('host')}/${file.filename}`);
 
       // Create an object with the properties to be updated in the database.
       const updateObject = {
-        location: { country, state, city },
+        location: { country: country.trim(), state: state.trim(), city: city.trim() },
         description,
         price,
         numFloors,
