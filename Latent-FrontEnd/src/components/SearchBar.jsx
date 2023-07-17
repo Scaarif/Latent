@@ -15,19 +15,30 @@ const SearchBar = ({ name, isLoaded }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    navigate('/explore');
     // setLocation(locationRef.current?.value);
-    const data = new FormData(e.target);
-    data.set('agentName', agent);
-    data.set('location', locationRef.current.value);
-    data.set('priceRange', priceRange);
-    data.set('numBedrooms', bedrooms);
-    console.log(data.get('location'), locationRef.current.value);
+    const data = {};
+    if (agent) {
+      const [first, last] = agent.split(' ');
+      data['agentFirstname'] = first;
+      data['agentLastname'] = last;
+    }
+    const location = locationRef.current.value;
+    if (location) {
+      const [city, state, country] = location.split(',')
+      data['city'] = city;
+      data['state'] = state;
+      data['country'] = country;
+    }
+    data['priceRange'] = priceRange;
+    data['numRooms'] = bedrooms;
+    // console.log(data.get('location'), locationRef.current.value);
+    console.log('search parameters: ', data);
     // clear form fields
     setAgent('');
     setBedrooms('');
     // setLocation('');
     setPriceRange('');
+    navigate('/explore');
   };
 
   return (
@@ -72,7 +83,7 @@ const SearchBar = ({ name, isLoaded }) => {
 
         <input
           type="text"
-          placeholder="Price range"
+          placeholder="Price"
           value={priceRange}
           onChange={(e) => setPriceRange(e.target.value)}
           className="border pl-2 text-sm text-green focus:outline-none"

@@ -148,8 +148,8 @@ const EditHouse = () => {
     delete data.location;
     const [city, state, country] = values.location.split(',');
     data.city = city;
-    data.state = state;
-    data.country = country;
+    data.state = state.split(' ')[1];
+    data.country = country.split(' ')[1];
     data.shared = data.shared === 'Yes';
     data.electricity = true;
     data.water = true;

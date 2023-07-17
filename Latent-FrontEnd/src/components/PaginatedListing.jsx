@@ -8,8 +8,9 @@ const Pagination = ({ totalHouses, housesPerPage, setCurrentPage, currentPage })
   for (let i = 1; i <= Math.ceil(totalHouses / housesPerPage); i++) {
     pages.push(i);
   }
+  // console.log({ pages }, { currentPage });
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <div className={`${pages.length > 1 ? 'flex' : 'hidden'} items-center justify-center gap-2 mt-8`}>
       <div className="bg-light_green border border-light_green cursor-pointer items-center px-2 py-2 rounded-full">
         <span className="transition-colors text-white hover:text-black">
           <MdArrowForwardIos
@@ -62,16 +63,18 @@ const PaginatedListing = ({ searchParams = {}, itemsPerPage, loggedIn = null, ho
   const currentHouses = Object.keys(searchParams).length ? houseResults?.data : houses.data || houses;
   // const currentHouses = houseResults?.data || (houses.data || houses);
   // console.log({ houseResults });
+  const startIndex = currentPage === 1 ? (currentPage * housesPerPage) - housesPerPage : ((currentPage * housesPerPage) - 1) - housesPerPage;
+  // console.log({ startIndex });
   return (
-    <div>
+    <div className="items-center justify-center">
       <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
-        {currentHouses?.map((house, i) => (
+        {currentHouses?.slice(startIndex, housesPerPage).map((house, i) => (
           <HouseCard key={i} house={house} loggedIn={loggedIn} />
         ))}
         { !currentHouses.length && <div className="flex flex-col items-center justify-center"><span className="text-green">No listings to show...</span></div> }
       </div>
       <Pagination
-        totalHouses={houses.length}
+        totalHouses={currentHouses.length}
         housesPerPage={housesPerPage}
         setCurrentPage={setCurrentPage}
         currentPage={currentPage}

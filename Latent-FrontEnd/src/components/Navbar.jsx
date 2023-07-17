@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
@@ -147,7 +147,7 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
 
 const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) => {
   const [showProfile, setShowProfile] = useState(false);
-  console.log({ isAgent });
+  // console.log({ isAgent });
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
@@ -210,13 +210,9 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   // const [isAgent, setIsAgent] = useState(false);
 
-  // useEffect(() => {
-  //   console.log('re-rendering');
-  // }, [currentRoute, user]);
-
-  if (!isFetching && !error) {
-    console.log('user from Navbar: ', { loggedInUser });
-  }
+  // if (!isFetching && !error) {
+  //   console.log('user from Navbar: ', { loggedInUser });
+  // }
   if (error) console.log('getting user err: ', { error });
 
   const handleLogout = async () => {
@@ -266,8 +262,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
 
-      <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />
+      <div className={`md:hidden absolute z-10 top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
+        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} error={error} />
       </div>
     </div>
   );
