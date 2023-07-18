@@ -4,6 +4,7 @@ import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'r
 import { toast } from 'react-toastify';
 import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { altHouses } from '../constants';
+import { currency } from '../constants';
 
 const ConfirmModal = ({ setShowModal, handleDelete }) => (
   <div className="absolute top-12 flex flex-col gap-3 p-4 bg-white shadow-lg z-10 rounded-md">
@@ -40,6 +41,9 @@ const HouseCard = ({ house }) => {
   };
   const random = Math.floor(Math.random() * (4 - 1)) + 1;
   const altImage = altHouses[0].images[random - 1];
+  // console.log({ house });
+  const money = currency.filter((curr) => curr.CountryName.toLowerCase() === house.location.country.toLowerCase());
+  // console.log({ money });
 
   return (
     <div
@@ -65,7 +69,7 @@ const HouseCard = ({ house }) => {
         <h1 className="font-semibold text-slate-500 py-2">{ house.name ? `${`${house.name} ${house.houseType}`}` : `${house.numRooms} Bedroom ${house.houseType}`}</h1>
         <p className="flex items-center space-x-2">
           <span><MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} className="inline-block" /></span>
-          <span className="text-md ">ksh {house.price}/mth</span>
+          <span className="text-md ">{`${money[0].Symbol} ${house.price}/mth`}</span>
         </p>
         <p className="flex items-center space-x-2">
           <span><MdPinDrop style={{ height: '20px', width: '20px', color: '#75BD97' }} className="inline-block" /></span>

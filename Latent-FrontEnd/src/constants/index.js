@@ -1,4 +1,5 @@
 import { house1, house2, house3 } from '../assets';
+import currencyData from './world_currency_symbols.json';
 
 export const altHouses = [
   {
@@ -83,3 +84,5 @@ export const altHouses = [
 ];
 
 export const rootUrl = 'http://localhost:5000/api/v1';
+
+export const currency = currencyData;
