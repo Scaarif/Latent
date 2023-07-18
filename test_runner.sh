@@ -22,18 +22,37 @@ fi
 # Run backend server and job queue in background
 # TODO: log rotation
 cd backend/api/v1/ || return
-node jobs/processJobs.js >> queue.log &
-ENVIRON='test' npm start >> server.log &
+if [[ ! $(pgrep -f jobs/processJobs) ]]
+then
+  node jobs/processJobs.js >> queue.log &
+fi
 
-# Wait for back- and front-ends to start
-sleep 8  # too much?
+if [[ $(pgrep -f server.js) ]]
+then
+  # Stop [production] server
+  pkill -f server.js
+fi
+
+# Start test server
+ENVIRON='test' npm start > server.log &
+
+# Wait for backend to start
+# sleep 8  # too much?
+
+# Wait for backend to start, dynamically
+serverOn="$(pgrep -f server.js)"
+while [[ ! "$serverOn" ]]
+do
+  # server not running; try again later
+  serverOn="$(pgrep -f server.js)"
+  sleep 1
+done
 
 # run tests in backend
 npm test
 
-# Kill running test process
+sleep 2
+
+# Kill running test processes
 pkill -f jobs/processJobs.js
-for pid in $(pgrep -f server.js)
-do
-  kill "$pid"
-done
+pkill -f server.js
