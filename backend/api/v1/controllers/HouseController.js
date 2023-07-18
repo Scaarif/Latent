@@ -125,10 +125,10 @@ class HouseController {
         const { agentFirstname, agentLastname } = req.query;
         if (agentFirstname && agentLastname) {
           const agent = await Agent.findOne({
-            firstName: agentFirstname,
-            lastName: agentLastname,
+            firstName: agentFirstname.trim(),
+            lastName: agentLastname.trim(),
           });
-          const agentId = agent._id;
+          const agentId = agent?._id;
           params.agentId = agentId;
         }
 
@@ -167,8 +167,10 @@ class HouseController {
 
       // Implement pagination
       const count = await House.countDocuments(params);
+      console.log(count)
       const totalPages = Math.ceil(count / pageSize);
 
+      console.log(params)
       const result = await House.find(params)
         .skip(skip)
         .limit(pageSize);
@@ -307,6 +309,7 @@ class HouseController {
       // Extract necessary information from the house
       const { agentId, description, address } = house;
       // Create a job data to send mail
+      console.log(req.user);
       const bookingJobData = {
         agentId,
         tenantId: req.user._id,

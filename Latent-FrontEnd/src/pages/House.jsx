@@ -74,6 +74,7 @@ const House = () => {
   const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house?.agentId);
   const images = house && Object.keys(house?.images).length ? house.images : altHouses[0].images;
 
+  console.log({ agent });
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
   console.log({ agent });
@@ -191,8 +192,7 @@ const House = () => {
                 }
               </Swiper>
             ) : (
-              // <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
-              <img src={altHouses[0].images[0]} alt="house1" className="max-h-[400px] object-cover w-full" />
+              <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full"/>
             )}
           </div>
           {/* agent details */}

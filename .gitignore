@@ -2,3 +2,9 @@
 log
 queue.log
 server.log
+# miscellaneous
+changes.yaml
+bak_test_runner.sh
+x.sh
+node_modules/
+package-lock.json

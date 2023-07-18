@@ -122,7 +122,7 @@ A full stack developer with a  knack for problem-solving and a passion for creat
 ### Rahab Mary
 [LinkedIn](https://www.linkedin.com/in/mary-rahab/) | [GitHub](https://github.com/Scaarif) | [Twitter](https://twitter.com/ScaarifN)
 
-BIO
+A software engineer living the dream - thinking, dreaming, conceptualizing and building - it doesn't get any better than that!
 ### Greenbel Eleghasim
 [LinkedIn](https://linkedin.com/in/greenbele) | [GitHub](https://github.com/coldplayz) | [Twitter](https://twitter.com/GreenbelE)
 

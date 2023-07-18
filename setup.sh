@@ -72,8 +72,15 @@ fi
 CWD=$(pwd)  # Save working directory
 cd backend/api/v1/ || return
 npm install
-node jobs/processJobs.js >> queue.log &
-npm run dev >> server.log &
+if [[ ! $(pgrep -f jobs/processJobs) ]]
+then
+  node jobs/processJobs.js >> queue.log &
+fi
+
+if [[ ! $(pgrep -f server.js) ]]
+then
+  npm run dev >> server.log &
+fi
 
 # Reset working directory
 cd "$CWD" || return
@@ -81,7 +88,10 @@ cd "$CWD" || return
 # Run frontend app
 cd Latent-FrontEnd || return
 npm install
-npm run dev >> frontend.log &
+if [[ ! $(pgrep -f vite) ]]
+then
+  npm run dev >> frontend.log &
+fi
 
 # Reset working directory
 cd "$CWD" || return
