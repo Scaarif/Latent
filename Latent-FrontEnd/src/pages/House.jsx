@@ -74,6 +74,7 @@ const House = () => {
   const { data: agent, isFetching: loading, error: err } = useGetAgentQuery(house?.agentId);
   const images = house && Object.keys(house?.images).length ? house.images : altHouses[0].images;
 
+  console.log({ agent });
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
 
