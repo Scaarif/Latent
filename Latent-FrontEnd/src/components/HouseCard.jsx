@@ -20,10 +20,6 @@ const HouseCard = ({ house }) => {
   // const user = useSelector((state) => state.user.user);
   const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
-  // fetch the house's images
-  // const obj = { houseId: house._id, params: { coverImage: 'coverImage' } };
-  // const { data: image, isFetching: gettingImages, error: imageErr } = useGetHouseImagesQuery(obj);
-  // const [url, setUrl] = useState('');
 
   const [showModal, setShowModal] = useState(false);
 
@@ -44,26 +40,6 @@ const HouseCard = ({ house }) => {
   };
   const random = Math.floor(Math.random() * (4 - 1)) + 1;
   const altImage = altHouses[0].images[random - 1];
-
-  // if (imageErr) {
-  //   console.log({ imageErr });
-  //   if (imageErr.originalStatus === 200) {
-  //     // console.log(imageErr.data); // image data is in there --- figure out how to access it
-  //   }
-  // } else if (gettingImages) {
-  //   console.log(`Fetching ${house._id}'s images`);
-  // } else { console.log(URL.createObjectURL(image)); }
-
-  // useEffect(() => {
-  //   fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage`)
-  //     .then((response) => response.blob())
-  //     .then((blob) => {
-  //       // console.log({ blob });
-  //       setUrl(URL.createObjectURL(blob));
-  //       // console.log({ url });
-  //     })
-  //     .catch((fetchErr) => console.error(fetchErr));
-  // }, []);
 
   return (
     <div
