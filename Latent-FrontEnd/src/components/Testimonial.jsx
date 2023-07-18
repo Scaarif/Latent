@@ -17,7 +17,7 @@ export const TestimonialV2 = ({ review }) => (
     <span className="absolute -top-6 rounded-full h-12 w-12 bg-light_green flex items-center justify-center">
       <MdFormatQuote style={{ color: 'green', transform: 'rotate(180deg)', height: '24px', width: '24px' }} />
     </span>
-    <span className="font-semibold text-slate-600 pt-4">C'mon Mann</span>
+    <span className="font-semibold text-slate-600 pt-4">{`${review.user.firstName} ${review.user.lastName}`}</span>
     <div className="flex items-center">
       {[1, 2, 3, 4, 5].map((rating, i) => (
         <MdStar
