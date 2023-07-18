@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
@@ -145,15 +145,15 @@ const ProfileModal = ({ showProfile, loggedInUser }) => {
   );
 };
 
-const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout, isAgent }) => {
+const LoggedInNavbarLinks = ({ active, loggedInUser, handleLogout }) => {
   const [showProfile, setShowProfile] = useState(false);
-  console.log({ isAgent });
+  // console.log({ active });
   return (
     <>
       <div className="hidden md:flex space-x-4 items-center">
-        <Link to="/user" className={`${loggedInUser.listings ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize ${active === '/user' ? 'border_b border_green' : ''} hover:border-b border-green`}>My Listings</Link>
-        <Link to="/explore" className="p-1 cursor-pointer capitalize hover:border-b border-green">Explore</Link>
-        <Link to="/user/cart" className="p-1 cursor-pointer capitalize hover:border-b border-green">Cart</Link>
+        <Link to="/user" className={`${loggedInUser.listings ? 'inline-block' : 'hidden'} p-1 cursor-pointer capitalize border  transition-colors ${active === '/user' ? 'border-y-md_green' : 'border-transparent'} hover:border-y-light_green rounded`}>My Listings</Link>
+        <Link to="/explore" className={`p-1 cursor-pointer capitalize border transition-colors ${active === '/explore' ? 'border-y-md_green' : 'border-transparent'} hover:border-y-light_green rounded`}>Explore</Link>
+        <Link to="/user/cart" className={`p-1 cursor-pointer capitalize border transition-colors ${active === '/user/cart' ? 'border-y-md_green' : 'border-transparent'} hover:border-y-light_green rounded`}>Cart</Link>
       </div>
       <div
         className="hidden md:flex items-center space-x-2 mr-2 cursor-pointer"
@@ -210,13 +210,9 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   // const [isAgent, setIsAgent] = useState(false);
 
-  // useEffect(() => {
-  //   console.log('re-rendering');
-  // }, [currentRoute, user]);
-
-  if (!isFetching && !error) {
-    console.log('user from Navbar: ', { loggedInUser });
-  }
+  // if (!isFetching && !error) {
+  //   console.log('user from Navbar: ', { loggedInUser });
+  // }
   if (error) console.log('getting user err: ', { error });
 
   const handleLogout = async () => {
@@ -266,8 +262,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
 
-      <div className={`md:hidden absolute top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
-        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} />
+      <div className={`md:hidden absolute z-10 top-16 shadow-sm smooth-transition ${menuOpen ? 'left-0' : '-left-full'}`}>
+        <MobileMenu user={loggedInUser} handleLogout={handleLogout} isAgent={isAgent} error={error} active={currentRoute.pathname} />
       </div>
     </div>
   );

@@ -21,7 +21,13 @@ export const latentAPI = createApi({
         params: data,
       }),
     }),
-
+    getHouseImages: builder.query({
+      query: (data) => ({
+        url: `/houses/${data.houseId}`,
+        params: data.params,
+        responseType: 'blob',
+      }),
+    }),
     registerUser: builder.mutation({
       query: (user) => ({
         url: '/users',
@@ -80,6 +86,7 @@ export const latentAPI = createApi({
         method: 'PUT',
         body: houseData,
       }),
+      invalidatesTags: ['House'], // allHouses affected (figure out how to refetch only `this` house using [id and args] ), so fetch...
     }),
     deleteHouse: builder.mutation({
       query: (houseId) => ({
@@ -93,6 +100,7 @@ export const latentAPI = createApi({
         url: `/appointment/${houseId}`,
         method: 'POST',
       }),
+      invalidatesTags: ['User'], // user's cart changes, so refetch...
     }),
     reviewAgent: builder.mutation({
       query: (review) => ({
@@ -110,6 +118,7 @@ export const {
   useGetAgentQuery,
   useGetAllHousesQuery,
   useGetHousesQuery,
+  useGetHouseImagesQuery,
   useRegisterUserMutation,
   useLoginMutation,
   useLogoutMutation,

@@ -40,40 +40,42 @@ export const Filter = (props) => {
   const { setSearchParams } = props;
   const applyFilter = () => {
     let params = {};
-    for (const field of ['numRooms', 'country', 'state', 'city', 'minPrice', 'maxPrice']) {
-      if (values[field] && values[field] !== '') {
-        params[field] = values[field];
+    // set it searchParams to set parameters...
+    Object.entries(values).map(([key, value]) => {
+      if (value && key !== 'agentName') {
+        params[key] = value;
       }
-      // if (['maxPrice', 'rooms'].includes(field)) {
-      //   delete params[field]; // why?
-      // }
-    }
+    });
     if (values.agentName) {
       const [agentFirstname, agentLastname] = values.agentName.split(' ');
-      params = { agentFirstname, agentLastname };
+      params = { ...params, agentFirstname, agentLastname };
     }
     // console.log({ params });
     setSearchParams(params);
-  }
+    setValues({}); // clear fields after filter application
+  };
   return (
     <div className="hidden w-full md:flex md:flex-row justify-between bg-white rounded-sm py-2 mr-2 md:mr-0">
-      <div className="flex flex-col flex-wrap space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0 md:flex-row md:mr-2 p-2 px-4 justify-around">
+      {/* <div className="flex flex-col flex-wrap space-y-2 md:space-y-0 md:space-x-2 mb-2 md:mb-0 md:flex-row md:mr-2 p-2 px-4 justify-around"> */}
+      <div className="flex flex-wrap p-2 px-4">
         <span className="hidden border-r border-slate-400 px-2 py-1">Showing all</span>
         <input name="agentName" onChange={changeHandler} type="text" placeholder="Agent full name" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
-        <input name='numRooms' onChange={changeHandler} type="number" placeholder="Number of rooms" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
-        <input name='country' onChange={changeHandler} type="text" placeholder="Country" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
-        <input name='state' onChange={changeHandler} type="text" placeholder="State" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
-        <input name='city' onChange={changeHandler} type="text" placeholder="City" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
-        <input name='minPrice' onChange={changeHandler} type="number" placeholder="Minimum price" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
-        <input name='maxPrice' onChange={changeHandler} type="number" placeholder="Maximum price" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
+        <input name="numRooms" onChange={changeHandler} type="number" placeholder="Number of bedrooms" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
+        <input name="country" onChange={changeHandler} type="text" placeholder="Country" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
+        <input name="state" onChange={changeHandler} type="text" placeholder="State" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
+        <input name="city" onChange={changeHandler} type="text" placeholder="City" className="border rounded-md m-2 p-1.5 text-sm text-green focus:outline-none" />
+        <input name="price" onChange={changeHandler} type="number" placeholder="Price" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" />
+        {/* <input name="maxPrice" onChange={changeHandler} type="number" placeholder="Maximum price" className="border m-2 rounded-md p-1.5 text-sm text-green focus:outline-none" /> */}
       </div>
       <div className="flex items-center justify-end pr-4">
-        <span className="flex border p-1.5 px-4 rounded-md transition-colors hover:border-md_green">
+        <span
+          className="flex border p-1.5 px-4 rounded-md transition-colors hover:border-md_green"
+          onClick={applyFilter}
+        >
           <BsFilter
             style={{ color: hovered ? 'green' : 'black', height: '20px', width: '20px' }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            onClick={applyFilter}
           />
         </span>
       </div>

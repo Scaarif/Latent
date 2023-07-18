@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 
-import { GoogleMap, Marker } from '@react-google-maps/api';
-
-import { useSelector } from 'react-redux';
-// import { houses } from '../constants';
+// import { GoogleMap, Marker } from '@react-google-maps/api';
 import HouseCard from '../components/HouseCard';
 import HousesListingTemplate from '../components/HousesListingTemplate';
 import { useGetAllHousesQuery } from '../redux/services/latentAPI';
@@ -20,7 +17,7 @@ const MapFilter = () => (
   </div>
 );
 
-const MapVersion = ({ setUseMap, isLoaded }) => {
+const MapVersion = ({ setUseMap, isLoaded, houses }) => {
   const [showFilter, setShowFilter] = useState(false);
   const [hovered, setHovered] = useState(false);
 
@@ -83,7 +80,10 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
                     </div>
                   </div>
                 </div>
-                <GoogleMap
+                <div className="flex items-center justify-center bg-hero-bg bg-cover w-full h-full">
+                  <span className="text-red">To be implemented soon...</span>
+                </div>
+                {/* <GoogleMap
                   center={coords.lat && coords.lng && coords}
                   zoom={15}
                   mapContainerStyle={{ width: '100%', height: '100%' }}
@@ -96,7 +96,7 @@ const MapVersion = ({ setUseMap, isLoaded }) => {
                   onLoad={(map) => setMap(map)}
                 >
                   { coords.lat && coords.lng && <Marker position={coords} /> }
-                </GoogleMap>
+                </GoogleMap> */}
               </>
             ) : (
               <div className="flex items-center justify-center">
@@ -117,10 +117,8 @@ const Explore = ({ isLoaded }) => {
   const [useMap, setUseMap] = useState(false);
   const toMap = true;
   const { data: houses, isFetching, error } = useGetAllHousesQuery();
-  // const user = useSelector((state) => state.user);
-  // console.log('selector user: ', user);
 
-  if (useMap) return <MapVersion setUseMap={setUseMap} isLoaded={isLoaded} />;
+  if (useMap) return <MapVersion setUseMap={setUseMap} isLoaded={isLoaded} houses={houses.data} />;
   return (
     <HousesListingTemplate
       houses={houses}
