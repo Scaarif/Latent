@@ -4,6 +4,7 @@ import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'r
 import { toast } from 'react-toastify';
 import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { altHouses } from '../constants';
+import { currency } from '../constants';
 
 const ConfirmModal = ({ setShowModal, handleDelete }) => (
   <div className="absolute top-12 flex flex-col gap-3 p-4 bg-white shadow-lg z-10 rounded-md">
@@ -20,10 +21,6 @@ const HouseCard = ({ house }) => {
   // const user = useSelector((state) => state.user.user);
   const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
-  // fetch the house's images
-  // const obj = { houseId: house._id, params: { coverImage: 'coverImage' } };
-  // const { data: image, isFetching: gettingImages, error: imageErr } = useGetHouseImagesQuery(obj);
-  // const [url, setUrl] = useState('');
 
   const [showModal, setShowModal] = useState(false);
 
@@ -44,26 +41,9 @@ const HouseCard = ({ house }) => {
   };
   const random = Math.floor(Math.random() * (4 - 1)) + 1;
   const altImage = altHouses[0].images[random - 1];
-
-  // if (imageErr) {
-  //   console.log({ imageErr });
-  //   if (imageErr.originalStatus === 200) {
-  //     // console.log(imageErr.data); // image data is in there --- figure out how to access it
-  //   }
-  // } else if (gettingImages) {
-  //   console.log(`Fetching ${house._id}'s images`);
-  // } else { console.log(URL.createObjectURL(image)); }
-
-  // useEffect(() => {
-  //   fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage`)
-  //     .then((response) => response.blob())
-  //     .then((blob) => {
-  //       // console.log({ blob });
-  //       setUrl(URL.createObjectURL(blob));
-  //       // console.log({ url });
-  //     })
-  //     .catch((fetchErr) => console.error(fetchErr));
-  // }, []);
+  // console.log({ house });
+  const money = currency.filter((curr) => curr.CountryName.toLowerCase() === house.location.country.toLowerCase());
+  // console.log({ money });
 
   return (
     <div
@@ -89,7 +69,7 @@ const HouseCard = ({ house }) => {
         <h1 className="font-semibold text-slate-500 py-2">{ house.name ? `${`${house.name} ${house.houseType}`}` : `${house.numRooms} Bedroom ${house.houseType}`}</h1>
         <p className="flex items-center space-x-2">
           <span><MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} className="inline-block" /></span>
-          <span className="text-md ">ksh {house.price}/mth</span>
+          <span className="text-md ">{`${money[0].Symbol} ${house.price}/mth`}</span>
         </p>
         <p className="flex items-center space-x-2">
           <span><MdPinDrop style={{ height: '20px', width: '20px', color: '#75BD97' }} className="inline-block" /></span>

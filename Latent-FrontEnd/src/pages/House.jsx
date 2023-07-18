@@ -17,6 +17,7 @@ import { Navigation } from 'swiper/modules';
 import PaginatedListing from '../components/PaginatedListing';
 // import ConfirmDelete from '../components/ConfirmDelete';
 import { altHouses } from '../constants';
+import { currency } from '../constants';
 import {
   useGetAllHousesQuery,
   useBookAppointmentMutation,
@@ -76,11 +77,13 @@ const House = () => {
 
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
+  // console.log({ agent });
 
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
   const inCart = !gettingUser && !userErr && user.cart?.includes(houseId);
   // const [showModal, setShowModal] = useState(false);
+  const money = currency.filter((curr) => curr.CountryName.toLowerCase() === house.location.country.toLowerCase());
 
   const handleContactRequest = async () => {
     if (err) {
@@ -190,8 +193,7 @@ const House = () => {
                 }
               </Swiper>
             ) : (
-              // <img src={house.coverImage || altHouses[0].coverImage} alt="house" className="max-h-[400px] object-cover w-full" />
-              <img src={altHouses[0].images[0]} alt="house1" className="max-h-[400px] object-cover w-full" />
+              <img src={house.coverImage} alt="house" className="max-h-[400px] object-cover w-full"/>
             )}
           </div>
           {/* agent details */}
@@ -270,7 +272,7 @@ const House = () => {
                 !err && !loading ? (agent?.reviews?.map((review, i) => (
                   <div className="flex flex-col gap-2 justify-start text-sm pr-4 md:pr-16 pb-4 border-b" key={i}>
                     <span className="text-s_gray">{`“${review.comment}”`}</span>
-                    <span className="self-end font-semibold text-s_gray">C'mon Mann</span>
+                    <span className="self-end font-semibold text-s_gray">{`${review.user.firstName} ${review.user.lastName}`}</span>
                   </div>
                 ))) : (
                   <span className="text-green">Loading...</span>
@@ -286,7 +288,7 @@ const House = () => {
         <div className="w-full flex-1 flex flex-col py-2 px-4 bg-white rounded-sm">
           <div className="flex items-center gap-2 bg-light_green mt-2 p-2 rounded-sm">
             <MdPayment style={{ height: '20px', width: '20px', color: '#75BD97' }} />
-            <span className="font-semibold text-green">{house.price} ksh/mth</span>
+            <span className="font-semibold text-green">{`${money[0].Symbol} ${house.price} /mth`}</span>
             <span className={`${house.shared ? 'flex' : 'hidden'} font-semibold text-white bg-green px-4 py-1`}>Per Individual</span>
           </div>
           <div className="flex items-center gap-2 mt-2 p-2">
