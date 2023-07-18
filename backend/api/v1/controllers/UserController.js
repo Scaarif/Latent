@@ -415,12 +415,10 @@ class UserController {
       // ensure newPassword is provided
 
       // verify token
-      // TODO: verify against mail on linking implementation
-      // TODO: invalidate the token on first use. E.g. unlink
       const verified = speakEasy.totp.verify({
         secret: secret.base32,
         encoding: 'base32',
-        token,
+        token: otp,
         window: 20,
       });
       if (!verified) {
@@ -491,7 +489,7 @@ class UserController {
       ================================== */
       // check if user is a Tenant
       let userType;
-      const userId = await Tenant.exists({
+      let userId = await Tenant.exists({
         email,
         firstName,
         lastName,
@@ -516,6 +514,9 @@ class UserController {
 
       // +++++user found with provided atttibutes+++++
 
+      // extract the _id from the return of exists()
+      userId = userId._id;
+
       // generate OTP with speakeasy module
       // generate a time-based OTP token based on the secret;
       // to be verified later with:
@@ -532,7 +533,8 @@ class UserController {
       };
       const job = pwdQueue.add(jobData); // Promise
       // link generated OTP with user ID and type
-      const val = `${userType}:${userId}`;
+      // console.log(Object.entries(userId), 538); // SCAFF
+      const val = `${userType}:${userId.toString()}`;
       const expiration = 900; // 15 minutes
       await redisClient.set(otp, val, expiration);
       // respond based on job completion status
