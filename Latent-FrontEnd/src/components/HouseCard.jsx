@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdPinDrop, MdPayment, MdBathroom, MdBedroomParent, MdGroupAdd } from 'react-icons/md';
+import { toast } from 'react-toastify';
 import { useDeleteHouseMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { altHouses } from '../constants';
 
@@ -19,6 +20,11 @@ const HouseCard = ({ house }) => {
   // const user = useSelector((state) => state.user.user);
   const { data: user, isFetching, error } = useGetLoggedInUserQuery();
   const [deleteHouse, { isLoading }] = useDeleteHouseMutation();
+  // fetch the house's images
+  // const obj = { houseId: house._id, params: { coverImage: 'coverImage' } };
+  // const { data: image, isFetching: gettingImages, error: imageErr } = useGetHouseImagesQuery(obj);
+  // const [url, setUrl] = useState('');
+
   const [showModal, setShowModal] = useState(false);
 
   const handleDelete = async () => {
@@ -28,22 +34,44 @@ const HouseCard = ({ house }) => {
         const res = await deleteHouse(house._id);
         // console.log({ res });
         if (res.data.success) {
-          alert('House deleted successfully');
+          toast.success('House deleted successfully');
         }
-      } catch (error) {
-        console.log('delete house failed: ', error);
+      } catch (err) {
+        console.log('delete house failed: ', err);
+        toast.error('failed to delete, try again.');
       }
     }
   };
   const random = Math.floor(Math.random() * (4 - 1)) + 1;
   const altImage = altHouses[0].images[random - 1];
+
+  // if (imageErr) {
+  //   console.log({ imageErr });
+  //   if (imageErr.originalStatus === 200) {
+  //     // console.log(imageErr.data); // image data is in there --- figure out how to access it
+  //   }
+  // } else if (gettingImages) {
+  //   console.log(`Fetching ${house._id}'s images`);
+  // } else { console.log(URL.createObjectURL(image)); }
+
+  // useEffect(() => {
+  //   fetch(`http://localhost:5000/api/v1/houses/${house._id}?coverImage=coverImage`)
+  //     .then((response) => response.blob())
+  //     .then((blob) => {
+  //       // console.log({ blob });
+  //       setUrl(URL.createObjectURL(blob));
+  //       // console.log({ url });
+  //     })
+  //     .catch((fetchErr) => console.error(fetchErr));
+  // }, []);
+
   return (
     <div
       className="w-[320px] flex flex-col h-[400px] rounded-md bg-white relative transition-shadow hover:shadow-md cursor-pointer"
     >
       {/* <img src={altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" /> */}
       <img src={house.coverImage || altImage} alt="house" className="h-2/4 object-cover rounded-t-md bg-slate-300" />
-      <div className="absolute z-10 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
+      <div className="absolute z-1 top-2 left-2 bg-white text-green text-sm flex items-center rounded-sm">
         <span
           onClick={() => navigate(`/houses/${house._id || house.id}`)}
           className="px-2 py-1 border-r transition-colors hover:text-md_green cursor-pointer"
@@ -79,7 +107,7 @@ const HouseCard = ({ house }) => {
         </div>
         {/* roommate flag */}
         {house.shared && (
-        <div className="absolute top-[190px] -right-2 bg-green text-white text-sm px-4 pr-6 py-1 flex items-center space-x-2 rounded-md">
+        <div className="absolute top-[170px] -right-2 bg-green text-white text-sm px-4 pr-6 py-1 flex items-center space-x-2 rounded-md">
           <span><MdGroupAdd style={{ height: '20px', width: '20px', color: 'white' }} className="inline-block" /></span>
           <span>Roommates</span>
         </div>

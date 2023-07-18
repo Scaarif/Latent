@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
+import { toast } from 'react-toastify';
 import { useRegisterUserMutation, useGetLoggedInUserQuery } from '../redux/services/latentAPI';
 import { setUser } from '../redux/features/userSlice';
 
@@ -87,6 +88,7 @@ const SignUp = () => {
         const res = await registerUser(data).unwrap();
         // console.log(res);
         if (res.success) {
+          toast.success('Successfully registered, welcome!');
           // set user to loggedIn user's details
           if (!usrErr && !isFetching) {
             dispatch(setUser(userData));
@@ -101,8 +103,8 @@ const SignUp = () => {
         }
         Object.keys(values).forEach((key) => setValues({ ...values, [key]: '' }));
       } catch (error) {
-        console.error('Failed to register user: ', error);
-        alert('Signup failed, try again');
+        // console.error('Failed to register user: ', error);
+        toast.error('Signup failed, try again...');
       }
     }
   };
