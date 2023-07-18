@@ -76,6 +76,7 @@ const House = () => {
 
   // if (loading) console.log('loading agent details in housePage');
   // if (err) console.log('loading agent details in housePage failed: ', err);
+  console.log({ agent });
 
   // determine if user (currently logged in) is the house owner && if owner, provide delete and edit actions
   const owner = !gettingUser && !userErr && user.listings?.includes(houseId);
