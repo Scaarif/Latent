@@ -20,7 +20,13 @@ mongoose
 // register root hooks to be executed for all test files
 exports.mochaHooks = {
   beforeAll(done) {
-    this.baseUrl = 'http://localhost:5000/api/v1';
+    // let n = 0; // SCAFF
+    // console.log('POINT NUMBER:', ++n); // SCAFF
+
+    const baseUrl = 'http://localhost:5000/api/v1';
+    this.timeout(5000);
+
+    this.baseUrl = baseUrl;
     // enable cookies for all requests, and json body
     const baseRequest = request.defaults({ jar: true, json: true });
     this.rq = baseRequest;
@@ -46,49 +52,62 @@ exports.mochaHooks = {
       body: tData,
     };
 
+    // console.log('POINT NUMBER:', ++n); // SCAFF
+
     // logout from any active session
     const url = `${this.baseUrl}/logout`;
-    this.rq.post(url, () => {});
+    this.rq.post(url, () => {
+      // console.log('logout done!'); // SCAFF
 
-    baseRequest.post(reqOpts, (err, res, bdy) => {
-      // console.log('#########', err, res, bdy); // SCAFF
-      if (res.statusCode === 201) {
-        // tenant creation success;
-        // logout tenant and...
-        baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
+      // logout done; create dummy tenant and agent
+      baseRequest.post(reqOpts, (err, res, bdy) => {
+        // console.log('#########', err, res, bdy); // SCAFF
+        if (res.statusCode === 201) {
+          // tenant creation success;
+          // logout tenant and...
+          baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
+            if (err) {
+              // console.log('issues logging out dummy tenant......'); // SCAFF
+              done(err);
+            }
+            // ...create agent
+            reqOpts.body = aData;
+            baseRequest.post(reqOpts, (err, res, bdy) => {
+              if (res.statusCode !== 201) {
+                // console.log('issues creating dummy agent......'); // SCAFF
+                console.log(res.statusCode, bdy);
+              }
+
+              if (err) {
+                done(err);
+              } else {
+                // console.log('created dummy agent; logging out......'); // SCAFF
+                // logout agent
+                baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
+                  if (err) {
+                    // console.log('issues logging out dummy agent......'); // SCAFF
+                    done(err);
+                  } else {
+                    // console.log('logout successfull; calling done...'); // SCAFF
+                    done();
+                  }
+                });
+              }
+              // console.log('code!==201; no err; then what?......'); // SCAFF
+            });
+          });
+        } else {
+          // tenant creation failed
+          // console.log('issues creating dummy tenant......'); // SCAFF
+          console.log(res.statusCode, bdy);
+
           if (err) {
             done(err);
+          } else {
+            done();
           }
-          // ...create agent
-          reqOpts.body = aData;
-          baseRequest.post(reqOpts, (err, res, bdy) => {
-            if (res.statusCode !== 201) {
-              console.log('issues creating dummy agent......'); // SCAFF
-              console.log(res.statusCode, bdy);
-            }
-
-            if (err) {
-              done(err);
-            } else {
-              // logout agent
-              baseRequest.post('http://localhost:5000/api/v1/logout', (err) => {
-                if (err) {
-                  done(err);
-                }
-              });
-              done();
-            }
-          });
-        });
-      } else {
-        // tenant creation failed
-        console.log('issues creating dummy tenant......'); // SCAFF
-        console.log(res.statusCode, bdy);
-
-        if (err) {
-          done(err);
         }
-      }
+      });
     });
   },
   async afterAll() {
