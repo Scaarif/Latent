@@ -112,6 +112,13 @@ app.use(cors({
 // mount router
 app.use('/api/v1', allRoutes);
 
+// finally, at stack bottom, uncaught error handler
+app.use(function (err, req, res, next) {
+  console.log(err.stack);
+  const message = `UNCAUGHT EXCEPTION: ${err.message}`;
+  res.status(err.status || 500).json({ success: false, message });
+});
+
 // establish connections
 mongoose
   .connect(MONGO_URI, {
