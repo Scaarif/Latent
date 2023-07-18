@@ -6,3 +6,5 @@ changes.yml
 x.js
 y.js
 public/
+queue.log
+server.log
