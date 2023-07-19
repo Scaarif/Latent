@@ -6,7 +6,14 @@ const util = require('util');
 class RedisClient {
   constructor() {
     // this.isConnected = false;
-    const client = createClient();
+    let client;
+
+    if (process.env.NODE_ENV === 'production') {
+      client = createClient({ url: process.env.REDIS_URI });
+    } else {
+      // connect to default 127.0.0.1:6379
+      client = createClient();
+    }
 
     client.connect();
 
