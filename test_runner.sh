@@ -21,10 +21,10 @@ fi
 
 # Run backend server and job queue in background
 # TODO: log rotation
-cd backend/api/v1/ || return
+# cd backend/api/v1/ || return
 if [[ ! $(pgrep -f jobs/processJobs) ]]
 then
-  node jobs/processJobs.js >> queue.log &
+  node ./backend/api/v1/jobs/processJobs.js >> queue.log &
 fi
 
 if [[ $(pgrep -f server.js) ]]
@@ -34,7 +34,7 @@ then
 fi
 
 # Start test server
-ENVIRON='test' npm start > server.log &
+ENVIRON='test' node ./backend/api/v1/server.js > server.log &
 
 # Wait for backend to start
 # sleep 8  # too much?
