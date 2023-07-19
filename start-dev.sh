@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
-# Production start script for the project - Latent
+# Start script for the project - Latent
+
+# Start MongoDB
+mongoOn=$(pgrep -f /usr/bin/mongod)
+if [ ! "$mongoOn" ]
+then
+  # MongoDB not running; start it
+  sudo service mongod start
+fi
+
+# Start Redis
+redisOn=$(pgrep -f redis-server)
+if [ ! "$redisOn" ]
+then
+  # Redis not running; start it
+  sudo service redis-server start
+fi
+
+# Wait for servers to start up
+# sleep 5  # too much?
 
 # Run backend server and job queue in background
 # TODO: log rotation

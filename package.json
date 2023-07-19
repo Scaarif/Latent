@@ -11,9 +11,11 @@
     "check-lint": "lint [0-9]*.js",
     "test": "./node_modules/.bin/mocha --require ./backend/api/v1/test/hooks.js --exit ./backend/api/v1/test",
     "start": "./start.sh",
+    "start-dev": "./start-dev.sh",
     "b-dev": "nodemon ./backend/api/v1/server.js",
     "f-dev": "cd Latent-FrontEnd && vite",
     "//build": "./vite_build.sh",
+    "build-dev": "./vite_build.sh",
     "preview": "cd Latent-FrontEnd && vite preview"
   },
   "//frontend-scripts": {
