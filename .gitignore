@@ -6,5 +6,6 @@ server.log
 changes.yaml
 bak_test_runner.sh
 x.sh
+.tmp/
 node_modules/
 package-lock.json

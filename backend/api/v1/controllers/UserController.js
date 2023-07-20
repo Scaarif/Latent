@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 // const Bull = require('bull');
 const speakEasy = require('speakeasy');
 const { resetPassword: pwdQueue } = require('../jobs/queue');
+const redisClient = require('../utils/redis');
 const Tenant = require('../models/Tenant');
 const Agent = require('../models/Agent');
 const House = require('../models/House');
@@ -304,7 +305,7 @@ class UserController {
    * Algorithm:
    *
    * oldPassword and newPassword are always expected in the request body (form).
-   * If both are set, attempt is made to change the password.
+   * If both are set, attempt is made to change the password, as for Case1.
    * If password is changed correctly, user is logged out.
    * If oldPassword is incorrect, error is sent.
    * If any of them is missing, check for email is done.
@@ -317,9 +318,11 @@ class UserController {
    *        - wrong oldPassword
    *        - successfull password change and logout
    *
-   * If email is set, then then it is done in one of two steps:
+   * If email is set, then then it is done in one of two steps, as for Case2:
    * Step1 --> password is forgotten, the user is logged out,
    * and their email is provided in a form (for OTP delivery) along with firstName and lastName.
+   * These three will be used to fetch an existing user. If user found, user doc ID and
+   * token will be linked, and we proceed to sending the OTP via email; otherwise error is sent.
    * All three are expected in req.body.
    * TEST:
    *   - response/behaviour on:
@@ -327,66 +330,52 @@ class UserController {
    *       - no email
    *       - no firstName
    *       - no lastName
+   *       - otp successfully sent to email
    * Step2 --> OTP has been delivered, and is being
    * provided for password reset.
-   * email, firstName, lastName, and otp are expected in req.query.
-   * newPassword is expected in req.body
+   * otp and newPassword are expected in req.body
    *
-   * If no otp, but the email, firstName and lastName are set, it is assumed this is
-   * the first step, and the OTP needs to be sent.
-   * TEST:
-   *   - response/behaviour on:
-   *     - user is not authenticated and:
-   *       - no otp, but with email, firstName, and lastName set
-   *       - otp successfully sent to email
-   *
-   * If the four are present (step2), along with newPassword, then
-   * we proceed to verifying the OTP, resetting the password, and logging out the user.
-   * TEST:
-   *   - response/behaviour on:
-   *     - user is not authenticated and:
-   *       - otp, email, firstName and lastName are present and:
-   *         - no newPassword
-   *         - valid OTP:
-   *           - user doc is found, password is reset, and user is logged out
-   *           - user doc is not found and password is not reset
-   *         - invalid OTP
-   *   - that password is actually reset (e.g. user is logged out)
+   * If both OTP and newPassword are provided:
+   * - verify OTP
+   *   - if OTP is verified:
+   *     - use OTP to fetch user doc ID from link in Redis
+   *       - if doc is found, it is used to reset password
+   *         TEST:
+   *           - response/behaviour on:
+   *             - provided newPassword and valid OTP; user doc found, and:
+   *               - successfull password reset
+   *       - else no doc; error is sent
+   *         TEST:
+   *           - response/behaviour on:
+   *             - provided newPassword and valid OTP, but no linked user ID
+   *             - provided newPassword and valid OTP, but user not found with linked ID (deleted)
+   *   - if OTP is unverified, error is sent
+   *     TEST:
+   *       - response/behaviour on:
+   *         - provided newPassword, but invalid OTP
    *
    * Otherwise (if no oldPassword and newPassword, or no email), error is sent.
    *
    * In the first step, the
    * user's email, firstName, and lastName are expected, and in the req body (form).
    *
-   * In the second step, the email, otp, firstName, and lastName are
-   * expected in the query string, and the newPassword is expected in the body.
+   * In the second step, the otp and newPassword are expected in the body.
    */
   static async putPassword(req, res) {
     // TODO: improve security by linking token with email
     const {
       oldPassword,
       newPassword,
+      email,
+      otp,
     } = req.body;
 
-    const { otp: token } = req.query;
-    let { email, firstName, lastName } = req.body;
+    let { firstName, lastName } = req.body;
     // console.log(email, firstName, lastName); // SCAFF
     // console.log('##########'); // SCAFF
     // console.log(Object.entries(req.query)); // SCAFF
     // console.log(Object.entries(req.body)); // SCAFF
     // console.log('##########'); // SCAFF
-    if (!email) {
-      // not in body; check query string
-      email = req.query.email;
-    }
-    if (!firstName) {
-      // not in body; check query string
-      firstName = req.query.firstName;
-    }
-    if (!lastName) {
-      // not in body; check query string
-      lastName = req.query.lastName;
-    }
 
     // capitalize names for [case-sensitive] query search
     firstName = capitalize(firstName);
@@ -394,7 +383,7 @@ class UserController {
 
     // console.log(email, firstName, lastName); // SCAFF
 
-    // case1: user is logged in and wants to reset password
+    // CASE1: user is logged in and wants to reset password
     if (oldPassword && newPassword && req.isAuthenticated()) {
       req.user.changePassword(oldPassword, newPassword, (err) => {
         if (err) {
@@ -417,119 +406,177 @@ class UserController {
       return undefined;
     }
 
-    // case2: user has forgotten password; must be logged out
-    if (email && !req.isAuthenticated()) {
-      // email provided
-      // console.log('email available...'); // SCAFF
-      if (!token && firstName && lastName) {
-        // generate and send OTP
-        /* =====generate OTP manually=====
-        let otp = (Math.round(Math.random() * 999999)).toString();
-        const padding = '0'.repeat(6 - otp.length);
-        otp = `${otp}${padding}`;
-        const jobData = {
-          email,
-          otp,
-        };
-        pwdQueue.add(job);
-        ================================== */
-        // generate OTP with speakeasy module
-        // generate a time-based OTP token based on the secret;
-        // to be verified later with:
-        // `speakEasy.totp.verify({secret: secret.base32, encoding: 'base32', token, window: 20})`
-        // which uses a 10-minute window (1 window is 30 secs step by default),
-        // meaning the token is valid for only about 10 minutes
-        const token = speakEasy.totp({ secret: secret.base32, encoding: 'base32' }); // hex and ascii key/encoding can be used
-        console.log(token); // SCAFF
+    // CASE2: user has forgotten password; must be logged out
 
-        // add a job to the queue for sending emails with OTP
-        const jobData = {
-          otp: token,
-          email,
-          firstName,
-          lastName,
-        };
-        const job = pwdQueue.add(jobData); // Promise
-        job.then(() => {
-          // job completed
-          res.json({ success: true, message: 'sent OTP to email' });
-        }).catch((err) => {
-          // job failed
-          res.status(500).json({ success: false, message: err ? err.toString() : 'OTP not sent' });
-        });
+    // +++++check if OTP and newPassword provided+++++
 
-        return undefined;
+    if (otp && newPassword && !req.isAuthenticated()) {
+      // otp, and newPassword provided; attempt pwd reset
+      // ensure newPassword is provided
+
+      // verify token
+      const verified = speakEasy.totp.verify({
+        secret: secret.base32,
+        encoding: 'base32',
+        token: otp,
+        window: 20,
+      });
+      if (!verified) {
+        // invalid OTP
+        return res.status(401).json({ success: false, message: 'invalid OTP' });
       }
 
-      if (email && token && firstName && lastName) {
-        // email, otp, firstName and lastName provided; attempt pwd reset
-        // ensure newPassword is provided
-        if (!newPassword) {
-          return res.status(400).json({ success: false, message: 'newPassword not provided in form' });
+      // +++++OTP verified+++++
+
+      // retrieve user ID linked to OTP
+      const value = await redisClient.get(otp); // as String
+      if (!value) {
+        // expired, or not linked in the first place
+        return res.status(401).json({ success: false, message: 'OTP expired or invalid' });
+      }
+      // OTP linked to a user ID; unlink on retrieval
+      await redisClient.del(otp);
+      // get the user type and ID from return value
+      const [userType, userId] = value.split(':');
+      // retrieve the user doc based on ID and type
+      let userDoc;
+      if (userType === 'Agent') {
+        userDoc = await Agent.findById(userId).exec();
+      } else if (userType === 'Tenant') {
+        userDoc = await Tenant.findById(userId).exec();
+      }
+      if (!userDoc) {
+        // no linked document; probably deleted
+        return res.status(401).json({ success: false, message: 'account not found; probably removed' });
+      }
+
+      // +++++user doc found+++++
+
+      // process the doc
+      userDoc.setPassword(newPassword, async (err, user, passwordErr) => {
+        if (err) {
+          // likely hashing algorithm error
+          return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
         }
-
-        // verify token
-        // TODO: verify against mail on linking implementation
-        // TODO: invalidate the token on first use. E.g. unlink
-        const verified = speakEasy.totp.verify({
-          secret: secret.base32,
-          encoding: 'base32',
-          token,
-          window: 20,
-        });
-        if (!verified) {
-          // invalid OTP
-          return res.status(401).json({ success: false, message: 'invalid OTP' });
+        if (passwordErr) {
+          return res.status(401).json({ success: false, message: passwordErr.toString() });
         }
+        // no errors
+        try {
+          await user.save();
+          return res.json({ success: true, message: 'password reset complete' });
+        } catch (err) {
+          return res.status(500).json({ success: false, message: err.toString() });
+        }
+      });
 
-        // +++++OTP verified+++++
+      return undefined;
+    }
 
-        // retrieve the user doc
-        let userDoc = await Agent.findOne({
+    // +++++check if data provided for sending OTP+++++
+
+    if (email && firstName && lastName) {
+      // generate and send OTP
+      /* =====generate OTP manually=====
+      let otp = (Math.round(Math.random() * 999999)).toString();
+      const padding = '0'.repeat(6 - otp.length);
+      otp = `${otp}${padding}`;
+      const jobData = {
+        email,
+        otp,
+      };
+      pwdQueue.add(job);
+      ================================== */
+      // check if user is a Tenant
+      let userType;
+      let userId = await Tenant.exists({
+        email,
+        firstName,
+        lastName,
+      }).exec();
+      if (!userId) {
+        // check if an Agent
+        const userId = await Agent.exists({
           email,
           firstName,
           lastName,
         }).exec();
-        if (!userDoc) {
-          // check if user is a tenant
-          userDoc = await Tenant.findOne({
-            email,
-            firstName,
-            lastName,
-          }).exec();
+        if (!userId) {
+          // no user found; send error
+          return res.status(401).json({ success: false, message: 'no user found with such attributes'});
         }
-
-        // process the doc
-        if (userDoc) {
-          // document found
-          userDoc.setPassword(newPassword, async (err, user, passwordErr) => {
-            if (err) {
-              // likely hashing algorithm error
-              return res.status(500).json({ success: false, message: 'possible issues with hashing algorithm' });
-            }
-            if (passwordErr) {
-              return res.status(401).json({ success: false, message: passwordErr.toString() });
-            }
-            // no errors
-            await user.save();
-            return res.json({ success: true, message: 'password reset complete' });
-          });
-        } else {
-          // no user doc found
-          return res.status(401).json({ success: false, message: 'no user found' });
-        }
-        return undefined;
+        // else found in agents collection
+        userType = 'Agent';
+      } else {
+        // found in tenants collection
+        userType = 'Tenant';
       }
-      // email present, but no firstName and/or lastName
-      return res.status(401).json({ success: false, message: 'no firstName and/or lastName' });
+
+      // +++++user found with provided atttibutes+++++
+
+      // extract the _id from the return of exists()
+      userId = userId._id;
+
+      // generate OTP with speakeasy module
+      // generate a time-based OTP token based on the secret;
+      // to be verified later with:
+      // `speakEasy.totp.verify({secret: secret.base32, encoding: 'base32', token, window: 20})`
+      // which uses a 10-minute window (1 window is 30 secs step by default),
+      // meaning the token is valid for only about 10 minutes
+      const otp = speakEasy.totp({ secret: secret.base32, encoding: 'base32' }); // hex and ascii key/encoding can be used
+      console.log(otp); // SCAFF
+
+      // add a job to the queue for sending emails with OTP
+      const jobData = {
+        otp,
+        email,
+      };
+      const job = pwdQueue.add(jobData); // Promise
+      // link generated OTP with user ID and type
+      // console.log(Object.entries(userId), 538); // SCAFF
+      const val = `${userType}:${userId.toString()}`;
+      const expiration = 900; // 15 minutes
+      await redisClient.set(otp, val, expiration);
+      // respond based on job completion status
+      job.then(() => {
+        // job completed
+        res.json({ success: true, message: 'sent OTP to email' });
+      }).catch((err) => {
+        // job failed
+        res.status(500).json({ success: false, message: err ? err.toString() : 'OTP not sent' });
+      });
+
+      return undefined;
     }
+
+    // ;;;;;edge cases;;;;;
 
     if (req.isAuthenticated()) {
-      return res.status(401).json({ success: false, message: 'no/invalid oldPassword and newPassword fields' });
+      // user is authenticated
+      return res.status(401).json({ success: false, message: 'no oldPassword and newPassword fields' });
     }
 
-    // not authenticated, and no email
-    return res.status(401).json({ success: false, message: 'no email field' });
+    // +++++not authenticated+++++
+
+    if (!email) {
+      return res.status(401).json({ success: false, message: 'no email field' });
+    }
+
+    if (!firstName) {
+      return res.status(401).json({ success: false, message: 'no firstName field' });
+    }
+
+    if (!lastName) {
+      return res.status(401).json({ success: false, message: 'no lastName field' });
+    }
+
+    if (!otp) {
+      return res.status(401).json({ success: false, message: 'no otp field' });
+    }
+
+    if (!newPassword) {
+      return res.status(401).json({ success: false, message: 'no newPassword field' });
+    }
   }
 
   /**
