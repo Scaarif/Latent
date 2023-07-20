@@ -496,7 +496,7 @@ class UserController {
       }).exec();
       if (!userId) {
         // check if an Agent
-        const userId = await Agent.exists({
+        userId = await Agent.exists({
           email,
           firstName,
           lastName,
@@ -515,6 +515,7 @@ class UserController {
       // +++++user found with provided atttibutes+++++
 
       // extract the _id from the return of exists()
+      console.log(userId, typeof userId, 518); // SCAFF
       userId = userId._id;
 
       // generate OTP with speakeasy module
