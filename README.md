@@ -35,22 +35,22 @@ The following highlights some of the features of Latent:
 ### Rich Search Options
 From house location to price ranges, the search options are varied, allowing you to more likely find just what you are looking for.
 
-![Search filter image](https://github.com/Scaarif/Latent/blob/bugs/search.png)
+![Search filter image](https://github.com/Scaarif/Latent/blob/master/search.png)
 
 ### Agent Appointments
 See what you like? We provide an easy way to inform the agent, or roommate, of your interest, and get the both parties together.
 
-![Appointment-booking image](https://github.com/Scaarif/Latent/blob/bugs/appointment.png)
+![Appointment-booking image](https://github.com/Scaarif/Latent/blob/master/appointment.png)
 
 ### View Agent Rating
 Looking for an agent with a good service-delivery track record? Your decision-making process can be made easier by viewing agent ratings.
 
-![Agent rating image](https://github.com/Scaarif/Latent/blob/bugs/request_agent_contact.png)
+![Agent rating image](https://github.com/Scaarif/Latent/blob/master/request_agent_contact.png)
 
 ### Advertise Houses for Rent
 As a registered agent, you can post house listings and they will appear in searches whose filters match the house attributes (e.g. location and amenities like water).
 
-![Image demonstrating house posting feature](https://github.com/Scaarif/Latent/blob/bugs/house_posting.png)
+![Image demonstrating house posting feature](https://github.com/Scaarif/Latent/blob/master/house_posting.png)
 
 ### Seek a roommate
 Looking to cut rent costs? Feeling lonely and in need of a companion? You can put your currently rented apartment up to be shared.
