@@ -34,7 +34,7 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
     },
     {
       id: 2,
-      name: 'password',
+      name: 'newPassword',
       type: 'password',
       placeholder: 'Password',
       errorMessage:
@@ -50,7 +50,7 @@ const ResetPassword = ({ showResetModal, setShowResetModal }) => {
       placeholder: 'Confirm Password',
       errorMessage: "Passwords don't match!",
       label: 'Confirm Password',
-      pattern: values.password,
+      pattern: values.newPassword,
       required: true,
     },
 
