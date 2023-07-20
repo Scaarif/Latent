@@ -8,8 +8,6 @@ class RedisClient {
     // this.isConnected = false;
     const client = createClient();
 
-    client.connect();
-
     /*
     // hack to ensure connection before moving on
     while (client.connected === false) {
@@ -58,23 +56,20 @@ class RedisClient {
     */
 
     this.client = client;
-    // this.rGet = util.promisify(client.get);
+    this.rGet = util.promisify(client.get);
   }
 
   isAlive() {
-    return this.client.isReady;
+    return this.client.connected;
   }
 
   async get(key) {
-    // const val = await this.rGet.call(this.client, key);
-    const val = await this.client.get(key);
+    const val = await this.rGet.call(this.client, key);
     return val;
   }
 
   async set(key, val, expiration/* seconds */) {
-    await this.client.set(key, val, { EX: expiration });
-    /* ==========================
-    this.client.set(key, val, function (err) {
+    this.client.set(key, val, (err/* , reply */) => {
       if (err) {
         console.log(err.toString());
       } else {
@@ -82,7 +77,6 @@ class RedisClient {
         this.client.expire(key, expiration);
       }
     });
-    ============================== */
   }
 
   async del(key) {
