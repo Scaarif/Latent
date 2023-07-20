@@ -20,7 +20,14 @@ if (process.env.ENVIRON === 'test') {
 }
 
 // Initialize redis client.
-const redisClient = createClient();
+// TODO: use client in utils/redis.js
+let redisClient;
+if (process.env.NODE_ENV === 'production') {
+  // production environment
+  redisClient = createClient({ url: process.env.REDIS_URI });
+} else {
+  redisClient = createClient();
+}
 redisClient.connect().catch(console.error);
 
 // Initialize redis session store.
