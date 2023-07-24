@@ -13,7 +13,7 @@ const session = require('express-session');
 const allRoutes = require('./routes/index');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.BACKEND_PORT || 5000;
 let MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost/latent';
 if (process.env.ENVIRON === 'test') {
   MONGO_URI = 'mongodb://localhost/testdb';
@@ -108,8 +108,10 @@ app.use(express.urlencoded({ extended: true }));
 // setup logger
 app.use(logger('dev'));
 
+// setup CORS
+// const origin = process.env.NODE_ENV === 'production' ? `${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}` : 'localhost:3000';
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: `http://localhost:3000`,
   credentials: true,
   exposedHeaders: ['Set-Cookie'],
 }));
@@ -127,6 +129,7 @@ app.use(function (err, req, res, next) {
 });
 
 // establish connections
+// const HOST = process.env.NODE_ENV === 'production' ? '::' : '0.0.0.0';
 mongoose
   .connect(MONGO_URI, {
     useNewUrlParser: true,
