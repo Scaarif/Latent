@@ -42,7 +42,10 @@ const sessionConfig = {
 app.use(session(sessionConfig));
 
 // Serve static files from the public folder
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'dist')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 // initialize app with passport
 app.use(passport.initialize());
